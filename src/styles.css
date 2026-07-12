@@ -2,30 +2,30 @@
   color-scheme: dark;
 
   /* ── Background layers — each step is clearly lighter ── */
-  --bg-app:              #0f0f10;  /* Page canvas — near black, slight warmth */
-  --bg-surface:          #1a1a1c;  /* Sidebar, panels */
-  --bg-surface-elevated: #242428;  /* Cards, inputs, dropdowns */
-  --bg-input:            #1e1e21;  /* Input fields */
-  --bg-card:             #222226;  /* Book cards — clearly visible */
-  --bg-card-hover:       #2a2a2f;  /* Hovered card */
-  --bg-segmented:        #1e1e21;
-  --bg-segmented-active: #2e2e34;
+  --bg-app:              #0d0d0f;  /* Deep charcoal app background */
+  --bg-surface:          #151518;  /* Deep gray-slate sidebar and panels */
+  --bg-surface-elevated: #1e1e22;  /* Modals, dropdowns, inputs */
+  --bg-input:            #121214;  /* Input fields */
+  --bg-card:             #151518;  /* Book cards */
+  --bg-card-hover:       #1c1c20;  /* Hovered card */
+  --bg-segmented:        #121214;
+  --bg-segmented-active: #1a1a1e;
   --bg-ghost:            rgba(255, 255, 255, 0.04);
   --bg-ghost-hover:      rgba(255, 255, 255, 0.07);
 
-  /* ── Borders — strong enough to see in dark mode ── */
-  --border-subtle:  rgba(255, 255, 255, 0.09);  /* Cards, panels */
-  --border-hover:   rgba(255, 255, 255, 0.16);  /* Hover state */
-  --border-focus:   rgba(16, 185, 129, 0.45);
+  /* ── Borders ── */
+  --border-subtle:  rgba(255, 255, 255, 0.08);  /* Cards, panels */
+  --border-hover:   rgba(255, 255, 255, 0.14);  /* Hover state */
+  --border-focus:   #d97706;                    /* Gold focus */
 
   /* ── Text ── */
-  --text-primary:   #f2f2f3;   /* Crisp, not blinding white */
-  --text-secondary: #9a9aa4;   /* Secondary labels */
-  --text-muted:     #5e5e68;   /* Muted / placeholders */
+  --text-primary:   #f1ece4;   /* Soft vanilla cream */
+  --text-secondary: #a19e99;   /* tan-gray secondary text */
+  --text-muted:     #68686d;   /* Muted / placeholders */
 
   /* ── Accents ── */
-  --accent-emerald: #10b981;
-  --accent-amber:   #f59e0b;
+  --accent-emerald: #d97706;   /* Primary accent - gold */
+  --accent-amber:   #d97706;
   --accent-indigo:  #6366f1;
   --accent-plum:    #8b5cf6;
   --accent-coral:   #ef4444;
@@ -34,7 +34,7 @@
   --font-sans:  'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-serif: 'Playfair Display', Georgia, Cambria, "Times New Roman", Times, serif;
 
-  /* ── Shadows — deep but not overpowering ── */
+  /* ── Shadows ── */
   --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.55);
   --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.65);
@@ -48,28 +48,31 @@
 
 [data-theme="light"] {
   color-scheme: light;
-  --bg-app: #f1f5f9;
-  --bg-surface: #ffffff;
-  --bg-surface-elevated: #e2e8f0;
-  --bg-input: #f8fafc;
-  --border-subtle: rgba(15, 23, 42, 0.08);
-  --border-focus: rgba(16, 185, 129, 0.3);
+  --bg-app: #fcf9f2;              /* Warm linen parchment app background */
+  --bg-surface: #f5eedf;          /* Sidebar, panels (warm vanilla card/sheet) */
+  --bg-surface-elevated: #ebdcc3; /* Modals, dropdowns, inputs */
+  --bg-input: #fdfbf7;            /* Cream white fields */
+  --border-subtle: rgba(62, 54, 46, 0.09); /* Soft brown border */
+  --border-focus: #b45309;        /* Warm gold focus */
   
-  --text-primary: #0f172a;
-  --text-secondary: #334155;
-  --text-muted: #64748b;
+  --text-primary: #2d241c;        /* Deep charcoal wood-bark */
+  --text-secondary: #5c5043;      /* Soft leather brown secondary */
+  --text-muted: #8c7e6e;          /* Muted labels */
   
-  --bg-ghost: rgba(15, 23, 42, 0.03);
-  --bg-ghost-hover: rgba(15, 23, 42, 0.06);
-  --border-hover: rgba(15, 23, 42, 0.1);
-  --bg-card: rgba(15, 23, 42, 0.015);
-  --bg-card-hover: rgba(15, 23, 42, 0.025);
-  --bg-segmented: rgba(15, 23, 42, 0.06);
+  --bg-ghost: rgba(92, 80, 67, 0.03);
+  --bg-ghost-hover: rgba(92, 80, 67, 0.06);
+  --border-hover: rgba(92, 80, 67, 0.1);
+  --bg-card: #fcfbf8;             /* White paper book cards */
+  --bg-card-hover: #ffffff;
+  --bg-segmented: rgba(92, 80, 67, 0.06);
   --bg-segmented-active: var(--bg-surface);
   
-  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05);
-  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06);
-  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.1);
+  --shadow-sm: 0 1px 3px rgba(62, 54, 46, 0.06);
+  --shadow-md: 0 4px 12px rgba(62, 54, 46, 0.08);
+  --shadow-lg: 0 12px 32px rgba(62, 54, 46, 0.12);
+
+  --accent-emerald: #b45309;      /* Primary light mode gold accent */
+  --accent-amber: #b45309;
 }
 
 * {
