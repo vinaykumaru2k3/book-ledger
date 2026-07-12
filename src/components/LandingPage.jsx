@@ -147,17 +147,6 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
                 />
               </g>
 
-              {/* Gold Bookmark Ribbon */}
-              <g className="svg-book-ribbon">
-                <polygon
-                  points="280,205 292,201 302,236 312,272 305,266 300,275 290,240"
-                  fill="#fbbf24"
-                  stroke="#12100f"
-                  strokeWidth="5"
-                  strokeLinejoin="round"
-                />
-              </g>
-
               {/* Book 2: Red Book (Middle) - Shifted Right */}
               <g className="svg-book red">
                 {/* Left Face (spine) */}
@@ -179,6 +168,16 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
                 {/* Page Lines */}
                 <line x1="230" y1="230" x2="335" y2="196" stroke="#d7ccc8" strokeWidth="2.5" />
                 <line x1="230" y1="240" x2="335" y2="206" stroke="#d7ccc8" strokeWidth="2.5" />
+
+                {/* Gold Bookmark Ribbon emerging from middle pages */}
+                <polygon
+                  points="275,203 281,201 286,223 291,245 288,240 285,246 280,225"
+                  fill="#fbbf24"
+                  stroke="#12100f"
+                  strokeWidth="5"
+                  strokeLinejoin="round"
+                  style={{ pointerEvents: "none" }}
+                />
                 
                 {/* Top Face (cover) */}
                 <polygon
