@@ -119,15 +119,15 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
               <g className="svg-book yellow">
                 {/* Left Face (pages) */}
                 <polygon
-                  points="80,270 200,310 200,270 80,230"
+                  points="80,275 200,310 200,270 80,235"
                   fill="#fbf7f0"
                   stroke="#12100f"
                   strokeWidth="5"
                   strokeLinejoin="round"
                 />
                 {/* Page Lines */}
-                <line x1="85" y1="245" x2="195" y2="282" stroke="#d7ccc8" strokeWidth="2.5" />
-                <line x1="85" y1="255" x2="195" y2="292" stroke="#d7ccc8" strokeWidth="2.5" />
+                <line x1="85" y1="250" x2="195" y2="282" stroke="#d7ccc8" strokeWidth="2.5" />
+                <line x1="85" y1="260" x2="195" y2="292" stroke="#d7ccc8" strokeWidth="2.5" />
                 
                 {/* Right Face (spine) */}
                 <polygon
@@ -139,7 +139,7 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
                 />
                 {/* Top Face (cover) */}
                 <polygon
-                  points="200,270 80,230 210,185 330,225"
+                  points="200,270 80,235 210,190 330,225"
                   fill="#fbbf24"
                   stroke="#12100f"
                   strokeWidth="5"
@@ -147,11 +147,11 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
                 />
               </g>
 
-              {/* Book 2: Red Book (Middle) */}
+              {/* Book 2: Red Book (Middle) - Shifted Right */}
               <g className="svg-book red">
                 {/* Left Face (spine) */}
                 <polygon
-                  points="90,200 210,240 210,202 90,162"
+                  points="100,175 225,215 225,177 100,137"
                   fill="#b91c1c"
                   stroke="#12100f"
                   strokeWidth="5"
@@ -159,19 +159,19 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
                 />
                 {/* Right Face (pages) */}
                 <polygon
-                  points="210,240 340,195 340,157 210,202"
+                  points="225,215 340,180 340,142 225,177"
                   fill="#fbf7f0"
                   stroke="#12100f"
                   strokeWidth="5"
                   strokeLinejoin="round"
                 />
                 {/* Page Lines */}
-                <line x1="215" y1="215" x2="335" y2="173" stroke="#d7ccc8" strokeWidth="2.5" />
-                <line x1="215" y1="225" x2="335" y2="183" stroke="#d7ccc8" strokeWidth="2.5" />
+                <line x1="230" y1="190" x2="335" y2="156" stroke="#d7ccc8" strokeWidth="2.5" />
+                <line x1="230" y1="200" x2="335" y2="166" stroke="#d7ccc8" strokeWidth="2.5" />
                 
                 {/* Top Face (cover) */}
                 <polygon
-                  points="210,202 90,162 220,117 340,157"
+                  points="225,177 100,137 215,102 340,142"
                   fill="#ef4444"
                   stroke="#12100f"
                   strokeWidth="5"
@@ -179,11 +179,11 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
                 />
               </g>
 
-              {/* Book 3: Blue Book (Top) */}
+              {/* Book 3: Blue Book (Top) - Shifted Left */}
               <g className="svg-book blue">
                 {/* Left Face (spine) */}
                 <polygon
-                  points="85,139 195,175 195,140 85,104"
+                  points="60,107 175,142 175,107 60,72"
                   fill="#1d4ed8"
                   stroke="#12100f"
                   strokeWidth="5"
@@ -191,19 +191,19 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
                 />
                 {/* Right Face (pages) */}
                 <polygon
-                  points="195,175 315,133 315,98 195,140"
+                  points="175,142 300,102 300,67 175,107"
                   fill="#fbf7f0"
                   stroke="#12100f"
                   strokeWidth="5"
                   strokeLinejoin="round"
                 />
                 {/* Page Lines */}
-                <line x1="200" y1="152" x2="310" y2="114" stroke="#d7ccc8" strokeWidth="2.5" />
-                <line x1="200" y1="160" x2="310" y2="122" stroke="#d7ccc8" strokeWidth="2.5" />
+                <line x1="180" y1="117" x2="295" y2="79" stroke="#d7ccc8" strokeWidth="2.5" />
+                <line x1="180" y1="125" x2="295" y2="87" stroke="#d7ccc8" strokeWidth="2.5" />
                 
                 {/* Top Face (cover) */}
                 <polygon
-                  points="195,140 85,104 205,62 315,98"
+                  points="175,107 60,72 185,32 300,67"
                   fill="#0ea5e9"
                   stroke="#12100f"
                   strokeWidth="5"
