@@ -72,8 +72,7 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
         <section className="landing-hero">
           <div className="landing-hero-text">
             <div className="landing-kicker">
-              <Sparkles size={12} className="kicker-icon" />
-              <span>A sanctuary for readers</span>
+              <span>Pusthaka Library</span>
             </div>
             <h1 className="landing-hero-title">
               Your personal library,<br />
@@ -87,7 +86,6 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
                 <span>Enter the Reading Room</span>
                 <ArrowRight size={16} />
               </button>
-              <span className="landing-cta-note">Private cloud catalog · Real-time sync</span>
             </div>
           </div>
 

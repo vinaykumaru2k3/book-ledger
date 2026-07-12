@@ -2411,12 +2411,12 @@ textarea:focus-visible {
   flex-direction: column;
   
   /* ── Cozy Library Variables (Dark Mode Default) ── */
-  --bg-app-landing: #12100f;       /* Deep warm obsidian walnut */
-  --bg-card-landing: #1c1816;      /* Rich mahogany card surfaces */
-  --border-subtle-landing: rgba(220, 209, 198, 0.08);
-  --border-hover-landing: rgba(220, 209, 198, 0.16);
-  --text-primary-landing: #f7f4f0;  /* Soft cream white */
-  --text-secondary-landing: #c7bbb0; /* Linen tan */
+  --bg-app-landing: #16110e;       /* Deep warm obsidian walnut chocolate */
+  --bg-card-landing: #231b17;      /* Rich mahogany leather card surfaces */
+  --border-subtle-landing: rgba(217, 119, 6, 0.12);
+  --border-hover-landing: rgba(217, 119, 6, 0.22);
+  --text-primary-landing: #faeed8;  /* Soft warm vanilla cream */
+  --text-secondary-landing: #ccbcaa; /* Linen tan */
   --accent-gold-landing: #d97706;   /* Burnished brass gold */
   
   background-color: var(--bg-app-landing);
@@ -2593,16 +2593,29 @@ textarea:focus-visible {
 .landing-kicker {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.15em;
   color: var(--accent-gold-landing);
-  background-color: rgba(217, 119, 6, 0.08);
-  padding: 5px 12px;
-  border-radius: 99px;
-  border: 1px solid rgba(217, 119, 6, 0.15);
+  border: 1px solid var(--accent-gold-landing);
+  padding: 4px 12px;
+  background: transparent;
+  position: relative;
+  border-radius: 2px;
+}
+
+.landing-kicker::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 2px;
+  right: 2px;
+  border: 1px solid var(--accent-gold-landing);
+  opacity: 0.45;
+  pointer-events: none;
+  border-radius: 1px;
 }
 
 .landing-hero-title {
@@ -2692,6 +2705,19 @@ textarea:focus-visible {
   align-items: center;
   position: relative;
   padding: 40px 0;
+}
+
+.landing-hero-visual::before {
+  content: "";
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(217, 119, 6, 0.1) 0%, rgba(217, 119, 6, 0) 70%);
+  z-index: 1;
+  pointer-events: none;
 }
 
 .hero-shelf {
@@ -2807,8 +2833,9 @@ textarea:focus-visible {
 }
 
 .landing-feature-card:hover {
-  border-color: var(--border-hover-landing);
-  transform: translateY(-2px);
+  border-color: var(--accent-gold-landing);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
 }
 
 .landing-feature-icon {
