@@ -1,105 +1,152 @@
 import React from "react";
-import { BookOpen, Cloud, BarChart3, Search, ShieldCheck, ArrowRight, Library, Star, Sun, Moon } from "lucide-react";
+import {
+  Cloud,
+  BarChart3,
+  Search,
+  Sun,
+  Moon,
+  ArrowRight,
+  BookMarked,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
+
+const FEATURES = [
+  {
+    icon: Cloud,
+    title: "Cloud Synced",
+    body: "Your collection is securely synced in real-time with Firebase Cloud. Access it anywhere.",
+  },
+  {
+    icon: Search,
+    title: "Google Books Search",
+    body: "Instantly find and import any book by title, author, or ISBN with phonetic match support.",
+  },
+  {
+    icon: BarChart3,
+    title: "Insightful Metrics",
+    body: "Track page progress, status distributions, yearly goals, and averages without clutter.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Distraction Free",
+    body: "No social feeds, no tracking, no algorithms. Just a quiet space for you and your library.",
+  },
+];
+
+const BOOKS = [
+  { h: 140, a: "#115e59", b: "#0f766e" }, // Teal
+  { h: 165, a: "#3730a3", b: "#4338ca" }, // Indigo
+  { h: 130, a: "#9a3412", b: "#b45309" }, // Amber/Coral
+  { h: 155, a: "#581c87", b: "#6b21a8" }, // Plum
+  { h: 145, a: "#065f46", b: "#047857" }, // Emerald
+  { h: 160, a: "#1e1b4b", b: "#312e81" }, // Midnight
+];
 
 function LandingPage({ onEnter, theme, toggleTheme }) {
   return (
     <div className="landing-shell">
-      <header className="landing-header">
-        <div className="brand-lockup">
-          <div className="brand-mark" aria-hidden="true">
-            <Library size={20} />
+      {/* ── Navigation ── */}
+      <header className="landing-nav">
+        <div className="landing-nav-brand">
+          <div className="landing-brand-icon" aria-hidden="true">
+            <BookMarked size={18} />
           </div>
-          <h1>Book Ledger</h1>
+          <span className="landing-brand-name">Pusthaka</span>
         </div>
-        <div className="landing-header-actions" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <button 
-            className="icon-button theme-toggle-btn" 
-            onClick={toggleTheme} 
+        <div className="landing-nav-actions">
+          <button
+            className="landing-theme-toggle"
+            onClick={toggleTheme}
             aria-label="Toggle theme"
             title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
             type="button"
           >
             {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
-          <button className="button ghost compact landing-login-btn" onClick={onEnter}>
+          <button className="landing-signin-button" onClick={onEnter} type="button">
             Sign In
           </button>
         </div>
       </header>
 
       <main className="landing-main">
+        {/* ── Hero Section ── */}
         <section className="landing-hero">
-          <span className="hero-kicker">Digital Shelf & Progress Tracker</span>
-          <h2 className="hero-title">
-            Your reading journey,<br />
-            <span>beautifully cataloged.</span>
-          </h2>
-          <p className="hero-subtitle">
-            An elegant, cloud-synced personal ledger for tracking your books, reading progress, and reviews. Completely ad-free and distraction-free.
-          </p>
-          <div className="hero-actions">
-            <button className="button primary landing-cta" onClick={onEnter}>
-              <span>Open Your Shelf</span>
-              <ArrowRight size={16} />
-            </button>
-          </div>
-        </section>
-
-        <section className="landing-features">
-          <div className="feature-card">
-            <div className="feature-icon">
-              <Cloud size={20} />
+          <div className="landing-hero-text">
+            <div className="landing-kicker">
+              <Sparkles size={12} className="kicker-icon" />
+              <span>Digital Shelf & Reading Tracker</span>
             </div>
-            <h3>Cloud-Synced Library</h3>
-            <p>Your collection is stored in real-time using Firebase. Access your library, notes, and progress securely from any device.</p>
-          </div>
-
-          <div className="feature-card">
-            <div className="feature-icon">
-              <Search size={20} />
-            </div>
-            <h3>Intelligent Search</h3>
-            <p>Powered by the Google Books API. Instantly search by title, author, or genre with full support for phonetic and multilingual queries.</p>
-          </div>
-
-          <div className="feature-card">
-            <div className="feature-icon">
-              <BarChart3 size={20} />
-            </div>
-            <h3>Reading Metrics</h3>
-            <p>Track your yearly milestones, calculate average ratings, and monitor page progress metrics with clean, minimalist charts.</p>
-          </div>
-
-          <div className="feature-card">
-            <div className="feature-icon">
-              <ShieldCheck size={20} />
-            </div>
-            <h3>Distraction-Free</h3>
-            <p>No advertisements, no social media feeds, and no algorithms. Just you, your books, and your personal reading thoughts.</p>
-          </div>
-        </section>
-
-        <section className="landing-showcase">
-          <div className="showcase-content">
-            <h3>Designed for Readers</h3>
-            <p>
-              Whether you are reading fiction, research papers, or regional literature, Book Ledger provides a structured repository for your library. Log pages read, toggle favorites, and write down your notes in a modern Obsidian Slate environment.
+            <h1 className="landing-hero-title">
+              Your reading journey,<br />
+              <span className="serif-italic">beautifully cataloged.</span>
+            </h1>
+            <p className="landing-hero-sub">
+              Pusthaka is an elegant, cloud-synced private ledger for your books, reading progress, and reviews. Ad-free, distraction-free, and designed to flow.
             </p>
-          </div>
-          <div className="showcase-visual" aria-hidden="true">
-            <div className="visual-shelf">
-              <span className="visual-book" style={{ height: "130px", "--color-a": "#1e293b", "--color-b": "#f59e0b" }} />
-              <span className="visual-book" style={{ height: "150px", "--color-a": "#064e3b", "--color-b": "#10b981" }} />
-              <span className="visual-book" style={{ height: "120px", "--color-a": "#31102f", "--color-b": "#ec4899" }} />
-              <span className="visual-book" style={{ height: "140px", "--color-a": "#172554", "--color-b": "#3b82f6" }} />
+            <div className="landing-hero-actions">
+              <button className="landing-cta-btn" onClick={onEnter} type="button">
+                <span>Open Pusthaka</span>
+                <ArrowRight size={16} />
+              </button>
+              <span className="landing-cta-note">Free · Private · Real-time Sync</span>
             </div>
-            <div className="visual-shelf-line" />
           </div>
+
+          {/* Premium Animated Bookshelf Visual */}
+          <div className="landing-hero-visual" aria-hidden="true">
+            <div className="hero-shelf">
+              {BOOKS.map((book, i) => (
+                <div
+                  key={i}
+                  className="hero-book"
+                  style={{
+                    height: `${book.h}px`,
+                    background: `linear-gradient(160deg, ${book.a}, ${book.b})`,
+                    animationDelay: `${i * 0.08}s`,
+                  }}
+                >
+                  <div className="hero-book-spine-line" />
+                </div>
+              ))}
+            </div>
+            <div className="hero-shelf-plank" />
+            <div className="hero-shelf-shadow" />
+          </div>
+        </section>
+
+        {/* ── Features Section ── */}
+        <section className="landing-features-section">
+          <h2 className="landing-section-title">Designed for mindful readers</h2>
+          <div className="landing-features-grid">
+            {FEATURES.map(({ icon: Icon, title, body }) => (
+              <div className="landing-feature-card" key={title}>
+                <div className="landing-feature-icon">
+                  <Icon size={20} />
+                </div>
+                <h3 className="landing-feature-title">{title}</h3>
+                <p className="landing-feature-body">{body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── CTA Banner Strip ── */}
+        <section className="landing-cta-strip">
+          <div className="cta-strip-content">
+            <h2>Start tracking your bookshelf today</h2>
+            <p>Add, search, and update reading logs with zero friction.</p>
+          </div>
+          <button className="landing-cta-btn secondary" onClick={onEnter} type="button">
+            <span>Get Started</span>
+            <ArrowRight size={16} />
+          </button>
         </section>
       </main>
 
       <footer className="landing-footer">
-        <p>&copy; {new Date().getFullYear()} Book Ledger. A private cloud-first shelf.</p>
+        <p>&copy; {new Date().getFullYear()} Pusthaka. Between the first page and the last.</p>
       </footer>
     </div>
   );

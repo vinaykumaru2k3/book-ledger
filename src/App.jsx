@@ -794,7 +794,7 @@ function App() {
           </div>
           <div>
             <div className="eyebrow">Cloud Shelf</div>
-            <h1>Book Ledger</h1>
+            <h1>Pusthaka</h1>
           </div>
         </div>
 

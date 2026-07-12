@@ -36,7 +36,7 @@ function AuthScreen({ error, onEmailSubmit, onGoogleSignIn, onBackToLanding, the
             <Library size={36} />
           </div>
           <span className="auth-edition">Cloud Edition</span>
-          <h1 className="auth-book-title">Book Ledger</h1>
+          <h1 className="auth-book-title">Pusthaka</h1>
           <div className="auth-book-divider" />
           <p className="auth-book-tagline">
             A private, real-time synced journal for cataloging your reading journey.
