@@ -1,41 +1,49 @@
 :root {
   color-scheme: dark;
-  --bg-app: #08080a; /* Luxurious Obsidian Pitch Black */
-  --bg-surface: #121215; /* Pure Slate Charcoal */
-  --bg-surface-elevated: #1e1e24; /* Elevated Zinc Slate */
-  --bg-input: #151518; /* Inset dark input fields */
-  --border-subtle: rgba(255, 255, 255, 0.05); /* Soft, delicate dark borders */
-  --border-focus: rgba(16, 185, 129, 0.4);
-  
-  --text-primary: #fafafa; /* Crisp, readable soft white */
-  --text-secondary: #a1a1aa; /* Secondary grey */
-  --text-muted: #5b5b63; /* Dark muted grey */
-  
-  --bg-ghost: rgba(255, 255, 255, 0.02);
-  --bg-ghost-hover: rgba(255, 255, 255, 0.05);
-  --border-hover: rgba(255, 255, 255, 0.08);
-  --bg-card: rgba(255, 255, 255, 0.008);
-  --bg-card-hover: rgba(255, 255, 255, 0.015);
-  --bg-segmented: #18181c;
-  --bg-segmented-active: #27272c;
-  
+
+  /* ── Background layers — each step is clearly lighter ── */
+  --bg-app:              #0f0f10;  /* Page canvas — near black, slight warmth */
+  --bg-surface:          #1a1a1c;  /* Sidebar, panels */
+  --bg-surface-elevated: #242428;  /* Cards, inputs, dropdowns */
+  --bg-input:            #1e1e21;  /* Input fields */
+  --bg-card:             #222226;  /* Book cards — clearly visible */
+  --bg-card-hover:       #2a2a2f;  /* Hovered card */
+  --bg-segmented:        #1e1e21;
+  --bg-segmented-active: #2e2e34;
+  --bg-ghost:            rgba(255, 255, 255, 0.04);
+  --bg-ghost-hover:      rgba(255, 255, 255, 0.07);
+
+  /* ── Borders — strong enough to see in dark mode ── */
+  --border-subtle:  rgba(255, 255, 255, 0.09);  /* Cards, panels */
+  --border-hover:   rgba(255, 255, 255, 0.16);  /* Hover state */
+  --border-focus:   rgba(16, 185, 129, 0.45);
+
+  /* ── Text ── */
+  --text-primary:   #f2f2f3;   /* Crisp, not blinding white */
+  --text-secondary: #9a9aa4;   /* Secondary labels */
+  --text-muted:     #5e5e68;   /* Muted / placeholders */
+
+  /* ── Accents ── */
   --accent-emerald: #10b981;
-  --accent-amber: #f59e0b;
-  --accent-indigo: #6366f1;
-  --accent-plum: #8b5cf6;
-  --accent-coral: #ef4444;
-  
-  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --accent-amber:   #f59e0b;
+  --accent-indigo:  #6366f1;
+  --accent-plum:    #8b5cf6;
+  --accent-coral:   #ef4444;
+
+  /* ── Typography ── */
+  --font-sans:  'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-serif: 'Playfair Display', Georgia, Cambria, "Times New Roman", Times, serif;
-  
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.6);
+
+  /* ── Shadows — deep but not overpowering ── */
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.65);
+
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
-  
-  --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  --transition-smooth: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 [data-theme="light"] {
@@ -140,6 +148,8 @@ textarea:focus-visible {
   flex-direction: column;
   gap: 28px;
   overflow-y: auto;
+  /* Give sidebar a faint separator shadow from the main area */
+  box-shadow: 1px 0 0 var(--border-subtle);
 }
 
 .brand-lockup {
@@ -887,8 +897,8 @@ textarea:focus-visible {
   aspect-ratio: 2/3;
   border-radius: 4px;
   overflow: hidden;
-  background: linear-gradient(135deg, var(--cover-a, #1f2937), var(--cover-b, #111827));
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, var(--cover-a, #2a2a30), var(--cover-b, #1a1a1f));
+  /* No border by default — image covers should look clean */
   box-shadow: var(--shadow-sm);
   flex-shrink: 0;
 }
@@ -897,6 +907,14 @@ textarea:focus-visible {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
+  /* Prevent dark outline around transparent PNGs */
+  mix-blend-mode: normal;
+}
+
+/* Only fallback gradient covers get a subtle border */
+.cover:not(:has(img[src])) {
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .cover-fallback {
@@ -947,20 +965,17 @@ textarea:focus-visible {
 
 .book-card {
   position: relative;
-  background-color: var(--bg-surface);
+  background-color: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   padding: 24px 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-  box-shadow: var(--shadow-sm);
   transition: var(--transition-smooth);
 }
 
 .book-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
   border-color: var(--border-hover);
   background-color: var(--bg-card-hover);
 }
