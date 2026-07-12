@@ -1124,45 +1124,119 @@ textarea:focus-visible {
   margin-top: 6px;
 }
 
-.status-select-wrap {
+/* Custom Status Dropdown Styles */
+.custom-dropdown-container {
   position: relative;
-  display: flex;
-  align-items: center;
-  background-color: var(--bg-segmented);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 4px 10px;
-  gap: 6px;
+  display: inline-block;
   flex: 1.2;
-  height: 32px;
-  transition: var(--transition-smooth);
 }
 
-.status-select-wrap:hover {
-  border-color: var(--border-hover);
-  background-color: var(--bg-card-hover);
-}
-
-.status-select-wrap select {
-  border: none;
-  background: transparent;
-  color: var(--text-primary);
+.status-dropdown-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
   font-size: 0.78rem;
   font-weight: 600;
-  width: 100%;
-  outline: none;
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-segmented);
+  border: 1px solid var(--border-subtle);
+  transition: var(--transition-smooth);
   cursor: pointer;
-  appearance: none;
-  padding-right: 14px;
+  height: 32px;
+  width: 100%;
+  justify-content: space-between;
 }
 
-.status-select-wrap::after {
-  content: "▾";
+.status-dropdown-trigger:hover {
+  background-color: var(--bg-card-hover);
+  border-color: var(--border-hover);
+}
+
+.status-dropdown-trigger span {
+  flex-grow: 1;
+  text-align: left;
+  margin-left: 2px;
+}
+
+.status-dropdown-trigger .chevron-icon {
+  opacity: 0.7;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.status-dropdown-trigger .chevron-icon.open {
+  transform: rotate(180deg);
+}
+
+.dropdown-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+}
+
+.status-dropdown-menu {
   position: absolute;
-  right: 10px;
-  pointer-events: none;
-  font-size: 0.65rem;
-  color: var(--text-muted);
+  bottom: 120%;
+  left: 0;
+  width: 100%;
+  min-width: 150px;
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 1000;
+  animation: dropdownFadeIn 0.15s ease-out;
+}
+
+/* Open downwards in list view row mode */
+.book-card.row .status-dropdown-menu {
+  bottom: auto;
+  top: 120%;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.status-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  width: 100%;
+  text-align: left;
+  transition: var(--transition-smooth);
+  cursor: pointer;
+}
+
+.status-dropdown-item:hover {
+  background-color: var(--bg-ghost-hover);
+  color: var(--text-primary);
+}
+
+.status-dropdown-item.active {
+  background-color: var(--bg-ghost);
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 .page-field {

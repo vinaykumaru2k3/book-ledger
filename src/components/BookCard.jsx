@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Trash2, Edit3, Heart, Archive, BookOpen, CheckCircle, Search } from "lucide-react";
+import { Trash2, Edit3, Heart, Archive, BookOpen, CheckCircle, Search, ChevronDown } from "lucide-react";
 import Cover from "./Cover";
 import Rating from "./Rating";
 import { STATUSES, progressFor, formatDate } from "./constants";
@@ -9,6 +9,7 @@ function BookCard({ book, layout, onDelete, onEdit, onUpdate, onViewDetails }) {
   const StatusIcon = STATUSES[book.status]?.icon;
   const statusColor = STATUSES[book.status]?.color || "#10b981";
   const [pageDraft, setPageDraft] = useState(String(book.currentPage || 0));
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
     setPageDraft(String(book.currentPage || 0));
@@ -98,19 +99,43 @@ function BookCard({ book, layout, onDelete, onEdit, onUpdate, onViewDetails }) {
         ) : null}
 
         <div className="card-controls">
-          <div className="status-select-wrap" style={{ "--border-status": statusColor }}>
-            {StatusIcon && <StatusIcon size={12} style={{ color: statusColor }} />}
-            <select
-              value={book.status}
-              onChange={(e) => onUpdate(book.id, { status: e.target.value })}
-              aria-label="Change book status"
+          <div className="custom-dropdown-container">
+            <button 
+              className="status-dropdown-trigger" 
+              style={{ color: statusColor, borderColor: statusColor }}
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              type="button"
+              aria-label="Toggle status menu"
             >
-              {Object.entries(STATUSES).map(([key, status]) => (
-                <option key={key} value={key}>
-                  {status.longLabel}
-                </option>
-              ))}
-            </select>
+              {StatusIcon && <StatusIcon size={12} />}
+              <span>{STATUSES[book.status]?.longLabel}</span>
+              <ChevronDown size={12} className={`chevron-icon ${dropdownOpen ? 'open' : ''}`} />
+            </button>
+            
+            {dropdownOpen && (
+              <>
+                <div className="dropdown-overlay" onClick={() => setDropdownOpen(false)} />
+                <div className="status-dropdown-menu">
+                  {Object.entries(STATUSES).map(([key, status]) => {
+                    const ItemIcon = status.icon;
+                    return (
+                      <button
+                        key={key}
+                        className={`status-dropdown-item ${book.status === key ? 'active' : ''}`}
+                        onClick={() => {
+                          onUpdate(book.id, { status: key });
+                          setDropdownOpen(false);
+                        }}
+                        type="button"
+                      >
+                        {ItemIcon && <ItemIcon size={13} style={{ color: status.color }} />}
+                        <span>{status.longLabel}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
           </div>
 
           {book.pages ? (
