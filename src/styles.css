@@ -1266,42 +1266,52 @@ textarea:focus-visible {
   grid-column: 2 !important;
   grid-row: 1 / span 2 !important;
   margin-top: 0 !important;
-  justify-content: flex-start !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
   gap: 4px !important;
   width: auto !important;
+}
+
+.book-card.row .finish-date-label {
+  font-size: 0.72rem !important;
+  color: var(--text-muted) !important;
+  white-space: nowrap !important;
+  margin: 0 !important;
+  font-weight: 500 !important;
 }
 
 .book-card.row .tag-row {
   grid-column: 3 !important;
   grid-row: 1 / span 2 !important;
-  display: block !important;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
   margin: 0 !important;
   width: 100% !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  white-space: nowrap !important;
+  align-items: center !important;
 }
 
 .book-card.row .tag-badge {
-  background: transparent !important;
-  border: none !important;
-  padding: 0 !important;
-  font-size: 0.76rem !important;
+  background-color: var(--bg-segmented) !important;
+  border: 1px solid var(--border-subtle) !important;
+  padding: 2px 8px !important;
+  font-size: 0.7rem !important;
   color: var(--text-secondary) !important;
   text-transform: none !important;
   font-weight: 500 !important;
   letter-spacing: 0 !important;
   white-space: nowrap !important;
   box-shadow: none !important;
-  display: inline !important;
+  border-radius: 4px !important;
+  display: inline-block !important;
   max-width: none !important;
 }
 
 .book-card.row .tag-badge:not(:last-child)::after {
-  content: " • " !important;
-  margin: 0 4px !important;
-  color: var(--text-muted) !important;
-  opacity: 0.7 !important;
+  content: none !important;
 }
 
 .book-card.row .progress-area {
