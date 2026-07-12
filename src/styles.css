@@ -1996,17 +1996,17 @@ textarea:focus-visible {
   justify-content: center;
   min-height: 100vh;
   padding: 32px 24px;
-  /* Rich warm wooden desk gradient background */
-  background: radial-gradient(circle, #251c16 0%, #16110e 100%);
+  /* Dark desk shadow backdrop (clean charcoal) */
+  background: radial-gradient(circle, #1c1c21 0%, #0d0d0f 100%);
   box-sizing: border-box;
 
   /* ── Cozy Library Variables (Dark Mode Default) ── */
-  --bg-app-landing: #16110e;
-  --bg-card-landing: #231b17;
-  --border-subtle-landing: rgba(217, 119, 6, 0.12);
-  --border-hover-landing: rgba(217, 119, 6, 0.22);
-  --text-primary-landing: #faeed8;
-  --text-secondary-landing: #ccbcaa;
+  --bg-app-landing: #0d0d0f;
+  --bg-card-landing: #151518;
+  --border-subtle-landing: rgba(255, 255, 255, 0.08);
+  --border-hover-landing: rgba(255, 255, 255, 0.14);
+  --text-primary-landing: #f1ece4;
+  --text-secondary-landing: #a19e99;
   --accent-gold-landing: #d97706;
 }
 
@@ -2104,8 +2104,8 @@ textarea:focus-visible {
   border-radius: 4px 0 0 4px;
   border-right: 1px solid rgba(0, 0, 0, 0.15);
   box-sizing: border-box;
-  /* Parchment leaf crease shading */
-  background: linear-gradient(to right, #251c17 0%, #201713 88%, #140d0a 100%);
+  /* Charcoal parchment leaf crease shading (cool dark neutral) */
+  background: linear-gradient(to right, #1b1b1e 0%, #151518 88%, #0d0d0f 100%);
 }
 
 [data-theme="light"] .auth-art {
@@ -2122,15 +2122,15 @@ textarea:focus-visible {
   z-index: 1;
 }
 
-.auth-crest-img-wrap {
+.auth-crest-svg-wrap {
+  width: 140px;
+  height: 140px;
   z-index: 2;
-  margin-top: 18px;
-}
-
-.auth-logo-img {
-  width: 48px;
-  height: 48px;
-  object-fit: contain;
+  margin-top: 10px;
+  margin-bottom: -15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .auth-edition {
@@ -2194,8 +2194,8 @@ textarea:focus-visible {
   gap: 16px;
   border-radius: 0 4px 4px 0;
   box-sizing: border-box;
-  /* Parchment leaf crease shading */
-  background: linear-gradient(to left, #251c17 0%, #201713 88%, #140d0a 100%);
+  /* Charcoal parchment leaf crease shading (cool dark neutral) */
+  background: linear-gradient(to left, #1b1b1e 0%, #151518 88%, #0d0d0f 100%);
 }
 
 [data-theme="light"] .auth-card {
@@ -2555,12 +2555,12 @@ textarea:focus-visible {
   flex-direction: column;
   
   /* ── Cozy Library Variables (Dark Mode Default) ── */
-  --bg-app-landing: #16110e;       /* Deep warm obsidian walnut chocolate */
-  --bg-card-landing: #231b17;      /* Rich mahogany leather card surfaces */
-  --border-subtle-landing: rgba(217, 119, 6, 0.12);
-  --border-hover-landing: rgba(217, 119, 6, 0.22);
-  --text-primary-landing: #faeed8;  /* Soft warm vanilla cream */
-  --text-secondary-landing: #ccbcaa; /* Linen tan */
+  --bg-app-landing: #0d0d0f;       /* Deep obsidian charcoal */
+  --bg-card-landing: #151518;      /* Deep gray-slate card surfaces */
+  --border-subtle-landing: rgba(255, 255, 255, 0.08);
+  --border-hover-landing: rgba(255, 255, 255, 0.14);
+  --text-primary-landing: #f1ece4;  /* Soft vanilla cream */
+  --text-secondary-landing: #a19e99; /* Muted gray */
   --accent-gold-landing: #d97706;   /* Burnished brass gold */
   
   background-color: var(--bg-app-landing);
