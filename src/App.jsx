@@ -18,6 +18,7 @@ import {
   Heart,
   Sun,
   Moon,
+  CheckCircle,
 } from "lucide-react";
 import {
   onAuthStateChanged,
