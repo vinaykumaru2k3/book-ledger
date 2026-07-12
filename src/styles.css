@@ -2019,7 +2019,7 @@ textarea:focus-visible {
     inset 0 0 20px rgba(0, 0, 0, 0.8),
     0 4px 10px rgba(0, 0, 0, 0.4);
   padding: 12px 16px; /* Exposes the leather backing cover edge */
-  transform: perspective(1200px) rotateX(6.5deg) rotateY(0deg) rotateZ(-0.5deg);
+  transform: none;
   box-sizing: border-box;
   gap: 4px;
 }
@@ -2341,6 +2341,21 @@ textarea:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 14px;
+}
+
+.auth-card .button.primary.full {
+  background-color: var(--accent-gold-landing);
+  color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2);
+  transition: var(--transition-smooth);
+}
+
+.auth-card .button.primary.full:hover {
+  background-color: var(--accent-gold-landing);
+  opacity: 0.95;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(217, 119, 6, 0.3);
 }
 
 .inline-alert {

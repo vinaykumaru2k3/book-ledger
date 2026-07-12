@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Library, LogIn, Mail, Loader2, Sparkles, ShieldCheck, Sun, Moon } from "lucide-react";
+import { Library, LogIn, Mail, Loader2, UserPlus, ShieldCheck, Sun, Moon } from "lucide-react";
 
 function AuthScreen({ error, onEmailSubmit, onGoogleSignIn, onBackToLanding, theme, toggleTheme }) {
   const [mode, setMode] = useState("signin");
@@ -27,7 +27,7 @@ function AuthScreen({ error, onEmailSubmit, onGoogleSignIn, onBackToLanding, the
   return (
     <div className="auth-shell">
       <div className="auth-panel">
-        {/* Decorative Gold Bookmark Ribbon */}
+        {/* Decorative Centered Gold Bookmark Ribbon */}
         <div className="auth-bookmark-ribbon" />
 
         {/* Left Page (Book Title Page) */}
@@ -87,8 +87,8 @@ function AuthScreen({ error, onEmailSubmit, onGoogleSignIn, onBackToLanding, the
               onClick={() => setMode("create")}
               type="button"
             >
-              <Sparkles size={15} />
-              <span>Create</span>
+              <UserPlus size={15} />
+              <span>Register</span>
             </button>
           </div>
 
@@ -116,7 +116,6 @@ function AuthScreen({ error, onEmailSubmit, onGoogleSignIn, onBackToLanding, the
                   required
                   type="email"
                   value={email}
-                  placeholder="name@example.com"
                   onChange={(event) => setEmail(event.target.value)}
                 />
               </div>
@@ -130,7 +129,6 @@ function AuthScreen({ error, onEmailSubmit, onGoogleSignIn, onBackToLanding, the
                 required
                 type="password"
                 value={password}
-                placeholder="••••••••"
                 onChange={(event) => setPassword(event.target.value)}
               />
             </label>
@@ -144,7 +142,7 @@ function AuthScreen({ error, onEmailSubmit, onGoogleSignIn, onBackToLanding, the
                 <ShieldCheck size={18} />
               )}
               <span>
-                {mode === "create" ? "Create Account" : "Access Shelf"}
+                {mode === "create" ? "Register Account" : "Access Shelf"}
               </span>
             </button>
           </form>
