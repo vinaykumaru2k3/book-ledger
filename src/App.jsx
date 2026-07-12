@@ -2,73 +2,61 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Archive,
   BarChart3,
-  BookCheck,
-  BookMarked,
-  BookOpen,
-  Bookmark,
   CalendarDays,
-  Check,
-  ChevronDown,
   Download,
-  Edit3,
-  Grid3X3,
-  Heart,
   Import,
   Library,
   List,
-  Loader2,
+  Grid3X3,
   Plus,
   RotateCcw,
   Search,
-  Sparkles,
+  ChevronDown,
+  ShieldCheck,
   Star,
-  Tags,
-  Trash2,
-  Upload,
-  X,
+  BookOpen,
+  Heart,
+  Sun,
+  Moon,
 } from "lucide-react";
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+} from "firebase/auth";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  orderBy,
+  query,
+  setDoc,
+  writeBatch,
+} from "firebase/firestore";
+import { auth, db, googleProvider } from "./firebase";
+
+// Modular Component Imports
+import LoadingScreen from "./components/LoadingScreen";
+import AuthScreen from "./components/AuthScreen";
+import AccountCard from "./components/AccountCard";
+import MetricCard from "./components/MetricCard";
+import BookCard from "./components/BookCard";
+import BookModal from "./components/BookModal";
+import LandingPage from "./components/LandingPage";
+import EmptyState from "./components/EmptyState";
+import ReadingStack from "./components/ReadingStack";
+import LoadingPanel from "./components/LoadingPanel";
+import Toast from "./components/Toast";
+import DeleteConfirmModal from "./components/DeleteConfirmModal";
+import BookDetailsModal from "./components/BookDetailsModal";
+
+// Constants & Helpers
+import { STATUSES, SORTS, progressFor } from "./components/constants";
 
 const STORAGE_KEY = "personal-book-ledger:v1";
-
-const STATUSES = {
-  want: {
-    label: "Want",
-    longLabel: "Want to read",
-    color: "#b45f43",
-    icon: Bookmark,
-  },
-  reading: {
-    label: "Reading",
-    longLabel: "Reading",
-    color: "#2d7d73",
-    icon: BookOpen,
-  },
-  done: {
-    label: "Finished",
-    longLabel: "Finished",
-    color: "#7356a6",
-    icon: BookCheck,
-  },
-};
-
-const SORTS = [
-  { value: "recent", label: "Recently added" },
-  { value: "title", label: "Title" },
-  { value: "author", label: "Author" },
-  { value: "progress", label: "Progress" },
-  { value: "rating", label: "Rating" },
-  { value: "finished", label: "Recently finished" },
-];
-
-const COVER_PALETTE = [
-  ["#203f63", "#e0a83e", "#f4efe5"],
-  ["#7b3152", "#ef805f", "#fbf0de"],
-  ["#285f5a", "#d5a83d", "#f5ead8"],
-  ["#4b4f89", "#8bc7bd", "#f7ecdf"],
-  ["#8c4b38", "#dac56f", "#fff5dc"],
-  ["#2e5871", "#c9715b", "#f4f0e8"],
-  ["#4f6840", "#d89e53", "#f7eedb"],
-];
 
 const EMPTY_FORM = {
   title: "",
@@ -100,31 +88,6 @@ function toNumber(value, fallback = 0) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-function coverUrlFromId(coverId, size = "M") {
-  return coverId ? `https://covers.openlibrary.org/b/id/${coverId}-${size}.jpg` : "";
-}
-
-function getCoverStyle(seed = "") {
-  const total = [...seed].reduce((sum, char) => sum + char.charCodeAt(0), 0);
-  const [a, b, c] = COVER_PALETTE[total % COVER_PALETTE.length];
-  return { "--cover-a": a, "--cover-b": b, "--cover-c": c };
-}
-
-function getInitials(title = "") {
-  const parts = title
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2);
-  if (!parts.length) return "BL";
-  return parts.map((part) => part[0]).join("").toUpperCase();
-}
-
-function progressFor(book) {
-  if (!book.pages) return book.status === "done" ? 100 : 0;
-  return clamp(Math.round((book.currentPage / book.pages) * 100), 0, 100);
-}
-
 function normalizeBook(raw) {
   const pages = Math.max(0, toNumber(raw.pages, 0));
   const currentPage = clamp(toNumber(raw.currentPage, 0), 0, pages || 999999);
@@ -151,7 +114,7 @@ function normalizeBook(raw) {
     publishedYear: raw.publishedYear ? String(raw.publishedYear) : "",
     isbn: raw.isbn ? String(raw.isbn) : "",
     coverId: raw.coverId || null,
-    coverUrl: raw.coverUrl || coverUrlFromId(raw.coverId),
+    coverUrl: raw.coverUrl || "",
     sourceKey: raw.sourceKey || "",
     favorite: Boolean(raw.favorite),
     addedAt,
@@ -191,23 +154,6 @@ function formFromBook(book) {
   };
 }
 
-function formFromDoc(doc) {
-  const author = doc.author_name?.[0] || "";
-  const isbn = doc.isbn?.[0] || "";
-  const pages = doc.number_of_pages_median || "";
-  return {
-    ...EMPTY_FORM,
-    title: doc.title || "",
-    author,
-    pages: pages ? String(pages) : "",
-    publishedYear: doc.first_publish_year ? String(doc.first_publish_year) : "",
-    isbn,
-    coverId: doc.cover_i || null,
-    coverUrl: coverUrlFromId(doc.cover_i),
-    sourceKey: doc.key || "",
-  };
-}
-
 function createBookFromForm(form, existing = null) {
   const pages = Math.max(0, toNumber(form.pages, 0));
   const status = STATUSES[form.status] ? form.status : "want";
@@ -243,41 +189,221 @@ function createBookFromForm(form, existing = null) {
   });
 }
 
-function formatDate(value) {
-  if (!value) return "";
-  return new Intl.DateTimeFormat(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(new Date(value));
+function authMessage(error) {
+  console.error("Firebase Auth Error:", error);
+  const code = error?.code || "";
+  const msg = error?.message || "";
+  
+  if (code.includes("popup-closed-by-user")) return "The sign-in popup was closed before completion.";
+  if (code.includes("invalid-credential") || code.includes("wrong-password")) {
+    return "The credentials entered were not accepted.";
+  }
+  if (code.includes("email-already-in-use")) return "An account already exists for this email.";
+  if (code.includes("weak-password")) return "Password must be at least 6 characters.";
+  if (code.includes("invalid-email")) return "Invalid email address formatting.";
+  if (code.includes("operation-not-allowed")) {
+    return "Google Sign-In is not enabled. Go to Firebase Console > Authentication > Sign-in method and enable Google.";
+  }
+  if (code.includes("unauthorized-domain")) {
+    return "This local domain is not authorized. Add it under Firebase Authentication > Settings > Authorized Domains.";
+  }
+  return `Authentication failed: ${msg} (${code})`;
 }
 
+// Synchronously initialize theme to prevent flash of unstyled screen on browser refresh
+const initialTheme = localStorage.getItem("book-ledger:theme") || "dark";
+document.documentElement.setAttribute("data-theme", initialTheme);
+
 function App() {
-  const [books, setBooks] = useState(loadBooks);
+  const [books, setBooks] = useState([]);
+  const [user, setUser] = useState(null);
+  const [authReady, setAuthReady] = useState(false);
+  const [authError, setAuthError] = useState("");
+  const [booksLoading, setBooksLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
   const [libraryQuery, setLibraryQuery] = useState("");
   const [sortBy, setSortBy] = useState("recent");
   const [view, setView] = useState("grid");
-  const [favoriteOnly, setFavoriteOnly] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [searching, setSearching] = useState(false);
-  const [searchError, setSearchError] = useState("");
   const [saveError, setSaveError] = useState("");
+  const [deleteConfirmBook, setDeleteConfirmBook] = useState(null);
+  const [detailsBook, setDetailsBook] = useState(null);
   const [toast, setToast] = useState("");
-  const fileInputRef = useRef(null);
+  const [toastType, setToastType] = useState("success");
+  const [localBackupCount, setLocalBackupCount] = useState(() => loadBooks().length);
+  const [showLanding, setShowLanding] = useState(true);
+  const checkedIdsRef = useRef(new Set());
+  const [theme, setTheme] = useState(() => {
+    return localStorage.getItem("book-ledger:theme") || "dark";
+  });
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, books }));
-      setSaveError("");
-    } catch {
-      setSaveError("Could not save to this browser.");
-    }
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("book-ledger:theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  };
+
+  const fileInputRef = useRef(null);
+  const booksRef = useRef([]);
+
+  useEffect(() => {
+    booksRef.current = books;
   }, [books]);
+
+  useEffect(() => {
+    return onAuthStateChanged(
+      auth,
+      (nextUser) => {
+        setUser(nextUser);
+        setAuthReady(true);
+        setAuthError("");
+        if (!nextUser) {
+          setBooks([]);
+          setBooksLoading(false);
+          closeModal();
+        }
+      },
+      () => {
+        setAuthReady(true);
+        setAuthError("Failed to fetch sign-in session state.");
+      }
+    );
+  }, []);
+
+  useEffect(() => {
+    if (!user) return undefined;
+
+    setBooksLoading(true);
+    const booksRef = collection(db, "users", user.uid, "books");
+    const booksQuery = query(booksRef, orderBy("addedAt", "desc"));
+
+    return onSnapshot(
+      booksQuery,
+      (snapshot) => {
+        setBooks(snapshot.docs.map((item) => normalizeBook({ id: item.id, ...item.data() })));
+        setBooksLoading(false);
+        setSaveError("");
+      },
+      (error) => {
+        console.error("Firestore subscription error:", error);
+        setBooksLoading(false);
+        setSaveError(`Failed to fetch Cloud records: ${error.message} (${error.code})`);
+      }
+    );
+  }, [user]);
+
+  // Background effect to enrich books with genre tags and page counts from the API using an interval scanner
+  useEffect(() => {
+    if (!user) return undefined;
+
+    const interval = setInterval(async () => {
+      if (booksLoading) return;
+      
+      const latestBooks = booksRef.current;
+      if (!latestBooks || !latestBooks.length) return;
+
+      // Find the first book that is missing tags OR has 0 pages, and hasn't been checked yet
+      const bookToEnrich = latestBooks.find(
+        (b) =>
+          !checkedIdsRef.current.has(b.id) &&
+          ((!b.tags || b.tags.length === 0) || !b.pages) &&
+          (b.sourceKey || b.isbn || b.title)
+      );
+
+      if (!bookToEnrich) return;
+
+      // Mark as checked immediately to prevent duplicate runs
+      checkedIdsRef.current.add(bookToEnrich.id);
+      
+      console.log(`[Auto-Enrich] Interval scanner querying API details for: "${bookToEnrich.title}"`);
+      try {
+        let categories = [];
+        let fetchedPages = 0;
+        
+        // 1. Try fetching via Google Books using sourceKey
+        if (bookToEnrich.sourceKey && !bookToEnrich.sourceKey.startsWith("/works/")) {
+          const res = await fetch(`https://www.googleapis.com/books/v1/volumes/${bookToEnrich.sourceKey}`);
+          if (res.ok) {
+            const data = await res.json();
+            categories = data.volumeInfo?.categories || [];
+            fetchedPages = data.volumeInfo?.pageCount || 0;
+          }
+        }
+        
+        // 2. Fallback to general Google Books search if no pages/categories found yet
+        if (!categories.length || !fetchedPages) {
+          const queryStr = bookToEnrich.isbn 
+            ? `isbn:${bookToEnrich.isbn}` 
+            : `${bookToEnrich.title}${bookToEnrich.author ? ` ${bookToEnrich.author}` : ""}`;
+          
+          const res = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(queryStr)}&maxResults=1`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.items?.[0]) {
+              const info = data.items[0].volumeInfo;
+              if (!categories.length) categories = info?.categories || [];
+              if (!fetchedPages) fetchedPages = info?.pageCount || 0;
+            }
+          }
+        }
+
+        // 3. Fallback to Open Library search if no pages/categories found yet
+        if (!categories.length || !fetchedPages) {
+          const queryParams = bookToEnrich.isbn 
+            ? `isbn=${bookToEnrich.isbn}` 
+            : `q=${encodeURIComponent(bookToEnrich.title + (bookToEnrich.author ? ` ${bookToEnrich.author}` : ""))}`;
+          
+          const res = await fetch(`https://openlibrary.org/search.json?limit=1&${queryParams}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.docs?.[0]) {
+              const doc = data.docs[0];
+              if (!categories.length) categories = doc.subject ? doc.subject.slice(0, 3) : [];
+              if (!fetchedPages) fetchedPages = doc.number_of_pages_median || doc.number_of_pages || 0;
+            }
+          }
+        }
+
+        // Build the updates object
+        const updates = {};
+        
+        // Update tags if they are currently missing
+        if (!bookToEnrich.tags || bookToEnrich.tags.length === 0) {
+          if (categories && categories.length > 0) {
+            const cleanTags = categories
+              .map((cat) => typeof cat === "string" ? cat.split("/").map(s => s.trim()) : [])
+              .flat()
+              .map((cat) => cat.trim())
+              .filter((cat) => cat.length > 1 && cat.length < 25);
+            const uniqueTags = [...new Set(cleanTags)].slice(0, 3);
+            updates.tags = uniqueTags.length > 0 ? uniqueTags : ["General"];
+          } else {
+            updates.tags = ["General"];
+          }
+        }
+
+        // Update pages if they are currently 0
+        if (!bookToEnrich.pages && fetchedPages) {
+          updates.pages = fetchedPages;
+        }
+
+        // Save updates to Firestore if there are any
+        if (Object.keys(updates).length > 0) {
+          console.log(`[Auto-Enrich] Interval scanner updating details for "${bookToEnrich.title}":`, updates);
+          await updateBook(bookToEnrich.id, updates);
+        }
+      } catch (err) {
+        console.error(`[Auto-Enrich] Interval scanner failed for "${bookToEnrich.title}":`, err);
+      }
+    }, 4000); // Scan every 4 seconds to sequence updates cleanly
+
+    return () => clearInterval(interval);
+  }, [books, booksLoading, user]);
 
   useEffect(() => {
     if (!toast) return undefined;
@@ -292,9 +418,11 @@ function App() {
     let ratedCount = 0;
     let ratingSum = 0;
     let finishedThisYear = 0;
+    let favorites = 0;
 
     books.forEach((book) => {
       statusCounts[book.status] += 1;
+      if (book.favorite) favorites += 1;
       pagesRead += book.status === "done" && book.pages ? book.pages : book.currentPage || 0;
       if (book.rating) {
         ratedCount += 1;
@@ -314,28 +442,32 @@ function App() {
       ...statusCounts,
       pagesRead,
       finishedThisYear,
+      favorites,
       averageRating: ratedCount ? (ratingSum / ratedCount).toFixed(1) : "0.0",
       completionRate: books.length ? Math.round((statusCounts.done / books.length) * 100) : 0,
     };
   }, [books]);
 
   const visibleBooks = useMemo(() => {
-    const query = libraryQuery.trim().toLowerCase();
+    const queryStr = libraryQuery.trim().toLowerCase();
     const filtered = books.filter((book) => {
-      if (statusFilter !== "all" && book.status !== statusFilter) return false;
-      if (favoriteOnly && !book.favorite) return false;
-      if (!query) return true;
+      if (statusFilter === "favorites") {
+        if (!book.favorite) return false;
+      } else if (statusFilter !== "all" && book.status !== statusFilter) {
+        return false;
+      }
+      if (!queryStr) return true;
       return [
         book.title,
         book.author,
         book.publishedYear,
         book.isbn,
         book.notes,
-        ...book.tags,
+        ...(book.tags || []),
       ]
         .join(" ")
         .toLowerCase()
-        .includes(query);
+        .includes(queryStr);
     });
 
     return [...filtered].sort((a, b) => {
@@ -346,7 +478,7 @@ function App() {
       if (sortBy === "finished") return (b.finishedAt || 0) - (a.finishedAt || 0);
       return (b.addedAt || 0) - (a.addedAt || 0);
     });
-  }, [books, favoriteOnly, libraryQuery, sortBy, statusFilter]);
+  }, [books, libraryQuery, sortBy, statusFilter]);
 
   const currentlyReading = useMemo(
     () =>
@@ -354,7 +486,7 @@ function App() {
         .filter((book) => book.status === "reading")
         .sort((a, b) => progressFor(b) - progressFor(a))
         .slice(0, 4),
-    [books],
+    [books]
   );
 
   const recentlyFinished = useMemo(
@@ -363,30 +495,135 @@ function App() {
         .filter((book) => book.status === "done")
         .sort((a, b) => (b.finishedAt || 0) - (a.finishedAt || 0))
         .slice(0, 4),
-    [books],
+    [books]
   );
 
-  const coverStrip = books.slice(0, 7);
+  const coverStrip = useMemo(() => books.slice(0, 8), [books]);
 
-  function notify(message) {
+  function notify(message, type = "success") {
+    setToastType(type);
     setToast(message);
+  }
+
+  function bookDoc(bookId) {
+    if (!user) throw new Error("Anonymous session error");
+    return doc(db, "users", user.uid, "books", bookId);
+  }
+
+  async function saveBook(book, message) {
+    if (!user) {
+      notify("Sign in to save books.", "error");
+      return;
+    }
+
+    const nextBook = normalizeBook(book);
+    setBooks((current) => {
+      const exists = current.some((item) => item.id === nextBook.id);
+      return exists
+        ? current.map((item) => (item.id === nextBook.id ? nextBook : item))
+        : [nextBook, ...current];
+    });
+
+    try {
+      await setDoc(bookDoc(nextBook.id), nextBook, { merge: true });
+      setSaveError("");
+      if (message) notify(message);
+    } catch (err) {
+      console.error(err);
+      setSaveError("Failed to sync records with the database.");
+      notify("Sync failed.", "error");
+    }
+  }
+
+  async function saveManyBooks(nextBooks, message) {
+    if (!user || !nextBooks.length) return;
+
+    const batch = writeBatch(db);
+    const normalized = nextBooks.map(normalizeBook);
+    normalized.forEach((book) => {
+      batch.set(bookDoc(book.id), book, { merge: true });
+    });
+
+    setBooks((current) => {
+      const byId = new Map(current.map((book) => [book.id, book]));
+      normalized.forEach((book) => byId.set(book.id, book));
+      return [...byId.values()].sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+    });
+
+    try {
+      await batch.commit();
+      setSaveError("");
+      if (message) notify(message);
+    } catch (err) {
+      console.error(err);
+      setSaveError("Batch import failed to sync to database.");
+      notify("Import sync failed.", "error");
+    }
+  }
+
+  async function signInWithGoogle() {
+    setAuthError("");
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error) {
+      setAuthError(authMessage(error));
+    }
+  }
+
+  async function signInWithEmail({ email, password, mode }) {
+    setAuthError("");
+    try {
+      if (mode === "create") {
+        await createUserWithEmailAndPassword(auth, email, password);
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+      }
+    } catch (error) {
+      setAuthError(authMessage(error));
+    }
+  }
+
+  async function handleSignOut() {
+    try {
+      await signOut(auth);
+      notify("Signed out successfully.");
+    } catch {
+      notify("Could not complete sign out.", "error");
+    }
+  }
+
+  async function migrateLocalBooks() {
+    const localBooks = loadBooks();
+    if (!localBooks.length) {
+      setLocalBackupCount(0);
+      return;
+    }
+
+    const seen = new Set(books.map((book) => book.sourceKey || book.id));
+    const additions = localBooks.filter((book) => {
+      const key = book.sourceKey || book.id;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    await saveManyBooks(
+      additions,
+      additions.length ? "Local library merged to Cloud shelf." : "No new books to import."
+    );
+    localStorage.removeItem(STORAGE_KEY);
+    setLocalBackupCount(0);
   }
 
   function openNewBook() {
     setEditingId(null);
     setForm(EMPTY_FORM);
-    setSearchQuery("");
-    setSearchResults([]);
-    setSearchError("");
     setModalOpen(true);
   }
 
   function openEditBook(book) {
     setEditingId(book.id);
     setForm(formFromBook(book));
-    setSearchQuery("");
-    setSearchResults([]);
-    setSearchError("");
     setModalOpen(true);
   }
 
@@ -394,112 +631,81 @@ function App() {
     setModalOpen(false);
     setEditingId(null);
     setForm(EMPTY_FORM);
-    setSearchQuery("");
-    setSearchResults([]);
-    setSearchError("");
   }
 
-  async function searchOpenLibrary(event) {
-    event.preventDefault();
-    const query = searchQuery.trim();
-    if (!query) return;
-
-    setSearching(true);
-    setSearchError("");
-    try {
-      const params = new URLSearchParams({
-        q: query,
-        limit: "12",
-        fields:
-          "key,title,author_name,first_publish_year,number_of_pages_median,cover_i,isbn",
-      });
-      const response = await fetch(`https://openlibrary.org/search.json?${params}`);
-      if (!response.ok) throw new Error("Search failed");
-      const data = await response.json();
-      setSearchResults(data.docs || []);
-      if (!data.docs?.length) setSearchError("No matches found.");
-    } catch {
-      setSearchResults([]);
-      setSearchError("Book search is unavailable right now.");
-    } finally {
-      setSearching(false);
-    }
+  async function quickAdd(volumeForm) {
+    const incoming = createBookFromForm(volumeForm);
+    await saveBook(incoming, "Added to library.");
   }
 
-  function useSearchResult(doc) {
-    setForm(formFromDoc(doc));
-    notify("Book details added.");
-  }
-
-  function quickAdd(doc) {
-    const incoming = createBookFromForm(formFromDoc(doc));
-    setBooks((current) => [incoming, ...current]);
-    notify("Added to your ledger.");
-  }
-
-  function submitBook(event) {
+  async function submitBook(event) {
     event.preventDefault();
     if (!form.title.trim()) return;
 
-    setBooks((current) => {
-      if (!editingId) {
-        return [createBookFromForm(form), ...current];
-      }
-      return current.map((book) =>
-        book.id === editingId ? createBookFromForm(form, book) : book,
-      );
-    });
-    notify(editingId ? "Book updated." : "Book added.");
+    const existing = editingId ? books.find((book) => book.id === editingId) : null;
+    await saveBook(
+      createBookFromForm(form, existing),
+      editingId ? "Book details updated." : "Book added to shelf."
+    );
     closeModal();
   }
 
   function deleteBook(book) {
-    const confirmed = window.confirm(`Remove "${book.title}" from your ledger?`);
-    if (!confirmed) return;
-    setBooks((current) => current.filter((item) => item.id !== book.id));
-    notify("Book removed.");
+    setDeleteConfirmBook(book);
   }
 
-  function updateBook(id, updates) {
-    setBooks((current) =>
-      current.map((book) => {
-        if (book.id !== id) return book;
-        const merged = { ...book, ...updates, updatedAt: Date.now() };
+  async function executeDeleteBook(book) {
+    setBooks((current) => current.filter((item) => item.id !== book.id));
 
-        if (updates.status === "want") {
-          merged.currentPage = 0;
-          merged.startedAt = null;
-          merged.finishedAt = null;
-        }
+    try {
+      await deleteDoc(bookDoc(book.id));
+      setSaveError("");
+      notify("Book removed from shelf.");
+    } catch (err) {
+      console.error(err);
+      setSaveError("Failed to delete the book from cloud storage.");
+      notify("Failed to delete book.", "error");
+    }
+  }
 
-        if (updates.status === "reading") {
-          merged.startedAt = merged.startedAt || Date.now();
-          merged.finishedAt = null;
-          if (merged.pages && merged.currentPage === 0) merged.currentPage = 1;
-        }
+  async function updateBook(id, updates) {
+    const existing = books.find((book) => book.id === id);
+    if (!existing) return;
 
-        if (updates.status === "done") {
-          merged.currentPage = merged.pages || merged.currentPage;
-          merged.finishedAt = merged.finishedAt || Date.now();
-        }
+    const merged = { ...existing, ...updates, updatedAt: Date.now() };
 
-        if (updates.currentPage !== undefined) {
-          merged.currentPage = clamp(toNumber(updates.currentPage, 0), 0, merged.pages || 999999);
-          if (merged.pages && merged.currentPage >= merged.pages) {
-            merged.status = "done";
-            merged.finishedAt = merged.finishedAt || Date.now();
-          } else if (merged.currentPage > 0 && merged.status === "want") {
-            merged.status = "reading";
-            merged.startedAt = merged.startedAt || Date.now();
-          } else if (merged.status === "done" && merged.pages && merged.currentPage < merged.pages) {
-            merged.status = "reading";
-            merged.finishedAt = null;
-          }
-        }
+    if (updates.status === "want") {
+      merged.currentPage = 0;
+      merged.startedAt = null;
+      merged.finishedAt = null;
+    }
 
-        return normalizeBook(merged);
-      }),
-    );
+    if (updates.status === "reading") {
+      merged.startedAt = merged.startedAt || Date.now();
+      merged.finishedAt = null;
+      if (merged.pages && merged.currentPage === 0) merged.currentPage = 1;
+    }
+
+    if (updates.status === "done") {
+      merged.currentPage = merged.pages || merged.currentPage;
+      merged.finishedAt = merged.finishedAt || Date.now();
+    }
+
+    if (updates.currentPage !== undefined) {
+      merged.currentPage = clamp(toNumber(updates.currentPage, 0), 0, merged.pages || 999999);
+      if (merged.pages && merged.currentPage >= merged.pages) {
+        merged.status = "done";
+        merged.finishedAt = merged.finishedAt || Date.now();
+      } else if (merged.currentPage > 0 && merged.status === "want") {
+        merged.status = "reading";
+        merged.startedAt = merged.startedAt || Date.now();
+      } else if (merged.status === "done" && merged.pages && merged.currentPage < merged.pages) {
+        merged.status = "reading";
+        merged.finishedAt = null;
+      }
+    }
+
+    await saveBook(normalizeBook(merged));
   }
 
   function exportLedger() {
@@ -510,7 +716,7 @@ function App() {
         books,
       },
       null,
-      2,
+      2
     );
     const blob = new Blob([payload], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -519,7 +725,7 @@ function App() {
     anchor.download = `book-ledger-${new Date().toISOString().slice(0, 10)}.json`;
     anchor.click();
     URL.revokeObjectURL(url);
-    notify("Ledger exported.");
+    notify("Ledger backup exported.");
   }
 
   async function importLedger(event) {
@@ -531,30 +737,51 @@ function App() {
       const text = await file.text();
       const parsed = JSON.parse(text);
       const incoming = Array.isArray(parsed) ? parsed : parsed.books;
-      if (!Array.isArray(incoming)) throw new Error("Invalid ledger");
+      if (!Array.isArray(incoming)) throw new Error("Invalid format");
       const normalized = incoming.map(normalizeBook);
 
-      setBooks((current) => {
-        const seen = new Set(current.map((book) => book.sourceKey || book.id));
-        const additions = normalized.filter((book) => {
-          const key = book.sourceKey || book.id;
-          if (seen.has(key)) return false;
-          seen.add(key);
-          return true;
-        });
-        return [...additions, ...current];
+      const seen = new Set(books.map((book) => book.sourceKey || book.id));
+      const additions = normalized.filter((book) => {
+        const key = book.sourceKey || book.id;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
       });
-      notify("Ledger imported.");
+      
+      await saveManyBooks(
+        additions,
+        additions.length ? "Ledger import complete." : "No new books to import."
+      );
     } catch {
-      notify("Could not import that file.");
+      notify("Failed to parse import backup file.", "error");
     }
   }
 
   function clearFilters() {
     setStatusFilter("all");
     setLibraryQuery("");
-    setFavoriteOnly(false);
     setSortBy("recent");
+  }
+
+  if (!authReady) {
+    return <LoadingScreen label="Connecting with Database Ledger" />;
+  }
+
+  if (!user && showLanding) {
+    return <LandingPage onEnter={() => setShowLanding(false)} theme={theme} toggleTheme={toggleTheme} />;
+  }
+
+  if (!user) {
+    return (
+      <AuthScreen
+        error={authError}
+        onEmailSubmit={signInWithEmail}
+        onGoogleSignIn={signInWithGoogle}
+        onBackToLanding={() => setShowLanding(true)}
+        theme={theme}
+        toggleTheme={toggleTheme}
+      />
+    );
   }
 
   return (
@@ -562,35 +789,40 @@ function App() {
       <aside className="sidebar">
         <div className="brand-lockup">
           <div className="brand-mark" aria-hidden="true">
-            <Library size={24} />
+            <Library size={22} />
           </div>
           <div>
-            <div className="eyebrow">Private shelf</div>
+            <div className="eyebrow">Cloud Shelf</div>
             <h1>Book Ledger</h1>
           </div>
         </div>
 
-        <div className="cover-strip" aria-hidden="true">
-          {(coverStrip.length ? coverStrip : Array.from({ length: 5 })).map((book, index) => (
-            <div
-              className="mini-spine"
-              key={book?.id || index}
-              style={getCoverStyle(book?.title || `empty-${index}`)}
-            >
-              {book?.coverUrl ? <img src={book.coverUrl} alt="" /> : null}
-            </div>
-          ))}
-        </div>
+        {coverStrip.length > 0 && (
+          <div className="cover-strip" aria-hidden="true">
+            {coverStrip.map((book) => (
+              <div
+                className="mini-spine"
+                key={book.id}
+                style={{
+                  background: `linear-gradient(135deg, var(--cover-a, #1e293b), var(--cover-b, #475569))`,
+                }}
+              >
+                {book.coverUrl ? <img src={book.coverUrl} alt="" /> : null}
+              </div>
+            ))}
+          </div>
+        )}
 
-        <nav className="status-nav" aria-label="Library filters">
+        <nav className="status-nav" aria-label="Shelf navigation">
           {[
-            ["all", "All books", Archive, stats.total],
+            ["all", "All Books", Archive, stats.total],
             ...Object.entries(STATUSES).map(([key, value]) => [
               key,
               value.longLabel,
               value.icon,
               stats[key],
             ]),
+            ["favorites", "Favorites", Heart, stats.favorites],
           ].map(([key, label, Icon, count]) => (
             <button
               className={statusFilter === key ? "nav-item active" : "nav-item"}
@@ -598,29 +830,31 @@ function App() {
               onClick={() => setStatusFilter(key)}
               type="button"
             >
-              <Icon size={18} />
+              <Icon size={17} />
               <span>{label}</span>
-              <strong>{count}</strong>
+              <strong className="nav-item-badge">{count}</strong>
             </button>
           ))}
         </nav>
 
         <div className="sidebar-actions">
-          <button className="button primary full" onClick={openNewBook} type="button">
-            <Plus size={18} />
-            <span>Add book</span>
+          <AccountCard user={user} onSignOut={handleSignOut} />
+          <button className="button primary full add-book-trigger" onClick={openNewBook} type="button">
+            <Plus size={16} />
+            <span>Add Book</span>
           </button>
           <div className="split-actions">
-            <button className="button ghost" onClick={exportLedger} type="button">
-              <Download size={17} />
+            <button className="button ghost" onClick={exportLedger} title="Export Ledger Backup" type="button">
+              <Download size={15} />
               <span>Export</span>
             </button>
             <button
               className="button ghost"
               onClick={() => fileInputRef.current?.click()}
+              title="Import Ledger Backup"
               type="button"
             >
-              <Upload size={17} />
+              <Import size={15} />
               <span>Import</span>
             </button>
           </div>
@@ -637,37 +871,55 @@ function App() {
       <main className="workspace">
         <header className="topbar">
           <div>
-            <p className="section-kicker">Your reading ledger</p>
-            <h2>Library dashboard</h2>
+            <p className="section-kicker">Library Dashboard</p>
+            <h2>My Library</h2>
           </div>
           <div className="topbar-actions">
-            <button
-              className={favoriteOnly ? "icon-button active" : "icon-button"}
-              onClick={() => setFavoriteOnly((value) => !value)}
-              aria-label="Show favorites"
-              title="Show favorites"
+            <button 
+              className="icon-button add-book-header-btn" 
+              onClick={openNewBook} 
+              aria-label="Add Book"
+              title="Add New Book"
               type="button"
             >
-              <Heart size={19} />
-            </button>
-            <button className="button primary" onClick={openNewBook} type="button">
               <Plus size={18} />
-              <span>Add book</span>
+            </button>
+
+            <button 
+              className="icon-button theme-toggle-btn" 
+              onClick={toggleTheme} 
+              aria-label="Toggle theme"
+              title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              type="button"
+            >
+              {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
             </button>
           </div>
         </header>
 
         {saveError ? (
-          <div className="notice" role="status">
+          <div className="notice error-notice" role="status">
             {saveError}
           </div>
         ) : null}
 
-        <section className="metrics-grid" aria-label="Reading metrics">
-          <MetricCard label="Books" value={stats.total} icon={Library} tone="teal" />
-          <MetricCard label="Pages read" value={stats.pagesRead.toLocaleString()} icon={BookOpen} tone="gold" />
-          <MetricCard label="Finished this year" value={stats.finishedThisYear} icon={CalendarDays} tone="plum" />
-          <MetricCard label="Average rating" value={stats.averageRating} icon={Star} tone="coral" />
+        {localBackupCount > 0 ? (
+          <div className="notice success-notice" role="status">
+            <span>
+              Found {localBackupCount} book{localBackupCount === 1 ? "" : "s"} in local browser storage.
+            </span>
+            <button className="button ghost on-light compact" onClick={migrateLocalBooks} type="button">
+              <Import size={14} />
+              <span>Migrate to Cloud</span>
+            </button>
+          </div>
+        ) : null}
+
+        <section className="metrics-grid" aria-label="Shelf stats summary">
+          <MetricCard label="Total Library" value={stats.total} icon={Library} tone="teal" />
+          <MetricCard label="Pages Read" value={stats.pagesRead.toLocaleString()} icon={BookOpen} tone="gold" />
+          <MetricCard label="Completed 2026" value={stats.finishedThisYear} icon={CalendarDays} tone="plum" />
+          <MetricCard label="Average Rating" value={stats.averageRating} icon={Star} tone="coral" />
         </section>
 
         <section className="content-layout">
@@ -678,11 +930,11 @@ function App() {
                 <input
                   value={libraryQuery}
                   onChange={(event) => setLibraryQuery(event.target.value)}
-                  placeholder="Search title, author, tag, note..."
+                  placeholder="Filter by title, author, tags, notes..."
                 />
               </label>
 
-              <div className="select-wrap">
+              <div className="select-wrap library-sort-select">
                 <select value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
                   {SORTS.map((sort) => (
                     <option key={sort.value} value={sort.value}>
@@ -690,32 +942,34 @@ function App() {
                     </option>
                   ))}
                 </select>
-                <ChevronDown size={16} />
+                <ChevronDown size={14} />
               </div>
 
-              <div className="view-toggle" aria-label="View mode">
+              <div className="view-toggle" aria-label="Toggle Layout Grid/List">
                 <button
                   className={view === "grid" ? "active" : ""}
                   onClick={() => setView("grid")}
-                  aria-label="Grid view"
-                  title="Grid view"
+                  aria-label="Grid View"
+                  title="Grid Layout"
                   type="button"
                 >
-                  <Grid3X3 size={17} />
+                  <Grid3X3 size={15} />
                 </button>
                 <button
                   className={view === "list" ? "active" : ""}
                   onClick={() => setView("list")}
-                  aria-label="List view"
-                  title="List view"
+                  aria-label="List View"
+                  title="List Layout"
                   type="button"
                 >
-                  <List size={18} />
+                  <List size={16} />
                 </button>
               </div>
             </div>
 
-            {visibleBooks.length ? (
+            {booksLoading ? (
+              <LoadingPanel label="Connecting with Database ledger..." />
+            ) : visibleBooks.length ? (
               <div className={view === "grid" ? "book-grid" : "book-list"}>
                 {visibleBooks.map((book) => (
                   <BookCard
@@ -725,6 +979,7 @@ function App() {
                     onDelete={deleteBook}
                     onEdit={openEditBook}
                     onUpdate={updateBook}
+                    onViewDetails={setDetailsBook}
                   />
                 ))}
               </div>
@@ -736,21 +991,21 @@ function App() {
           <aside className="insights-panel">
             <div className="insight-block">
               <div className="panel-heading">
-                <BarChart3 size={18} />
-                <h3>Progress</h3>
+                <BarChart3 size={17} />
+                <h3>Reading Progress</h3>
               </div>
               <div className="completion-meter">
                 <span style={{ width: `${stats.completionRate}%` }} />
               </div>
               <div className="meter-copy">
                 <strong>{stats.completionRate}%</strong>
-                <span>finished</span>
+                <span>completed</span>
               </div>
               <div className="status-bars">
                 {Object.entries(STATUSES).map(([key, status]) => (
                   <div className="status-bar-row" key={key}>
                     <span>{status.longLabel}</span>
-                    <div>
+                    <div className="status-bar-track">
                       <i
                         style={{
                           width: `${stats.total ? (stats[key] / stats.total) * 100 : 0}%`,
@@ -764,460 +1019,44 @@ function App() {
               </div>
             </div>
 
-            <ReadingStack title="Reading now" books={currentlyReading} empty="No active reads." />
-            <ReadingStack title="Recently finished" books={recentlyFinished} empty="Nothing finished yet." />
+            <ReadingStack title="Reading Now" books={currentlyReading} empty="No active books." />
+            <ReadingStack title="Recently Finished" books={recentlyFinished} empty="No books completed yet." />
           </aside>
         </section>
       </main>
 
-      {modalOpen ? (
+      {modalOpen && (
         <BookModal
+          books={books}
           editing={Boolean(editingId)}
           form={form}
           onClose={closeModal}
           onFormChange={setForm}
-          onSearch={searchOpenLibrary}
           onSubmit={submitBook}
           quickAdd={quickAdd}
-          searchError={searchError}
-          searchQuery={searchQuery}
-          searchResults={searchResults}
-          searching={searching}
-          setSearchQuery={setSearchQuery}
-          useSearchResult={useSearchResult}
-          books={books}
         />
-      ) : null}
-
-      {toast ? (
-        <div className="toast" role="status">
-          <Check size={17} />
-          <span>{toast}</span>
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-function MetricCard({ icon: Icon, label, value, tone }) {
-  return (
-    <div className={`metric-card ${tone}`}>
-      <div className="metric-icon">
-        <Icon size={20} />
-      </div>
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </div>
-  );
-}
-
-function Cover({ book, className = "" }) {
-  return (
-    <div className={`cover ${className}`} style={getCoverStyle(`${book.title}${book.author}`)}>
-      {book.coverUrl ? (
-        <img src={book.coverUrl} alt="" loading="lazy" />
-      ) : (
-        <div className="cover-fallback" aria-hidden="true">
-          <span>{getInitials(book.title)}</span>
-          <i />
-        </div>
       )}
-    </div>
-  );
-}
 
-function BookCard({ book, layout, onDelete, onEdit, onUpdate }) {
-  const progress = progressFor(book);
-  const StatusIcon = STATUSES[book.status].icon;
-  const [pageDraft, setPageDraft] = useState(String(book.currentPage || 0));
+      {toast && <Toast message={toast} type={toastType} />}
 
-  useEffect(() => {
-    setPageDraft(String(book.currentPage || 0));
-  }, [book.currentPage]);
-
-  function commitPage() {
-    onUpdate(book.id, { currentPage: pageDraft });
-  }
-
-  return (
-    <article className={`book-card ${layout === "list" ? "row" : ""}`}>
-      <Cover book={book} />
-      <div className="book-main">
-        <div className="book-title-row">
-          <div className="book-heading">
-            <div className="status-chip" style={{ "--status-color": STATUSES[book.status].color }}>
-              <StatusIcon size={13} />
-              <span>{STATUSES[book.status].longLabel}</span>
-            </div>
-            <h3>{book.title}</h3>
-            <p>
-              {book.author || "Unknown author"}
-              {book.publishedYear ? `, ${book.publishedYear}` : ""}
-            </p>
-          </div>
-          <div className="book-actions">
-            <button
-              className={book.favorite ? "icon-button active" : "icon-button"}
-              onClick={() => onUpdate(book.id, { favorite: !book.favorite })}
-              aria-label="Toggle favorite"
-              title="Toggle favorite"
-              type="button"
-            >
-              <Heart size={17} />
-            </button>
-            <button
-              className="icon-button"
-              onClick={() => onEdit(book)}
-              aria-label="Edit book"
-              title="Edit book"
-              type="button"
-            >
-              <Edit3 size={17} />
-            </button>
-            <button
-              className="icon-button danger"
-              onClick={() => onDelete(book)}
-              aria-label="Remove book"
-              title="Remove book"
-              type="button"
-            >
-              <Trash2 size={17} />
-            </button>
-          </div>
-        </div>
-
-        <div className="rating-row">
-          <Rating value={book.rating} onChange={(rating) => onUpdate(book.id, { rating })} />
-          {book.finishedAt ? <span>Finished {formatDate(book.finishedAt)}</span> : null}
-        </div>
-
-        {book.tags.length ? (
-          <div className="tag-row">
-            {book.tags.slice(0, 4).map((tag) => (
-              <span key={tag}>{tag}</span>
-            ))}
-          </div>
-        ) : null}
-
-        <div className="progress-area">
-          <div className="progress-copy">
-            <strong>{progress}%</strong>
-            <span>
-              {book.pages
-                ? `${book.currentPage.toLocaleString()} of ${book.pages.toLocaleString()} pages`
-                : "Page count not set"}
-            </span>
-          </div>
-          <div className="progress-track">
-            <span style={{ width: `${progress}%` }} />
-          </div>
-        </div>
-
-        <div className="card-controls">
-          <div className="segmented status-segmented">
-            {Object.entries(STATUSES).map(([key, status]) => {
-              const Icon = status.icon;
-              return (
-                <button
-                  className={book.status === key ? "active" : ""}
-                  key={key}
-                  onClick={() => onUpdate(book.id, { status: key })}
-                  type="button"
-                >
-                  <Icon size={15} />
-                  <span>{status.label}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {book.pages ? (
-            <label className="page-field">
-              <input
-                type="number"
-                min="0"
-                max={book.pages}
-                value={pageDraft}
-                onChange={(event) => setPageDraft(event.target.value)}
-                onBlur={commitPage}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") commitPage();
-                }}
-              />
-              <span>page</span>
-            </label>
-          ) : null}
-        </div>
-      </div>
-    </article>
-  );
-}
-
-function Rating({ value, onChange }) {
-  return (
-    <div className="rating" aria-label={`${value || 0} star rating`}>
-      {Array.from({ length: 5 }).map((_, index) => {
-        const rating = index + 1;
-        return (
-          <button
-            className={rating <= value ? "filled" : ""}
-            key={rating}
-            onClick={() => onChange(value === rating ? 0 : rating)}
-            aria-label={`${rating} stars`}
-            title={`${rating} stars`}
-            type="button"
-          >
-            <Star size={16} />
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-function EmptyState({ hasBooks, onAdd, onReset }) {
-  return (
-    <div className="empty-state">
-      <div className="empty-covers" aria-hidden="true">
-        {Array.from({ length: 4 }).map((_, index) => (
-          <span key={index} style={getCoverStyle(`empty-state-${index}`)} />
-        ))}
-      </div>
-      <h3>{hasBooks ? "No books match this view" : "Your ledger is empty"}</h3>
-      <p>{hasBooks ? "Clear filters or search for another shelf entry." : "Add the first title to begin."}</p>
-      <div className="empty-actions">
-        <button className="button primary" onClick={onAdd} type="button">
-          <Plus size={18} />
-          <span>Add book</span>
-        </button>
-        {hasBooks ? (
-          <button className="button ghost on-light" onClick={onReset} type="button">
-            <RotateCcw size={17} />
-            <span>Reset filters</span>
-          </button>
-        ) : null}
-      </div>
-    </div>
-  );
-}
-
-function ReadingStack({ title, books, empty }) {
-  return (
-    <div className="insight-block compact">
-      <div className="panel-heading">
-        <BookMarked size={18} />
-        <h3>{title}</h3>
-      </div>
-      {books.length ? (
-        <div className="stack-list">
-          {books.map((book) => (
-            <div className="stack-item" key={book.id}>
-              <Cover book={book} className="tiny" />
-              <div>
-                <strong>{book.title}</strong>
-                <span>{progressFor(book)}%</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="muted">{empty}</p>
+      {deleteConfirmBook && (
+        <DeleteConfirmModal
+          book={deleteConfirmBook}
+          onCancel={() => setDeleteConfirmBook(null)}
+          onConfirm={async () => {
+            const bookToDelete = deleteConfirmBook;
+            setDeleteConfirmBook(null);
+            await executeDeleteBook(bookToDelete);
+          }}
+        />
       )}
-    </div>
-  );
-}
 
-function BookModal({
-  books,
-  editing,
-  form,
-  onClose,
-  onFormChange,
-  onSearch,
-  onSubmit,
-  quickAdd,
-  searchError,
-  searchQuery,
-  searchResults,
-  searching,
-  setSearchQuery,
-  useSearchResult,
-}) {
-  const existingKeys = useMemo(() => new Set(books.map((book) => book.sourceKey).filter(Boolean)), [books]);
-
-  function patchForm(patch) {
-    onFormChange((current) => ({ ...current, ...patch }));
-  }
-
-  return (
-    <div className="modal-backdrop" role="presentation">
-      <section className="modal" role="dialog" aria-modal="true" aria-labelledby="book-modal-title">
-        <div className="modal-header">
-          <div>
-            <p className="section-kicker">{editing ? "Edit entry" : "New entry"}</p>
-            <h2 id="book-modal-title">{editing ? "Update book" : "Add a book"}</h2>
-          </div>
-          <button className="icon-button" onClick={onClose} aria-label="Close" title="Close" type="button">
-            <X size={19} />
-          </button>
-        </div>
-
-        {!editing ? (
-          <form className="lookup-bar" onSubmit={onSearch}>
-            <label className="search-field">
-              <Search size={18} />
-              <input
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Find a book from Open Library"
-              />
-            </label>
-            <button className="button primary" disabled={searching} type="submit">
-              {searching ? <Loader2 className="spin" size={18} /> : <Search size={18} />}
-              <span>{searching ? "Searching" : "Search"}</span>
-            </button>
-          </form>
-        ) : null}
-
-        {searchError ? <div className="inline-alert">{searchError}</div> : null}
-
-        {searchResults.length ? (
-          <div className="search-results">
-            {searchResults.map((doc) => {
-              const alreadyAdded = existingKeys.has(doc.key);
-              const tempBook = normalizeBook({
-                ...formFromDoc(doc),
-                pages: doc.number_of_pages_median || 0,
-              });
-              return (
-                <div className="result-row" key={doc.key}>
-                  <Cover book={tempBook} className="tiny" />
-                  <div>
-                    <strong>{doc.title}</strong>
-                    <span>
-                      {doc.author_name?.[0] || "Unknown author"}
-                      {doc.first_publish_year ? `, ${doc.first_publish_year}` : ""}
-                    </span>
-                  </div>
-                  <button className="button ghost on-light" onClick={() => useSearchResult(doc)} type="button">
-                    <Import size={16} />
-                    <span>Use</span>
-                  </button>
-                  <button
-                    className="button primary compact"
-                    disabled={alreadyAdded}
-                    onClick={() => quickAdd(doc)}
-                    type="button"
-                  >
-                    <Plus size={16} />
-                    <span>{alreadyAdded ? "Added" : "Add"}</span>
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        ) : null}
-
-        <form className="book-form" onSubmit={onSubmit}>
-          <div className="form-cover">
-            <Cover
-              book={normalizeBook({
-                title: form.title || "New book",
-                author: form.author,
-                coverUrl: form.coverUrl,
-                coverId: form.coverId,
-              })}
-            />
-          </div>
-
-          <div className="form-grid">
-            <label className="field span-2">
-              <span>Title</span>
-              <input
-                required
-                value={form.title}
-                onChange={(event) => patchForm({ title: event.target.value })}
-              />
-            </label>
-            <label className="field">
-              <span>Author</span>
-              <input value={form.author} onChange={(event) => patchForm({ author: event.target.value })} />
-            </label>
-            <label className="field">
-              <span>Published</span>
-              <input
-                inputMode="numeric"
-                value={form.publishedYear}
-                onChange={(event) => patchForm({ publishedYear: event.target.value })}
-              />
-            </label>
-            <label className="field">
-              <span>Pages</span>
-              <input
-                min="0"
-                type="number"
-                value={form.pages}
-                onChange={(event) => patchForm({ pages: event.target.value })}
-              />
-            </label>
-            <label className="field">
-              <span>Current page</span>
-              <input
-                min="0"
-                type="number"
-                value={form.currentPage}
-                onChange={(event) => patchForm({ currentPage: event.target.value })}
-              />
-            </label>
-            <label className="field">
-              <span>Status</span>
-              <select value={form.status} onChange={(event) => patchForm({ status: event.target.value })}>
-                {Object.entries(STATUSES).map(([key, status]) => (
-                  <option key={key} value={key}>
-                    {status.longLabel}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="field">
-              <span>Rating</span>
-              <div className="rating-input">
-                <Rating value={form.rating} onChange={(rating) => patchForm({ rating })} />
-              </div>
-            </label>
-            <label className="field span-2">
-              <span>Tags</span>
-              <div className="field-with-icon">
-                <Tags size={17} />
-                <input
-                  value={form.tags}
-                  onChange={(event) => patchForm({ tags: event.target.value })}
-                  placeholder="fiction, craft, research"
-                />
-              </div>
-            </label>
-            <label className="field span-2">
-              <span>Notes</span>
-              <textarea
-                value={form.notes}
-                onChange={(event) => patchForm({ notes: event.target.value })}
-                rows={4}
-              />
-            </label>
-          </div>
-
-          <div className="modal-footer">
-            <button className="button ghost on-light" onClick={onClose} type="button">
-              <X size={17} />
-              <span>Cancel</span>
-            </button>
-            <button className="button primary" type="submit">
-              <Sparkles size={18} />
-              <span>{editing ? "Save changes" : "Save book"}</span>
-            </button>
-          </div>
-        </form>
-      </section>
+      {detailsBook && (
+        <BookDetailsModal
+          book={books.find((b) => b.id === detailsBook.id) || detailsBook}
+          onClose={() => setDetailsBook(null)}
+        />
+      )}
     </div>
   );
 }
