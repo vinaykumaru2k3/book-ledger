@@ -151,7 +151,7 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
               <g className="svg-book red">
                 {/* Left Face (spine) */}
                 <polygon
-                  points="100,175 225,215 225,177 100,137"
+                  points="100,215 225,255 225,217 100,177"
                   fill="#b91c1c"
                   stroke="#12100f"
                   strokeWidth="5"
@@ -159,19 +159,19 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
                 />
                 {/* Right Face (pages) */}
                 <polygon
-                  points="225,215 340,180 340,142 225,177"
+                  points="225,255 340,220 340,182 225,217"
                   fill="#fbf7f0"
                   stroke="#12100f"
                   strokeWidth="5"
                   strokeLinejoin="round"
                 />
                 {/* Page Lines */}
-                <line x1="230" y1="190" x2="335" y2="156" stroke="#d7ccc8" strokeWidth="2.5" />
-                <line x1="230" y1="200" x2="335" y2="166" stroke="#d7ccc8" strokeWidth="2.5" />
+                <line x1="230" y1="230" x2="335" y2="196" stroke="#d7ccc8" strokeWidth="2.5" />
+                <line x1="230" y1="240" x2="335" y2="206" stroke="#d7ccc8" strokeWidth="2.5" />
                 
                 {/* Top Face (cover) */}
                 <polygon
-                  points="225,177 100,137 215,102 340,142"
+                  points="225,217 100,177 215,142 340,182"
                   fill="#ef4444"
                   stroke="#12100f"
                   strokeWidth="5"
@@ -183,7 +183,7 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
               <g className="svg-book blue">
                 {/* Left Face (spine) */}
                 <polygon
-                  points="60,107 175,142 175,107 60,72"
+                  points="60,163 175,198 175,163 60,128"
                   fill="#1d4ed8"
                   stroke="#12100f"
                   strokeWidth="5"
@@ -191,19 +191,19 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
                 />
                 {/* Right Face (pages) */}
                 <polygon
-                  points="175,142 300,102 300,67 175,107"
+                  points="175,198 300,158 300,123 175,163"
                   fill="#fbf7f0"
                   stroke="#12100f"
                   strokeWidth="5"
                   strokeLinejoin="round"
                 />
                 {/* Page Lines */}
-                <line x1="180" y1="117" x2="295" y2="79" stroke="#d7ccc8" strokeWidth="2.5" />
-                <line x1="180" y1="125" x2="295" y2="87" stroke="#d7ccc8" strokeWidth="2.5" />
+                <line x1="180" y1="175" x2="295" y2="135" stroke="#d7ccc8" strokeWidth="2.5" />
+                <line x1="180" y1="185" x2="295" y2="145" stroke="#d7ccc8" strokeWidth="2.5" />
                 
                 {/* Top Face (cover) */}
                 <polygon
-                  points="175,107 60,72 185,32 300,67"
+                  points="175,163 60,128 185,88 300,123"
                   fill="#0ea5e9"
                   stroke="#12100f"
                   strokeWidth="5"
