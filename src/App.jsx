@@ -1000,20 +1000,17 @@ function App() {
           <aside className="insights-panel">
             <div className="insight-block">
               <div className="panel-heading">
-                <BarChart3 size={17} />
+                <BarChart3 size={15} />
                 <h3>Reading Progress</h3>
+                <span className="panel-badge">{stats.completionRate}% done</span>
               </div>
               <div className="completion-meter">
                 <span style={{ width: `${stats.completionRate}%` }} />
               </div>
-              <div className="meter-copy">
-                <strong>{stats.completionRate}%</strong>
-                <span>completed</span>
-              </div>
               <div className="status-bars">
                 {Object.entries(STATUSES).map(([key, status]) => (
                   <div className="status-bar-row" key={key}>
-                    <span>{status.longLabel}</span>
+                    <span className="status-bar-label">{status.longLabel}</span>
                     <div className="status-bar-track">
                       <i
                         style={{

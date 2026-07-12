@@ -1532,31 +1532,46 @@ textarea:focus-visible {
 }
 
 .insight-block {
-  background-color: var(--bg-surface);
+  background-color: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
-  padding: 20px;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
+/* ── Panel heading ── */
 .panel-heading {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--text-secondary);
-  margin-bottom: 16px;
 }
 
 .panel-heading h3 {
-  font-size: 0.95rem;
+  font-size: 0.8rem;
   font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex: 1;
 }
 
+.panel-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent-emerald);
+  background: rgba(16, 185, 129, 0.1);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+/* ── Overall completion bar ── */
 .completion-meter {
-  height: 6px;
-  background-color: rgba(255, 255, 255, 0.04);
+  height: 5px;
+  background-color: var(--border-subtle);
   border-radius: 99px;
   overflow: hidden;
-  margin-bottom: 10px;
 }
 
 .completion-meter span {
@@ -1564,45 +1579,34 @@ textarea:focus-visible {
   height: 100%;
   background: linear-gradient(90deg, var(--accent-emerald), var(--accent-plum));
   border-radius: 99px;
+  transition: width 0.4s ease;
 }
 
-.meter-copy {
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  margin-bottom: 16px;
-}
-
-.meter-copy strong {
-  font-family: var(--font-serif);
-  font-size: 1.85rem;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.meter-copy span {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
+/* ── Per-status bar rows ── */
 .status-bars {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .status-bar-row {
   display: grid;
-  grid-template-columns: 80px minmax(0, 1fr) 20px;
+  grid-template-columns: 72px 1fr 18px;
   gap: 10px;
   align-items: center;
-  font-size: 0.78rem;
+}
+
+.status-bar-label {
+  font-size: 0.75rem;
   color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .status-bar-track {
-  height: 4px;
-  background-color: rgba(255, 255, 255, 0.04);
+  height: 3px;
+  background-color: var(--border-subtle);
   border-radius: 99px;
   overflow: hidden;
 }
@@ -1611,44 +1615,83 @@ textarea:focus-visible {
   display: block;
   height: 100%;
   border-radius: 99px;
+  transition: width 0.4s ease;
 }
 
 .status-bar-row strong {
   text-align: right;
-  color: var(--text-primary);
+  font-size: 0.75rem;
   font-weight: 600;
+  color: var(--text-primary);
 }
 
+/* ── Stack lists (Reading Now / Recently Finished) ── */
 .stack-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
 .stack-item {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  align-items: flex-start;
+  gap: 12px;
 }
 
 .stack-info {
   display: flex;
   flex-direction: column;
+  gap: 3px;
   min-width: 0;
+  flex: 1;
+  padding-top: 1px;
 }
 
 .stack-info strong {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.3;
 }
 
-.stack-info span {
+.stack-author {
   font-size: 0.72rem;
   color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stack-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 4px;
+}
+
+.stack-progress-track {
+  flex: 1;
+  height: 3px;
+  background-color: var(--border-subtle);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.stack-progress-fill {
+  height: 100%;
+  background-color: var(--accent-emerald);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+.stack-pct {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  flex-shrink: 0;
 }
 
 /* Empty States */
