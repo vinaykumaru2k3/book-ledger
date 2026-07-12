@@ -12,6 +12,8 @@ import {
   RotateCcw,
   Search,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   ShieldCheck,
   Star,
   BookOpen,
@@ -236,6 +238,7 @@ function App() {
   const [localBackupCount, setLocalBackupCount] = useState(() => loadBooks().length);
   const [showLanding, setShowLanding] = useState(true);
   const checkedIdsRef = useRef(new Set());
+  const [currentPage, setCurrentPage] = useState(1);
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem("book-ledger:theme") || "dark";
   });
@@ -244,6 +247,10 @@ function App() {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("book-ledger:theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [libraryQuery, statusFilter, sortBy]);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
@@ -480,6 +487,14 @@ function App() {
       return (b.addedAt || 0) - (a.addedAt || 0);
     });
   }, [books, libraryQuery, sortBy, statusFilter]);
+
+  const BOOKS_PER_PAGE = 8;
+  const totalPages = Math.ceil(visibleBooks.length / BOOKS_PER_PAGE);
+  const activePage = Math.min(currentPage, totalPages || 1);
+  const startIndex = (activePage - 1) * BOOKS_PER_PAGE;
+  const paginatedBooks = useMemo(() => {
+    return visibleBooks.slice(startIndex, startIndex + BOOKS_PER_PAGE);
+  }, [visibleBooks, startIndex]);
 
   const currentlyReading = useMemo(
     () =>
@@ -979,19 +994,65 @@ function App() {
             {booksLoading ? (
               <LoadingPanel label="Connecting with Database ledger..." />
             ) : visibleBooks.length ? (
-              <div className={view === "grid" ? "book-grid" : "book-list"}>
-                {visibleBooks.map((book) => (
-                  <BookCard
-                    book={book}
-                    key={book.id}
-                    layout={view}
-                    onDelete={deleteBook}
-                    onEdit={openEditBook}
-                    onUpdate={updateBook}
-                    onViewDetails={setDetailsBook}
-                  />
-                ))}
-              </div>
+              <>
+                <div className={view === "grid" ? "book-grid" : "book-list"}>
+                  {paginatedBooks.map((book) => (
+                    <BookCard
+                      book={book}
+                      key={book.id}
+                      layout={view}
+                      onDelete={deleteBook}
+                      onEdit={openEditBook}
+                      onUpdate={updateBook}
+                      onViewDetails={setDetailsBook}
+                    />
+                  ))}
+                </div>
+
+                {/* Folio Pagination Footer */}
+                {totalPages > 1 && (
+                  <div className="pagination-wrapper">
+                    <div className="pagination-info">
+                      Showing <strong>{startIndex + 1}</strong>–<strong>{Math.min(startIndex + BOOKS_PER_PAGE, visibleBooks.length)}</strong> of <strong>{visibleBooks.length}</strong> books
+                    </div>
+                    <div className="pagination-buttons">
+                      <button
+                        className="pagination-btn"
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={activePage === 1}
+                        aria-label="Previous Page"
+                        type="button"
+                      >
+                        <ChevronLeft size={15} />
+                      </button>
+
+                      {Array.from({ length: totalPages }).map((_, idx) => {
+                        const pageNum = idx + 1;
+                        return (
+                          <button
+                            key={pageNum}
+                            className={`pagination-btn page-num ${activePage === pageNum ? "active" : ""}`}
+                            onClick={() => setCurrentPage(pageNum)}
+                            type="button"
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      })}
+
+                      <button
+                        className="pagination-btn"
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        disabled={activePage === totalPages}
+                        aria-label="Next Page"
+                        type="button"
+                      >
+                        <ChevronRight size={15} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
             ) : (
               <EmptyState hasBooks={books.length > 0} onAdd={openNewBook} onReset={clearFilters} />
             )}
