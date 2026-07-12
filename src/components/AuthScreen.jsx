@@ -35,7 +35,6 @@ function AuthScreen({ error, onEmailSubmit, onGoogleSignIn, onBackToLanding, the
           <div className="auth-crest-img-wrap">
             <img src="/stack-of-books.png" alt="" className="auth-logo-img" />
           </div>
-          <span className="auth-edition">Cloud Edition</span>
           <h1 className="auth-book-title">Pusthaka</h1>
           <div className="auth-book-divider" />
           <p className="auth-book-tagline">
@@ -112,10 +111,11 @@ function AuthScreen({ error, onEmailSubmit, onGoogleSignIn, onBackToLanding, the
               <div className="field-with-icon">
                 <Mail size={16} />
                 <input
-                  autoComplete="email"
+                  autoComplete="off"
                   required
                   type="email"
                   value={email}
+                  placeholder="name@example.com"
                   onChange={(event) => setEmail(event.target.value)}
                 />
               </div>
@@ -124,11 +124,12 @@ function AuthScreen({ error, onEmailSubmit, onGoogleSignIn, onBackToLanding, the
             <label className="field">
               <span>Password</span>
               <input
-                autoComplete={mode === "create" ? "new-password" : "current-password"}
+                autoComplete="new-password"
                 minLength={6}
                 required
                 type="password"
                 value={password}
+                placeholder="••••••••"
                 onChange={(event) => setPassword(event.target.value)}
               />
             </label>
