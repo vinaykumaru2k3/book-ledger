@@ -33,13 +33,15 @@ const FEATURES = [
   },
 ];
 
+// Stacked books configuration: w = width (px), t = thickness/height (px), rot = rotation offset (deg)
+// Listed from bottom (index 0) to top (index 5)
 const BOOKS = [
-  { h: 140, a: "#6b21a8", b: "#581c87" }, // Plum/Deep Violet
-  { h: 165, a: "#1e3a8a", b: "#172554" }, // Classic Navy
-  { h: 130, a: "#b45309", b: "#92400e" }, // Antique Gold/Amber
-  { h: 155, a: "#065f46", b: "#064e3b" }, // Forest Pine Green
-  { h: 145, a: "#991b1b", b: "#7f1d1d" }, // Crimson / Burgundy
-  { h: 160, a: "#292524", b: "#1c1917" }, // Leather Charcoal
+  { w: 230, t: 29, rot: 0, a: "#7f1d1d", b: "#991b1b" },     // Burgundy
+  { w: 215, t: 25, rot: 2.5, a: "#172554", b: "#1e3a8a" },   // Classic Navy
+  { w: 200, t: 27, rot: -3.5, a: "#064e3b", b: "#065f46" },  // Forest Pine
+  { w: 185, t: 24, rot: 1.5, a: "#581c87", b: "#6b21a8" },   // Plum
+  { w: 170, t: 26, rot: -1.5, a: "#92400e", b: "#b45309" },  // Antique Gold
+  { w: 145, t: 22, rot: 3, a: "#1c1917", b: "#292524" },     // Leather Charcoal
 ];
 
 function LandingPage({ onEnter, theme, toggleTheme }) {
@@ -89,21 +91,28 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
             </div>
           </div>
 
-          {/* Premium Mahogany visual shelf representation */}
+          {/* Premium mahogany study desk with stacked books */}
           <div className="landing-hero-visual" aria-hidden="true">
-            <div className="hero-shelf">
+            <div className="hero-book-stack">
               {BOOKS.map((book, i) => (
                 <div
                   key={i}
-                  className="hero-book"
+                  className="stacked-book"
                   style={{
-                    height: `${book.h}px`,
-                    background: `linear-gradient(165deg, ${book.a}, ${book.b})`,
-                    animationDelay: `${i * 0.08}s`,
+                    width: `${book.w}px`,
+                    height: `${book.t}px`,
+                    background: `linear-gradient(180deg, ${book.b}, ${book.a})`,
+                    transform: `rotate(${book.rot}deg)`,
+                    zIndex: i + 10,
+                    animationDelay: `${i * 0.15}s`,
+                    // We also save target rotation in a custom CSS variable for hover transitions
+                    "--target-rot": `${book.rot}deg`,
                   }}
                 >
-                  <div className="hero-book-spine-line" />
-                  <div className="hero-book-gold-accents" />
+                  {/* Decorative embossed gold stripes on horizontal spine */}
+                  <div className="stacked-book-gold-stripe left" />
+                  <div className="stacked-book-gold-stripe right" />
+                  <div className="stacked-book-core-shadow" />
                 </div>
               ))}
             </div>
