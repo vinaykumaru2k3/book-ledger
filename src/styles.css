@@ -481,17 +481,16 @@ textarea:focus-visible {
 .stat-icon.coral { color: var(--accent-coral); }
 
 .stat-item strong {
-  font-size: 1.05rem;
-  font-weight: 700;
+  font-size: 0.85rem;
+  font-weight: 600;
   color: var(--text-primary);
   font-family: var(--font-sans);
-  letter-spacing: -0.01em;
 }
 
 .stat-item span {
-  font-size: 0.78rem;
+  font-size: 0.85rem;
   color: var(--text-muted);
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .stat-divider {
