@@ -7,7 +7,6 @@ import {
   Moon,
   ArrowRight,
   ShieldCheck,
-  Sparkles,
 } from "lucide-react";
 
 const FEATURES = [
@@ -31,17 +30,6 @@ const FEATURES = [
     title: "Reading Sanctuary",
     body: "Zero advertisements, zero algorithm feeds. A silent, private reading ledger designed for focus.",
   },
-];
-
-// Stacked books configuration: w = width (px), t = thickness/height (px), rot = rotation offset (deg)
-// Listed from bottom (index 0) to top (index 5)
-const BOOKS = [
-  { w: 230, t: 29, rot: 0, a: "#7f1d1d", b: "#991b1b" },     // Burgundy
-  { w: 215, t: 25, rot: 2.5, a: "#172554", b: "#1e3a8a" },   // Classic Navy
-  { w: 200, t: 27, rot: -3.5, a: "#064e3b", b: "#065f46" },  // Forest Pine
-  { w: 185, t: 24, rot: 1.5, a: "#581c87", b: "#6b21a8" },   // Plum
-  { w: 170, t: 26, rot: -1.5, a: "#92400e", b: "#b45309" },  // Antique Gold
-  { w: 145, t: 22, rot: 3, a: "#1c1917", b: "#292524" },     // Leather Charcoal
 ];
 
 function LandingPage({ onEnter, theme, toggleTheme }) {
@@ -91,33 +79,138 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
             </div>
           </div>
 
-          {/* Premium mahogany study desk with stacked books */}
+          {/* 3D Isometric SVG Stack - matching the stack-of-books logo */}
           <div className="landing-hero-visual" aria-hidden="true">
-            <div className="hero-book-stack">
-              {BOOKS.map((book, i) => (
-                <div
-                  key={i}
-                  className="stacked-book"
-                  style={{
-                    width: `${book.w}px`,
-                    height: `${book.t}px`,
-                    background: `linear-gradient(180deg, ${book.b}, ${book.a})`,
-                    transform: `rotate(${book.rot}deg)`,
-                    zIndex: i + 10,
-                    animationDelay: `${i * 0.15}s`,
-                    // We also save target rotation in a custom CSS variable for hover transitions
-                    "--target-rot": `${book.rot}deg`,
-                  }}
-                >
-                  {/* Decorative embossed gold stripes on horizontal spine */}
-                  <div className="stacked-book-gold-stripe left" />
-                  <div className="stacked-book-gold-stripe right" />
-                  <div className="stacked-book-core-shadow" />
-                </div>
-              ))}
-            </div>
-            <div className="hero-shelf-plank" />
-            <div className="hero-shelf-shadow" />
+            <svg
+              viewBox="0 0 400 400"
+              width="360"
+              height="360"
+              className="landing-svg-viewport"
+            >
+              {/* 3D Mahogany Desk Shelf */}
+              <g className="svg-desk-shelf">
+                {/* Top face */}
+                <polygon
+                  points="200,240 30,270 200,320 370,270"
+                  fill="#5c2e16"
+                  stroke="#12100f"
+                  strokeWidth="5"
+                  strokeLinejoin="round"
+                />
+                {/* Front Left */}
+                <polygon
+                  points="30,270 200,320 200,332 30,282"
+                  fill="#3d1d0c"
+                  stroke="#12100f"
+                  strokeWidth="5"
+                  strokeLinejoin="round"
+                />
+                {/* Front Right */}
+                <polygon
+                  points="200,320 370,270 370,282 200,332"
+                  fill="#2b1407"
+                  stroke="#12100f"
+                  strokeWidth="5"
+                  strokeLinejoin="round"
+                />
+              </g>
+
+              {/* Book 1: Yellow Book (Bottom) */}
+              <g className="svg-book yellow">
+                {/* Left Face (pages) */}
+                <polygon
+                  points="80,270 200,310 200,270 80,230"
+                  fill="#fbf7f0"
+                  stroke="#12100f"
+                  strokeWidth="5"
+                  strokeLinejoin="round"
+                />
+                {/* Page Lines */}
+                <line x1="85" y1="245" x2="195" y2="282" stroke="#d7ccc8" strokeWidth="2.5" />
+                <line x1="85" y1="255" x2="195" y2="292" stroke="#d7ccc8" strokeWidth="2.5" />
+                
+                {/* Right Face (spine) */}
+                <polygon
+                  points="200,310 330,265 330,225 200,270"
+                  fill="#d97706"
+                  stroke="#12100f"
+                  strokeWidth="5"
+                  strokeLinejoin="round"
+                />
+                {/* Top Face (cover) */}
+                <polygon
+                  points="200,270 80,230 210,185 330,225"
+                  fill="#fbbf24"
+                  stroke="#12100f"
+                  strokeWidth="5"
+                  strokeLinejoin="round"
+                />
+              </g>
+
+              {/* Book 2: Red Book (Middle) */}
+              <g className="svg-book red">
+                {/* Left Face (spine) */}
+                <polygon
+                  points="90,200 210,240 210,202 90,162"
+                  fill="#b91c1c"
+                  stroke="#12100f"
+                  strokeWidth="5"
+                  strokeLinejoin="round"
+                />
+                {/* Right Face (pages) */}
+                <polygon
+                  points="210,240 340,195 340,157 210,202"
+                  fill="#fbf7f0"
+                  stroke="#12100f"
+                  strokeWidth="5"
+                  strokeLinejoin="round"
+                />
+                {/* Page Lines */}
+                <line x1="215" y1="215" x2="335" y2="173" stroke="#d7ccc8" strokeWidth="2.5" />
+                <line x1="215" y1="225" x2="335" y2="183" stroke="#d7ccc8" strokeWidth="2.5" />
+                
+                {/* Top Face (cover) */}
+                <polygon
+                  points="210,202 90,162 220,117 340,157"
+                  fill="#ef4444"
+                  stroke="#12100f"
+                  strokeWidth="5"
+                  strokeLinejoin="round"
+                />
+              </g>
+
+              {/* Book 3: Blue Book (Top) */}
+              <g className="svg-book blue">
+                {/* Left Face (spine) */}
+                <polygon
+                  points="85,139 195,175 195,140 85,104"
+                  fill="#1d4ed8"
+                  stroke="#12100f"
+                  strokeWidth="5"
+                  strokeLinejoin="round"
+                />
+                {/* Right Face (pages) */}
+                <polygon
+                  points="195,175 315,133 315,98 195,140"
+                  fill="#fbf7f0"
+                  stroke="#12100f"
+                  strokeWidth="5"
+                  strokeLinejoin="round"
+                />
+                {/* Page Lines */}
+                <line x1="200" y1="152" x2="310" y2="114" stroke="#d7ccc8" strokeWidth="2.5" />
+                <line x1="200" y1="160" x2="310" y2="122" stroke="#d7ccc8" strokeWidth="2.5" />
+                
+                {/* Top Face (cover) */}
+                <polygon
+                  points="195,140 85,104 205,62 315,98"
+                  fill="#0ea5e9"
+                  stroke="#12100f"
+                  strokeWidth="5"
+                  strokeLinejoin="round"
+                />
+              </g>
+            </svg>
           </div>
         </section>
 
