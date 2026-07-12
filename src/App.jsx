@@ -807,51 +807,55 @@ function App() {
           <div className="brand-mark-img-wrap" aria-hidden="true">
             <img src="/stack-of-books.png" alt="" className="brand-logo-img" />
           </div>
-          <div>
-            <div className="eyebrow">Cloud Shelf</div>
-            <h1>Pusthaka</h1>
-          </div>
+          <h1>Pusthaka</h1>
         </div>
+
+        <div className="sidebar-divider" />
 
         {coverStrip.length > 0 && (
           <div className="cover-strip" aria-hidden="true">
-            {coverStrip.map((book) => (
-              <div
-                className="mini-spine"
-                key={book.id}
-                style={{
-                  background: `linear-gradient(135deg, var(--cover-a, #1e293b), var(--cover-b, #475569))`,
-                }}
-              >
-                {book.coverUrl ? <img src={book.coverUrl} alt="" /> : null}
-              </div>
-            ))}
+            <div className="cover-strip-track">
+              {[...coverStrip, ...coverStrip].map((book, i) => (
+                <div
+                  className="mini-spine"
+                  key={`${book.id}-${i}`}
+                  style={{
+                    background: `linear-gradient(135deg, var(--cover-a, #1e293b), var(--cover-b, #475569))`,
+                  }}
+                >
+                  {book.coverUrl ? <img src={book.coverUrl} alt="" /> : null}
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
-        <nav className="status-nav" aria-label="Shelf navigation">
-          {[
-            ["all", "All Books", Archive, stats.total],
-            ...Object.entries(STATUSES).map(([key, value]) => [
-              key,
-              value.longLabel,
-              value.icon,
-              stats[key],
-            ]),
-            ["favorites", "Favorites", Heart, stats.favorites],
-          ].map(([key, label, Icon, count]) => (
-            <button
-              className={statusFilter === key ? "nav-item active" : "nav-item"}
-              key={key}
-              onClick={() => setStatusFilter(key)}
-              type="button"
-            >
-              <Icon size={17} />
-              <span>{label}</span>
-              <strong className="nav-item-badge">{count}</strong>
-            </button>
-          ))}
-        </nav>
+        <div className="sidebar-section">
+          <div className="sidebar-section-label">Collection</div>
+          <nav className="status-nav" aria-label="Shelf navigation">
+            {[
+              ["all", "All Books", Archive, stats.total],
+              ...Object.entries(STATUSES).map(([key, value]) => [
+                key,
+                value.longLabel,
+                value.icon,
+                stats[key],
+              ]),
+              ["favorites", "Favorites", Heart, stats.favorites],
+            ].map(([key, label, Icon, count]) => (
+              <button
+                className={statusFilter === key ? "nav-item active" : "nav-item"}
+                key={key}
+                onClick={() => setStatusFilter(key)}
+                type="button"
+              >
+                <Icon size={17} />
+                <span>{label}</span>
+                <strong className="nav-item-badge">{count}</strong>
+              </button>
+            ))}
+          </nav>
+        </div>
 
         <div className="sidebar-actions">
           <AccountCard user={user} onSignOut={handleSignOut} />
@@ -893,7 +897,7 @@ function App() {
             </div>
             <div className="topbar-actions">
               <button
-                className="add-book-header-btn"
+                className="button primary add-book-header-btn"
                 onClick={openNewBook}
                 title="Add New Book"
                 type="button"

@@ -146,19 +146,18 @@ textarea:focus-visible {
   height: 100vh;
   background-color: var(--bg-surface);
   border-right: 1px solid var(--border-subtle);
-  padding: 28px 24px;
+  padding: 24px 20px;
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 0;
   overflow-y: auto;
-  /* Give sidebar a faint separator shadow from the main area */
-  box-shadow: 1px 0 0 var(--border-subtle);
 }
 
 .brand-lockup {
   display: flex;
   align-items: center;
   gap: 12px;
+  padding-bottom: 20px;
 }
 
 .brand-mark {
@@ -190,17 +189,61 @@ textarea:focus-visible {
   margin-bottom: 2px;
 }
 
+/* Sidebar Divider */
+.sidebar-divider {
+  height: 1px;
+  background-color: var(--border-subtle);
+  margin-bottom: 20px;
+}
+
+/* Sidebar Section */
+.sidebar-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.sidebar-section-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding: 0 8px;
+}
+
 .cover-strip {
   display: flex;
   align-items: center;
-  gap: 6px;
   overflow: hidden;
   height: 52px;
-  padding: 4px 8px;
+  padding: 4px 0;
   background-color: var(--bg-segmented);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  margin: 12px 0 6px;
+  margin: 0 0 16px;
+}
+
+.cover-strip-track {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  animation: cover-scroll 20s linear infinite;
+  will-change: transform;
+}
+
+.cover-strip:hover .cover-strip-track {
+  animation-play-state: paused;
+}
+
+@keyframes cover-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
 .mini-spine {
@@ -228,7 +271,7 @@ textarea:focus-visible {
 .status-nav {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .nav-item {
@@ -236,14 +279,15 @@ textarea:focus-visible {
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 9px 13px; /* Reduced by 1px to offset the border and prevent layout shift */
-  font-size: 0.9rem;
+  padding: 9px 12px;
+  font-size: 0.88rem;
   font-weight: 500;
   color: var(--text-secondary);
   border-radius: var(--radius-sm);
   transition: var(--transition-smooth);
   text-align: left;
-  border: 1px solid transparent;
+  border: none;
+  position: relative;
 }
 
 .nav-item:hover {
@@ -252,32 +296,42 @@ textarea:focus-visible {
 }
 
 .nav-item.active {
-  background-color: transparent !important;
+  background-color: var(--bg-ghost-hover);
   color: var(--text-primary);
-  border: 1px solid #b45309; /* Gold-brown border in dark mode */
+  font-weight: 600;
+}
+
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 18px;
+  background-color: var(--accent-emerald);
+  border-radius: 0 2px 2px 0;
 }
 
 [data-theme="light"] .nav-item.active {
-  border-color: #5c2e16; /* Cozy dark wood-bark/leather-brown border in light mode */
+  background-color: var(--bg-ghost-hover);
 }
 
 .nav-item-badge {
   margin-left: auto;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 600;
   padding: 2px 8px;
-  background-color: var(--bg-ghost-hover);
-  color: var(--text-secondary);
+  background-color: transparent;
+  color: var(--text-muted);
   border-radius: 99px;
   min-width: 24px;
   text-align: center;
-  border: 1px solid var(--border-subtle);
+  border: none;
 }
 
 .nav-item.active .nav-item-badge {
-  background-color: var(--bg-ghost-hover);
   color: var(--text-primary);
-  border-color: var(--border-subtle);
 }
 
 .sidebar-actions {
@@ -371,7 +425,7 @@ textarea:focus-visible {
 
 .button.primary:hover {
   background-color: var(--accent-emerald);
-  filter: brightness(1.15);
+  filter: brightness(0.92);
   transform: translateY(-1px);
 }
 
@@ -537,22 +591,7 @@ textarea:focus-visible {
   font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.01em;
-  border-radius: var(--radius-sm);
-  background-color: var(--accent-emerald);
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  transition: all 0.15s ease;
   flex-shrink: 0;
-}
-
-.add-book-header-btn:hover {
-  background-color: var(--accent-emerald);
-  filter: brightness(1.15);
-}
-
-.add-book-header-btn:active {
-  background-color: #0b9566;
 }
 
 .theme-toggle-btn {
@@ -570,13 +609,13 @@ textarea:focus-visible {
 }
 
 .theme-toggle-btn:hover {
-  background-color: transparent;
-  border-color: #b45309; /* Gold-brown border */
-  transform: rotate(15deg);
+  background-color: var(--bg-ghost-hover);
+  border-color: var(--border-hover);
+  color: var(--accent-emerald);
 }
 
 [data-theme="light"] .theme-toggle-btn:hover {
-  border-color: #5c2e16; /* Wood-bark border */
+  border-color: var(--border-hover);
 }
 
 .sync-pill {
@@ -625,14 +664,7 @@ textarea:focus-visible {
   color: #f87171;
 }
 
-.add-book-header-btn {
-  background-color: var(--accent-emerald) !important;
-  color: #fff !important;
-}
 
-.add-book-header-btn:hover {
-  background-color: #0da874 !important;
-}
 
 .notice {
   margin-bottom: 20px;
@@ -815,14 +847,14 @@ textarea:focus-visible {
 }
 
 .view-toggle button.active {
-  background-color: transparent;
+  background-color: var(--bg-surface-elevated);
   color: var(--text-primary);
-  border: 1px solid #b45309; /* Gold-brown border */
+  border: 1px solid transparent;
   box-shadow: var(--shadow-sm);
 }
 
 [data-theme="light"] .view-toggle button.active {
-  border-color: #5c2e16; /* Wood-bark border */
+  background-color: var(--bg-surface-elevated);
 }
 
 /* Loading Panel */
