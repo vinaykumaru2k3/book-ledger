@@ -358,11 +358,12 @@ textarea:focus-visible {
 
 .button.primary {
   background-color: var(--accent-emerald);
-  color: #042f1a;
+  color: #ffffff;
 }
 
 .button.primary:hover {
-  background-color: #059669;
+  background-color: var(--accent-emerald);
+  filter: brightness(1.15);
   transform: translateY(-1px);
 }
 
@@ -528,12 +529,13 @@ textarea:focus-visible {
   color: #fff;
   border: none;
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  transition: all 0.15s ease;
   flex-shrink: 0;
 }
 
 .add-book-header-btn:hover {
-  background-color: #0da874;
+  background-color: var(--accent-emerald);
+  filter: brightness(1.15);
 }
 
 .add-book-header-btn:active {
@@ -1564,9 +1566,13 @@ textarea:focus-visible {
   font-size: 0.72rem;
   font-weight: 600;
   color: var(--accent-emerald);
-  background: rgba(16, 185, 129, 0.1);
+  background: rgba(217, 119, 6, 0.12); /* Gold translucent background */
   padding: 2px 7px;
   border-radius: var(--radius-sm);
+}
+
+[data-theme="light"] .panel-badge {
+  background: rgba(180, 83, 9, 0.12);
 }
 
 /* ── Overall completion bar ── */
