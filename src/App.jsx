@@ -789,8 +789,8 @@ function App() {
     <div className="app-shell">
       <aside className="sidebar">
         <div className="brand-lockup">
-          <div className="brand-mark" aria-hidden="true">
-            <Library size={22} />
+          <div className="brand-mark-img-wrap" aria-hidden="true">
+            <img src="/stack-of-books.png" alt="" className="brand-logo-img" />
           </div>
           <div>
             <div className="eyebrow">Cloud Shelf</div>

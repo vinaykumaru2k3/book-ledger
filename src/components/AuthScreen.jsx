@@ -32,8 +32,8 @@ function AuthScreen({ error, onEmailSubmit, onGoogleSignIn, onBackToLanding, the
 
         {/* Left Page (Book Title Page) */}
         <section className="auth-art" aria-label="Book Title Page">
-          <div className="auth-crest">
-            <Library size={36} />
+          <div className="auth-crest-img-wrap">
+            <img src="/stack-of-books.png" alt="" className="auth-logo-img" />
           </div>
           <span className="auth-edition">Cloud Edition</span>
           <h1 className="auth-book-title">Pusthaka</h1>

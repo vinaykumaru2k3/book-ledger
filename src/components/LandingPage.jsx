@@ -6,7 +6,6 @@ import {
   Sun,
   Moon,
   ArrowRight,
-  BookMarked,
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
@@ -14,33 +13,33 @@ import {
 const FEATURES = [
   {
     icon: Cloud,
-    title: "Cloud Synced",
-    body: "Your collection is securely synced in real-time with Firebase Cloud. Access it anywhere.",
+    title: "Library Ledger",
+    body: "Your collection is securely stored and synced in real-time. Access your catalog from any device.",
   },
   {
     icon: Search,
-    title: "Google Books Search",
-    body: "Instantly find and import any book by title, author, or ISBN with phonetic match support.",
+    title: "Instant Book Finder",
+    body: "Powered by the Google Books API. Search and enrich your ledger by title, author, or ISBN instantly.",
   },
   {
     icon: BarChart3,
-    title: "Insightful Metrics",
-    body: "Track page progress, status distributions, yearly goals, and averages without clutter.",
+    title: "Shelf Insights",
+    body: "Understand your reading habits. Track completion rates, page distribution, and yearly milestones.",
   },
   {
     icon: ShieldCheck,
-    title: "Distraction Free",
-    body: "No social feeds, no tracking, no algorithms. Just a quiet space for you and your library.",
+    title: "Reading Sanctuary",
+    body: "Zero advertisements, zero algorithm feeds. A silent, private reading ledger designed for focus.",
   },
 ];
 
 const BOOKS = [
-  { h: 140, a: "#115e59", b: "#0f766e" }, // Teal
-  { h: 165, a: "#3730a3", b: "#4338ca" }, // Indigo
-  { h: 130, a: "#9a3412", b: "#b45309" }, // Amber/Coral
-  { h: 155, a: "#581c87", b: "#6b21a8" }, // Plum
-  { h: 145, a: "#065f46", b: "#047857" }, // Emerald
-  { h: 160, a: "#1e1b4b", b: "#312e81" }, // Midnight
+  { h: 140, a: "#6b21a8", b: "#581c87" }, // Plum/Deep Violet
+  { h: 165, a: "#1e3a8a", b: "#172554" }, // Classic Navy
+  { h: 130, a: "#b45309", b: "#92400e" }, // Antique Gold/Amber
+  { h: 155, a: "#065f46", b: "#064e3b" }, // Forest Pine Green
+  { h: 145, a: "#991b1b", b: "#7f1d1d" }, // Crimson / Burgundy
+  { h: 160, a: "#292524", b: "#1c1917" }, // Leather Charcoal
 ];
 
 function LandingPage({ onEnter, theme, toggleTheme }) {
@@ -49,9 +48,7 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
       {/* ── Navigation ── */}
       <header className="landing-nav">
         <div className="landing-nav-brand">
-          <div className="landing-brand-icon" aria-hidden="true">
-            <BookMarked size={18} />
-          </div>
+          <img src="/stack-of-books.png" alt="Pusthaka logo" className="landing-brand-logo-img" />
           <span className="landing-brand-name">Pusthaka</span>
         </div>
         <div className="landing-nav-actions">
@@ -76,25 +73,25 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
           <div className="landing-hero-text">
             <div className="landing-kicker">
               <Sparkles size={12} className="kicker-icon" />
-              <span>Digital Shelf & Reading Tracker</span>
+              <span>A sanctuary for readers</span>
             </div>
             <h1 className="landing-hero-title">
-              Your reading journey,<br />
-              <span className="serif-italic">beautifully cataloged.</span>
+              Your personal library,<br />
+              <span className="serif-italic">thoughtfully cataloged.</span>
             </h1>
             <p className="landing-hero-sub">
-              Pusthaka is an elegant, cloud-synced private ledger for your books, reading progress, and reviews. Ad-free, distraction-free, and designed to flow.
+              Pusthaka is a quiet harbor for your books, reading progress, and thoughts. No feeds, no noise, no pressure. Just a digital shelf that belongs to you.
             </p>
             <div className="landing-hero-actions">
               <button className="landing-cta-btn" onClick={onEnter} type="button">
-                <span>Open Pusthaka</span>
+                <span>Enter the Reading Room</span>
                 <ArrowRight size={16} />
               </button>
-              <span className="landing-cta-note">Free · Private · Real-time Sync</span>
+              <span className="landing-cta-note">Private cloud catalog · Real-time sync</span>
             </div>
           </div>
 
-          {/* Premium Animated Bookshelf Visual */}
+          {/* Premium Mahogany visual shelf representation */}
           <div className="landing-hero-visual" aria-hidden="true">
             <div className="hero-shelf">
               {BOOKS.map((book, i) => (
@@ -103,11 +100,12 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
                   className="hero-book"
                   style={{
                     height: `${book.h}px`,
-                    background: `linear-gradient(160deg, ${book.a}, ${book.b})`,
+                    background: `linear-gradient(165deg, ${book.a}, ${book.b})`,
                     animationDelay: `${i * 0.08}s`,
                   }}
                 >
                   <div className="hero-book-spine-line" />
+                  <div className="hero-book-gold-accents" />
                 </div>
               ))}
             </div>
@@ -118,7 +116,7 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
 
         {/* ── Features Section ── */}
         <section className="landing-features-section">
-          <h2 className="landing-section-title">Designed for mindful readers</h2>
+          <h2 className="landing-section-title">Built for intentional reading</h2>
           <div className="landing-features-grid">
             {FEATURES.map(({ icon: Icon, title, body }) => (
               <div className="landing-feature-card" key={title}>
@@ -135,8 +133,8 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
         {/* ── CTA Banner Strip ── */}
         <section className="landing-cta-strip">
           <div className="cta-strip-content">
-            <h2>Start tracking your bookshelf today</h2>
-            <p>Add, search, and update reading logs with zero friction.</p>
+            <h2>Add your first book in under ten seconds</h2>
+            <p>Start organizing your catalog and take control of your reading journey.</p>
           </div>
           <button className="landing-cta-btn secondary" onClick={onEnter} type="button">
             <span>Get Started</span>
