@@ -1999,10 +1999,28 @@ textarea:focus-visible {
   /* Rich warm wooden desk gradient background */
   background: radial-gradient(circle, #251c16 0%, #16110e 100%);
   box-sizing: border-box;
+
+  /* ── Cozy Library Variables (Dark Mode Default) ── */
+  --bg-app-landing: #16110e;
+  --bg-card-landing: #231b17;
+  --border-subtle-landing: rgba(217, 119, 6, 0.12);
+  --border-hover-landing: rgba(217, 119, 6, 0.22);
+  --text-primary-landing: #faeed8;
+  --text-secondary-landing: #ccbcaa;
+  --accent-gold-landing: #d97706;
 }
 
 [data-theme="light"] .auth-shell {
   background: radial-gradient(circle, #eae0cf 0%, #dcd0ba 100%);
+
+  /* ── Cozy Library Variables (Light Mode) ── */
+  --bg-app-landing: #fcf9f2;
+  --bg-card-landing: #f5eedf;
+  --border-subtle-landing: rgba(62, 54, 46, 0.09);
+  --border-hover-landing: rgba(62, 54, 46, 0.18);
+  --text-primary-landing: #2d241c;
+  --text-secondary-landing: #5c5043;
+  --accent-gold-landing: #b45309;
 }
 
 .auth-panel {
@@ -2053,14 +2071,14 @@ textarea:focus-visible {
 /* Centered Gold Bookmark Ribbon */
 .auth-bookmark-ribbon {
   position: absolute;
-  top: 12px;
+  top: 0; /* Aligned to the very top cover border */
   left: 51.5%;
-  width: 14px;
-  height: 190px;
+  width: 10px; /* Thinner elegant bookmark ribbon */
+  height: 202px;
   background: linear-gradient(to right, #d97706, #fbbf24 50%, #b45309);
   z-index: 10;
   box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.35);
-  border-radius: 0 0 3px 3px;
+  border-radius: 0 0 2px 2px;
   transform: translateX(-50%);
 }
 
@@ -2069,7 +2087,7 @@ textarea:focus-visible {
   position: absolute;
   bottom: -6px;
   left: 0;
-  border-width: 3px 7px 3px 7px;
+  border-width: 3px 5px 3px 5px; /* Proportionate swallow-tail for 10px width */
   border-style: solid;
   border-color: #b45309 #b45309 transparent #b45309;
 }
