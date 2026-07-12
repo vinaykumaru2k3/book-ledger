@@ -236,23 +236,29 @@ textarea:focus-visible {
   align-items: center;
   gap: 12px;
   width: 100%;
-  padding: 10px 14px;
+  padding: 9px 13px; /* Reduced by 1px to offset the border and prevent layout shift */
   font-size: 0.9rem;
   font-weight: 500;
   color: var(--text-secondary);
   border-radius: var(--radius-sm);
   transition: var(--transition-smooth);
   text-align: left;
+  border: 1px solid transparent;
 }
 
 .nav-item:hover {
-  background-color: rgba(255, 255, 255, 0.03);
+  background-color: var(--bg-ghost-hover);
   color: var(--text-primary);
 }
 
 .nav-item.active {
-  background-color: rgba(16, 185, 129, 0.08);
-  color: var(--accent-emerald);
+  background-color: transparent !important;
+  color: var(--text-primary);
+  border: 1px solid #b45309; /* Gold-brown border in dark mode */
+}
+
+[data-theme="light"] .nav-item.active {
+  border-color: #5c2e16; /* Cozy dark wood-bark/leather-brown border in light mode */
 }
 
 .nav-item-badge {
@@ -260,16 +266,18 @@ textarea:focus-visible {
   font-size: 0.75rem;
   font-weight: 600;
   padding: 2px 8px;
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--bg-ghost-hover);
   color: var(--text-secondary);
   border-radius: 99px;
   min-width: 24px;
   text-align: center;
+  border: 1px solid var(--border-subtle);
 }
 
 .nav-item.active .nav-item-badge {
-  background-color: rgba(16, 185, 129, 0.15);
-  color: var(--accent-emerald);
+  background-color: var(--bg-ghost-hover);
+  color: var(--text-primary);
+  border-color: var(--border-subtle);
 }
 
 .sidebar-actions {
@@ -1586,8 +1594,8 @@ textarea:focus-visible {
 .completion-meter span {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, var(--accent-emerald), var(--accent-plum));
-  border-radius: 99px;
+  background-color: var(--accent-emerald);
+  border-radius: 0;
   transition: width 0.4s ease;
 }
 
