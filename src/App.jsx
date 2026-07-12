@@ -871,22 +871,25 @@ function App() {
       <main className="workspace">
         <header className="topbar">
           <div>
-            <p className="section-kicker">Library Dashboard</p>
+            <p className="section-kicker">
+              <span className="live-indicator-dot" />
+              Library Dashboard
+            </p>
             <h2>My Library</h2>
           </div>
           <div className="topbar-actions">
             <button 
-              className="icon-button add-book-header-btn" 
+              className="add-book-header-btn" 
               onClick={openNewBook} 
-              aria-label="Add Book"
               title="Add New Book"
               type="button"
             >
-              <Plus size={18} />
+              <Plus size={15} />
+              <span>Add Book</span>
             </button>
 
             <button 
-              className="icon-button theme-toggle-btn" 
+              className="theme-toggle-btn" 
               onClick={toggleTheme} 
               aria-label="Toggle theme"
               title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}

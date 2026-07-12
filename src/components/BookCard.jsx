@@ -36,14 +36,7 @@ function BookCard({ book, layout, onDelete, onEdit, onUpdate, onViewDetails }) {
       
       <div className="book-main">
         <div className="book-heading">
-          {layout !== "list" && (
-            <div className="status-chip-row">
-              <div className="status-chip" style={{ "--status-color": statusColor }}>
-                {StatusIcon && <StatusIcon size={10} />}
-                <span>{STATUSES[book.status]?.longLabel}</span>
-              </div>
-            </div>
-          )}
+
           <h3 
             className="book-title clickable-title" 
             title="Click to view full details"
