@@ -171,7 +171,7 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
 
                 {/* Gold Bookmark Ribbon emerging from middle pages */}
                 <polygon
-                  points="275,203 281,201 286,223 291,245 288,240 285,246 280,225"
+                  points="270,204 282,200 290,221 297,245 292,237 287,247 278,225"
                   fill="#fbbf24"
                   stroke="#12100f"
                   strokeWidth="5"
