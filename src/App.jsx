@@ -866,64 +866,69 @@ function App() {
             onChange={importLedger}
           />
         </div>
-      </aside>
+        </aside>
 
       <main className="workspace">
-        <header className="topbar">
-          <div>
-            <p className="section-kicker">
-              <span className="live-indicator-dot" />
-              Library Dashboard
-            </p>
-            <h2>My Library</h2>
+        <header className="dashboard-header">
+          <div className="dashboard-header-top">
+            <div className="dashboard-title-group">
+              <p className="section-kicker">Library Dashboard</p>
+              <h2 className="dashboard-title">My Library</h2>
+            </div>
+            <div className="topbar-actions">
+              <button
+                className="add-book-header-btn"
+                onClick={openNewBook}
+                title="Add New Book"
+                type="button"
+              >
+                <Plus size={15} />
+                <span>Add Book</span>
+              </button>
+              <button
+                className="theme-toggle-btn"
+                onClick={toggleTheme}
+                aria-label="Toggle theme"
+                title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                type="button"
+              >
+                {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+              </button>
+            </div>
           </div>
-          <div className="topbar-actions">
-            <button 
-              className="add-book-header-btn" 
-              onClick={openNewBook} 
-              title="Add New Book"
-              type="button"
-            >
-              <Plus size={15} />
-              <span>Add Book</span>
-            </button>
 
-            <button 
-              className="theme-toggle-btn" 
-              onClick={toggleTheme} 
-              aria-label="Toggle theme"
-              title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
-              type="button"
-            >
-              {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
-            </button>
+          <div className="stats-strip" aria-label="Shelf stats summary">
+            <div className="stat-item">
+              <Library size={15} className="stat-icon teal" />
+              <strong>{stats.total}</strong>
+              <span>Total Books</span>
+            </div>
+            <div className="stat-divider" />
+            <div className="stat-item">
+              <CheckCircle size={15} className="stat-icon plum" />
+              <strong>{stats.done}</strong>
+              <span>Finished</span>
+            </div>
+            <div className="stat-divider" />
+            <div className="stat-item">
+              <BookOpen size={15} className="stat-icon gold" />
+              <strong>{stats.reading}</strong>
+              <span>Reading</span>
+            </div>
+            <div className="stat-divider" />
+            <div className="stat-item">
+              <CalendarDays size={15} className="stat-icon plum" />
+              <strong>{stats.finishedThisYear}</strong>
+              <span>Completed {new Date().getFullYear()}</span>
+            </div>
+            <div className="stat-divider" />
+            <div className="stat-item">
+              <Star size={15} className="stat-icon coral" />
+              <strong>{stats.averageRating}</strong>
+              <span>Avg Rating</span>
+            </div>
           </div>
         </header>
-
-        {saveError ? (
-          <div className="notice error-notice" role="status">
-            {saveError}
-          </div>
-        ) : null}
-
-        {localBackupCount > 0 ? (
-          <div className="notice success-notice" role="status">
-            <span>
-              Found {localBackupCount} book{localBackupCount === 1 ? "" : "s"} in local browser storage.
-            </span>
-            <button className="button ghost on-light compact" onClick={migrateLocalBooks} type="button">
-              <Import size={14} />
-              <span>Migrate to Cloud</span>
-            </button>
-          </div>
-        ) : null}
-
-        <section className="metrics-grid" aria-label="Shelf stats summary">
-          <MetricCard label="Total Library" value={stats.total} icon={Library} tone="teal" />
-          <MetricCard label="Pages Read" value={stats.pagesRead.toLocaleString()} icon={BookOpen} tone="gold" />
-          <MetricCard label="Completed 2026" value={stats.finishedThisYear} icon={CalendarDays} tone="plum" />
-          <MetricCard label="Average Rating" value={stats.averageRating} icon={Star} tone="coral" />
-        </section>
 
         <section className="content-layout">
           <div className="library-panel">
