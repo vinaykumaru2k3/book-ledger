@@ -505,28 +505,27 @@ textarea:focus-visible {
 .add-book-header-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
+  gap: 7px;
+  padding: 0 14px;
+  height: 34px;
   font-size: 0.8rem;
-  font-weight: 700;
-  border-radius: 99px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border-radius: 6px;
   background-color: var(--accent-emerald);
-  color: #ffffff;
+  color: #fff;
   border: none;
   cursor: pointer;
-  transition: var(--transition-smooth);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
-  height: 36px;
+  transition: background-color 0.15s ease;
+  flex-shrink: 0;
 }
 
 .add-book-header-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
-  filter: brightness(1.05);
+  background-color: #0da874;
 }
 
 .add-book-header-btn:active {
-  transform: translateY(0);
+  background-color: #0b9566;
 }
 
 .theme-toggle-btn {
@@ -591,15 +590,12 @@ textarea:focus-visible {
 }
 
 .add-book-header-btn {
-  color: var(--accent-emerald) !important;
-  border-color: rgba(16, 185, 129, 0.15) !important;
-  background-color: rgba(16, 185, 129, 0.03) !important;
+  background-color: var(--accent-emerald) !important;
+  color: #fff !important;
 }
 
 .add-book-header-btn:hover {
-  background-color: rgba(16, 185, 129, 0.1) !important;
-  border-color: var(--accent-emerald) !important;
-  color: var(--accent-emerald) !important;
+  background-color: #0da874 !important;
 }
 
 .notice {
