@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "book-ledger-2a2e4"
+  },
+  "targets": {
+    "book-ledger-2a2e4": {
+      "hosting": {
+        "pusthaka-target": [
+          "pusthaka"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
