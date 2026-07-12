@@ -83,19 +83,19 @@ function BookCard({ book, layout, onDelete, onEdit, onUpdate, onViewDetails }) {
           </div>
         ) : null}
 
-        <div className="progress-area">
-          <div className="progress-copy">
-            <strong className="progress-percentage">{progress}%</strong>
-            <span className="progress-pages">
-              {book.pages
-                ? `${book.currentPage.toLocaleString()} / ${book.pages.toLocaleString()} pages`
-                : "No page count"}
-            </span>
+        {book.pages ? (
+          <div className="progress-area">
+            <div className="progress-copy">
+              <strong className="progress-percentage">{progress}%</strong>
+              <span className="progress-pages">
+                {book.currentPage.toLocaleString()} / {book.pages.toLocaleString()} pages
+              </span>
+            </div>
+            <div className="progress-track">
+              <span style={{ width: `${progress}%`, backgroundColor: statusColor }} />
+            </div>
           </div>
-          <div className="progress-track">
-            <span style={{ width: `${progress}%`, backgroundColor: statusColor }} />
-          </div>
-        </div>
+        ) : null}
 
         <div className="card-controls">
           <div className="status-select-wrap" style={{ "--border-status": statusColor }}>

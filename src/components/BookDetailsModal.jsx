@@ -77,10 +77,12 @@ function BookDetailsModal({ book, onClose }) {
                   <span>ISBN: <strong>{book.isbn}</strong></span>
                 </div>
               )}
-              <div className="details-meta-item">
-                <BookOpen size={14} />
-                <span>Length: <strong>{book.pages ? `${book.pages} pages` : "No page count"}</strong></span>
-              </div>
+              {book.pages ? (
+                <div className="details-meta-item">
+                  <BookOpen size={14} />
+                  <span>Length: <strong>{book.pages} pages</strong></span>
+                </div>
+              ) : null}
             </div>
 
             <div className="details-rating-section">
