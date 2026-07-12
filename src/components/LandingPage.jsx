@@ -147,6 +147,17 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
                 />
               </g>
 
+              {/* Gold Bookmark Ribbon */}
+              <g className="svg-book-ribbon">
+                <polygon
+                  points="280,205 292,201 302,236 312,272 305,266 300,275 290,240"
+                  fill="#fbbf24"
+                  stroke="#12100f"
+                  strokeWidth="5"
+                  strokeLinejoin="round"
+                />
+              </g>
+
               {/* Book 2: Red Book (Middle) - Shifted Right */}
               <g className="svg-book red">
                 {/* Left Face (spine) */}

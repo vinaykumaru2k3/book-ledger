@@ -2752,6 +2752,15 @@ textarea:focus-visible {
   animation-delay: 0.4s;
 }
 
+.svg-book-ribbon {
+  opacity: 0;
+  transform: translateY(-300px);
+  animation: svgBookDrop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.15) forwards;
+  animation-delay: 0.3s;
+  pointer-events: none;
+  transform-origin: 200px 250px;
+}
+
 @keyframes svgBookDrop {
   to {
     opacity: 1;
