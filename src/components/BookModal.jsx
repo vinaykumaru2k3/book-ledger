@@ -251,6 +251,43 @@ function BookModal({
     return null;
   }
 
+  // Enrich a form with OpenLibrary data when Google Books is missing pages/description/genres
+  async function enrichWithOpenLibrary(matchedForm) {
+    try {
+      const q = encodeURIComponent(`${matchedForm.title} ${matchedForm.author}`.trim());
+      const res = await fetch(`https://openlibrary.org/search.json?limit=1&q=${q}`);
+      if (!res.ok) return matchedForm;
+      const data = await res.json();
+      const doc = data.docs?.[0];
+      if (!doc) return matchedForm;
+
+      // Fill pages if missing
+      if (!matchedForm.pages && doc.number_of_pages_median) {
+        matchedForm.pages = String(doc.number_of_pages_median);
+      }
+
+      // Fill genres if missing
+      if (!matchedForm.genres && doc.subject?.length) {
+        matchedForm.genres = doc.subject.slice(0, 5).join(", ");
+        if (!matchedForm.tags) matchedForm.tags = doc.subject.slice(0, 3).join(", ");
+      }
+
+      // Fill description if missing, from the work endpoint
+      if (!matchedForm.description && doc.key) {
+        const desc = await fetchOpenLibraryDescription(doc.key);
+        if (desc) matchedForm.description = desc.slice(0, 2000);
+      }
+
+      // Fill cover if missing
+      if (!matchedForm.coverUrl && doc.cover_i) {
+        matchedForm.coverUrl = `https://covers.openlibrary.org/b/id/${doc.cover_i}-L.jpg`;
+      }
+    } catch (e) {
+      console.error("OpenLibrary enrichment failed:", e);
+    }
+    return matchedForm;
+  }
+
   async function handleSelectResult(volume) {
     let finalVolume = volume;
     if (!volume.id.startsWith("/works/")) {
@@ -258,14 +295,19 @@ function BookModal({
       if (full) finalVolume = full;
     }
 
-    const matchedForm = formFromGoogleVolume(finalVolume);
+    let matchedForm = formFromGoogleVolume(finalVolume);
     
-    // If it came from Open Library fallback, fetch full description in background
+    // If it came from Open Library fallback, fetch full description
     if (volume.id.startsWith("/works/")) {
       const desc = await fetchOpenLibraryDescription(volume.id);
       if (desc) {
         matchedForm.description = desc.slice(0, 2000);
       }
+    }
+
+    // Enrich with OpenLibrary if Google Books data is incomplete
+    if (!matchedForm.pages || !matchedForm.description || !matchedForm.genres) {
+      matchedForm = await enrichWithOpenLibrary(matchedForm);
     }
     
     onFormChange(matchedForm);
@@ -279,13 +321,18 @@ function BookModal({
       if (full) finalVolume = full;
     }
 
-    const matchedForm = formFromGoogleVolume(finalVolume);
+    let matchedForm = formFromGoogleVolume(finalVolume);
     
     if (volume.id.startsWith("/works/")) {
       const desc = await fetchOpenLibraryDescription(volume.id);
       if (desc) {
         matchedForm.description = desc.slice(0, 2000);
       }
+    }
+
+    // Enrich with OpenLibrary if Google Books data is incomplete
+    if (!matchedForm.pages || !matchedForm.description || !matchedForm.genres) {
+      matchedForm = await enrichWithOpenLibrary(matchedForm);
     }
     
     await quickAdd(matchedForm);
