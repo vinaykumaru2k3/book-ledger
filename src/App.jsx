@@ -70,6 +70,8 @@ const EMPTY_FORM = {
   rating: 0,
   tags: "",
   notes: "",
+  description: "",
+  genres: "",
   publishedYear: "",
   isbn: "",
   coverId: null,
@@ -114,6 +116,13 @@ function normalizeBook(raw) {
           .map((tag) => tag.trim())
           .filter(Boolean),
     notes: String(raw.notes || ""),
+    description: String(raw.description || ""),
+    genres: Array.isArray(raw.genres)
+      ? raw.genres.map((g) => String(g).trim()).filter(Boolean)
+      : String(raw.genres || "")
+          .split(",")
+          .map((g) => g.trim())
+          .filter(Boolean),
     publishedYear: raw.publishedYear ? String(raw.publishedYear) : "",
     isbn: raw.isbn ? String(raw.isbn) : "",
     coverId: raw.coverId || null,
@@ -149,6 +158,8 @@ function formFromBook(book) {
     rating: book.rating || 0,
     tags: book.tags.join(", "),
     notes: book.notes,
+    description: book.description || "",
+    genres: (book.genres || []).join(", "),
     publishedYear: book.publishedYear,
     isbn: book.isbn,
     coverId: book.coverId,
@@ -179,6 +190,8 @@ function createBookFromForm(form, existing = null) {
     rating: form.rating,
     tags: form.tags,
     notes: form.notes,
+    description: form.description,
+    genres: form.genres,
     publishedYear: form.publishedYear,
     isbn: form.isbn,
     coverId: form.coverId,

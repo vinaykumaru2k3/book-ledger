@@ -1,5 +1,5 @@
 import React from "react";
-import { X, Calendar, Bookmark, Layers, Heart, BookOpen } from "lucide-react";
+import { X, Calendar, Bookmark, Layers, Heart, BookOpen, Tag } from "lucide-react";
 import Cover from "./Cover";
 import Rating from "./Rating";
 import { STATUSES, progressFor } from "./constants";
@@ -90,7 +90,21 @@ function BookDetailsModal({ book, onClose }) {
               <Rating value={book.rating} readonly />
             </div>
 
-            {book.tags && book.tags.length ? (
+            {book.genres && book.genres.length > 0 && (
+              <div className="details-genres-section">
+                <span className="details-section-label">
+                  <Tag size={13} />
+                  Genres:
+                </span>
+                <div className="genre-row">
+                  {book.genres.map((genre) => (
+                    <span key={genre} className="genre-chip">{genre}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {book.tags && book.tags.length > 0 && (
               <div className="details-tags-section">
                 <span className="details-section-label">Tags:</span>
                 <div className="tag-row">
@@ -99,15 +113,24 @@ function BookDetailsModal({ book, onClose }) {
                   ))}
                 </div>
               </div>
+            )}
+
+            {book.description ? (
+              <div className="details-description-section">
+                <h3 className="details-section-label">About This Book</h3>
+                <div className="details-description-text">
+                  <p>{book.description}</p>
+                </div>
+              </div>
             ) : null}
 
             <div className="details-description-section">
-              <h3 className="details-section-label">Description & Thoughts</h3>
+              <h3 className="details-section-label">Personal Notes</h3>
               <div className="details-description-text">
                 {book.notes ? (
                   <p>{book.notes}</p>
                 ) : (
-                  <p className="empty-desc">No description or review thoughts logged for this book yet.</p>
+                  <p className="empty-desc">No personal notes or review logged for this book yet.</p>
                 )}
               </div>
             </div>

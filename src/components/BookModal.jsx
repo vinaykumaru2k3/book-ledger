@@ -16,14 +16,26 @@ function formFromGoogleVolume(volume) {
     (id) => id.type === "ISBN_13" || id.type === "ISBN_10"
   )?.identifier || "";
 
-  // Upgrade image links to https
+  // Upgrade image links to https and request hi-res (zoom=2)
   let coverUrl = info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail || "";
   if (coverUrl && coverUrl.startsWith("http://")) {
     coverUrl = coverUrl.replace("http://", "https://");
   }
+  if (coverUrl) {
+    coverUrl = coverUrl.replace(/&zoom=\d/, "&zoom=2");
+    if (!coverUrl.includes("zoom=")) {
+      coverUrl += (coverUrl.includes("?") ? "&" : "?") + "zoom=2";
+    }
+  }
 
-  // Categories as tags
+  // Categories as tags (comma-separated for the form)
   const tags = info.categories?.join(", ") || "";
+  
+  // Genres extracted from categories (stored as separate field)
+  const genres = info.categories?.join(", ") || "";
+
+  // Description from API (separate from user notes)
+  const description = info.description ? info.description.slice(0, 2000) : "";
 
   return {
     title,
@@ -33,7 +45,9 @@ function formFromGoogleVolume(volume) {
     status: "want",
     rating: 0,
     tags,
-    notes: info.description ? info.description.slice(0, 1000) : "",
+    notes: "",
+    description,
+    genres,
     publishedYear,
     isbn,
     coverId: null,
@@ -250,7 +264,7 @@ function BookModal({
     if (volume.id.startsWith("/works/")) {
       const desc = await fetchOpenLibraryDescription(volume.id);
       if (desc) {
-        matchedForm.notes = desc.slice(0, 1000);
+        matchedForm.description = desc.slice(0, 2000);
       }
     }
     
@@ -270,7 +284,7 @@ function BookModal({
     if (volume.id.startsWith("/works/")) {
       const desc = await fetchOpenLibraryDescription(volume.id);
       if (desc) {
-        matchedForm.notes = desc.slice(0, 1000);
+        matchedForm.description = desc.slice(0, 2000);
       }
     }
     
@@ -327,11 +341,17 @@ function BookModal({
                         const isAddedByTitle = !!findDuplicate(null, volTitle, volAuthor);
                         const isAdded = isAddedByKey || isAddedByTitle;
                         const coverUrl = volumeInfo.imageLinks?.smallThumbnail || volumeInfo.imageLinks?.thumbnail || "";
+                        let hiResCover = coverUrl.startsWith("http://") ? coverUrl.replace("http://", "https://") : coverUrl;
                         const tempBook = {
                           title: volumeInfo.title || "Untitled",
                           author: volumeInfo.authors?.join(", ") || "Unknown Author",
-                          coverUrl: coverUrl.startsWith("http://") ? coverUrl.replace("http://", "https://") : coverUrl,
+                          coverUrl: hiResCover,
                         };
+                        const descSnippet = volumeInfo.description
+                          ? volumeInfo.description.replace(/<[^>]*>/g, "").slice(0, 100)
+                          : "";
+                        const categories = volumeInfo.categories || [];
+                        const pageCount = volumeInfo.pageCount;
 
                         return (
                           <div key={volume.id} className="dropdown-result-row">
@@ -341,7 +361,18 @@ function BookModal({
                               <span>
                                 {volumeInfo.authors?.join(", ") || "Unknown Author"} 
                                 {volumeInfo.publishedDate ? ` • ${volumeInfo.publishedDate.split("-")[0]}` : ""}
+                                {pageCount ? ` • ${pageCount}p` : ""}
                               </span>
+                              {descSnippet && (
+                                <span className="result-desc">{descSnippet}…</span>
+                              )}
+                              {categories.length > 0 && (
+                                <div className="result-genres">
+                                  {categories.slice(0, 3).map((cat) => (
+                                    <span key={cat} className="genre-chip">{cat}</span>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                             <div className="result-actions">
                               <button 
