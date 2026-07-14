@@ -1874,6 +1874,40 @@ textarea:focus-visible {
   border-bottom: 1px solid var(--border-subtle);
 }
 
+/* Duplicate detection warning banner */
+.duplicate-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 28px;
+  padding: 12px 16px;
+  background-color: rgba(217, 119, 6, 0.08);
+  border: 1px solid rgba(217, 119, 6, 0.2);
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.duplicate-warning svg {
+  color: #d97706;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.duplicate-warning strong {
+  color: var(--text-primary);
+}
+
+[data-theme="light"] .duplicate-warning {
+  background-color: rgba(180, 83, 9, 0.06);
+  border-color: rgba(180, 83, 9, 0.15);
+}
+
+[data-theme="light"] .duplicate-warning svg {
+  color: #b45309;
+}
+
 .lookup-controls {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 180px;

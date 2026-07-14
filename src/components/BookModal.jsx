@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { X, Search, Loader2, Plus, Import, Sparkles, BookOpen, Tags } from "lucide-react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { X, Search, Loader2, Plus, Import, Sparkles, BookOpen, Tags, AlertTriangle } from "lucide-react";
 import Cover from "./Cover";
 import Rating from "./Rating";
 import { STATUSES } from "./constants";
@@ -57,11 +57,41 @@ function BookModal({
   const [searching, setSearching] = useState(false);
   const [searchError, setSearchError] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
+  const [duplicateWarning, setDuplicateWarning] = useState(null); // { title, author } of matched book
 
   const existingKeys = useMemo(
     () => new Set(books.map((book) => book.sourceKey).filter(Boolean)),
     [books]
   );
+
+  // Build a lookup map of normalized "title|author" -> book for title+author duplicate detection
+  const existingTitleAuthors = useMemo(() => {
+    const map = new Map();
+    books.forEach((book) => {
+      const key = `${(book.title || "").trim().toLowerCase()}|${(book.author || "").trim().toLowerCase()}`;
+      if (key !== "|") map.set(key, book);
+    });
+    return map;
+  }, [books]);
+
+  // Find a duplicate book by sourceKey or title+author
+  const findDuplicate = useCallback((sourceKey, title, author) => {
+    if (sourceKey && existingKeys.has(sourceKey)) {
+      return books.find((b) => b.sourceKey === sourceKey) || null;
+    }
+    const key = `${(title || "").trim().toLowerCase()}|${(author || "").trim().toLowerCase()}`;
+    if (key !== "|" && existingTitleAuthors.has(key)) {
+      return existingTitleAuthors.get(key);
+    }
+    return null;
+  }, [books, existingKeys, existingTitleAuthors]);
+
+  // Check for duplicates when form title or author changes
+  useEffect(() => {
+    if (editing) { setDuplicateWarning(null); return; }
+    const dup = findDuplicate(form.sourceKey, form.title, form.author);
+    setDuplicateWarning(dup ? { title: dup.title, author: dup.author, status: dup.status } : null);
+  }, [form.title, form.author, form.sourceKey, editing, findDuplicate]);
 
   // Auto-suggest autocomplete logic with debounce
   useEffect(() => {
@@ -290,8 +320,12 @@ function BookModal({
                       <div className="dropdown-message error">{searchError}</div>
                     ) : (
                       searchResults.map((volume) => {
-                        const isAdded = existingKeys.has(volume.id);
                         const volumeInfo = volume.volumeInfo || {};
+                        const isAddedByKey = existingKeys.has(volume.id);
+                        const volTitle = volumeInfo.title || "";
+                        const volAuthor = volumeInfo.authors?.join(", ") || "";
+                        const isAddedByTitle = !!findDuplicate(null, volTitle, volAuthor);
+                        const isAdded = isAddedByKey || isAddedByTitle;
                         const coverUrl = volumeInfo.imageLinks?.smallThumbnail || volumeInfo.imageLinks?.thumbnail || "";
                         const tempBook = {
                           title: volumeInfo.title || "Untitled",
@@ -345,6 +379,17 @@ function BookModal({
                 </select>
               </div>
             </div>
+          </div>
+        )}
+
+        {duplicateWarning && (
+          <div className="duplicate-warning">
+            <AlertTriangle size={16} />
+            <span>
+              <strong>{duplicateWarning.title}</strong>{duplicateWarning.author ? ` by ${duplicateWarning.author}` : ""} is already in your library
+              {duplicateWarning.status ? ` (${STATUSES[duplicateWarning.status]?.longLabel || duplicateWarning.status})` : ""}.
+              You can still save if this is a different edition.
+            </span>
           </div>
         )}
 
