@@ -115,25 +115,36 @@ function BookDetailsModal({ book, onClose }) {
               </div>
             )}
 
-            {book.description ? (
-              <div className="details-description-section">
-                <h3 className="details-section-label">About This Book</h3>
-                <div className="details-description-text">
-                  <p>{book.description}</p>
-                </div>
-              </div>
-            ) : null}
+            {/* Smart fallback: if it has an API key but no description field, treat notes as description */}
+            {(() => {
+              const hasAPI = Boolean(book.sourceKey);
+              const displayDescription = book.description || (hasAPI ? book.notes : "");
+              const displayNotes = book.description ? book.notes : (hasAPI ? "" : book.notes);
 
-            <div className="details-description-section">
-              <h3 className="details-section-label">Personal Notes</h3>
-              <div className="details-description-text">
-                {book.notes ? (
-                  <p>{book.notes}</p>
-                ) : (
-                  <p className="empty-desc">No personal notes or review logged for this book yet.</p>
-                )}
-              </div>
-            </div>
+              return (
+                <>
+                  {displayDescription ? (
+                    <div className="details-description-section">
+                      <h3 className="details-section-label">About This Book</h3>
+                      <div className="details-description-text">
+                        <p>{displayDescription}</p>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  <div className="details-description-section">
+                    <h3 className="details-section-label">Personal Notes</h3>
+                    <div className="details-description-text">
+                      {displayNotes ? (
+                        <p>{displayNotes}</p>
+                      ) : (
+                        <p className="empty-desc">No personal notes or review logged for this book yet.</p>
+                      )}
+                    </div>
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </div>
       </div>

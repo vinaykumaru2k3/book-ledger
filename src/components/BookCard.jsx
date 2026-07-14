@@ -65,18 +65,22 @@ function BookCard({ book, layout, onDelete, onEdit, onUpdate, onViewDetails }) {
           </div>
         ) : null}
 
-        {book.notes ? (
-          <div className="notes-preview-container">
-            <button 
-              className="read-more-link" 
-              onClick={() => onViewDetails(book)}
-              title="View full description"
-              type="button"
-            >
-              Read description →
-            </button>
-          </div>
-        ) : null}
+        {(() => {
+          const hasAPI = Boolean(book.sourceKey);
+          const displayDescription = book.description || (hasAPI ? book.notes : "");
+          return displayDescription ? (
+            <div className="notes-preview-container">
+              <button 
+                className="read-more-link" 
+                onClick={() => onViewDetails(book)}
+                title="View full description"
+                type="button"
+              >
+                Read description →
+              </button>
+            </div>
+          ) : null;
+        })()}
 
         {book.pages ? (
           <div className="progress-area">

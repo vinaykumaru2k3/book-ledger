@@ -375,11 +375,12 @@ function App() {
 
         // 3. Fallback to Open Library search if no pages/categories found yet
         if (!categories.length || !fetchedPages) {
+          const fieldsParam = "&fields=key,title,author_name,number_of_pages_median,first_publish_year,subject,cover_i,isbn";
           const queryParams = bookToEnrich.isbn 
             ? `isbn=${bookToEnrich.isbn}` 
             : `q=${encodeURIComponent(bookToEnrich.title + (bookToEnrich.author ? ` ${bookToEnrich.author}` : ""))}`;
           
-          const res = await fetch(`https://openlibrary.org/search.json?limit=1&${queryParams}`);
+          const res = await fetch(`https://openlibrary.org/search.json?limit=1&${queryParams}${fieldsParam}`);
           if (res.ok) {
             const data = await res.json();
             if (data.docs?.[0]) {

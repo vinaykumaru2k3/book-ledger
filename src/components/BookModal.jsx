@@ -141,13 +141,14 @@ function BookModal({
         // Handle Google Books Rate Limit (HTTP 429) by silently falling back to Open Library
         if (response.status === 429) {
           console.warn("Google Books API rate limited (429). Falling back to Open Library...");
-          let olUrl = `https://openlibrary.org/search.json?limit=8&q=${encodeURIComponent(searchQuery.trim())}`;
+          const fieldsParam = "&fields=key,title,author_name,number_of_pages_median,first_publish_year,subject,cover_i,isbn";
+          let olUrl = `https://openlibrary.org/search.json?limit=8&q=${encodeURIComponent(searchQuery.trim())}${fieldsParam}`;
           if (searchType === "title") {
-            olUrl = `https://openlibrary.org/search.json?limit=8&title=${encodeURIComponent(searchQuery.trim())}`;
+            olUrl = `https://openlibrary.org/search.json?limit=8&title=${encodeURIComponent(searchQuery.trim())}${fieldsParam}`;
           } else if (searchType === "author") {
-            olUrl = `https://openlibrary.org/search.json?limit=8&author=${encodeURIComponent(searchQuery.trim())}`;
+            olUrl = `https://openlibrary.org/search.json?limit=8&author=${encodeURIComponent(searchQuery.trim())}${fieldsParam}`;
           } else if (searchType === "genre") {
-            olUrl = `https://openlibrary.org/search.json?limit=8&subject=${encodeURIComponent(searchQuery.trim())}`;
+            olUrl = `https://openlibrary.org/search.json?limit=8&subject=${encodeURIComponent(searchQuery.trim())}${fieldsParam}`;
           }
           console.log("Fetching Open Library fallback URL:", olUrl);
           
@@ -255,7 +256,8 @@ function BookModal({
   async function enrichWithOpenLibrary(matchedForm) {
     try {
       const q = encodeURIComponent(`${matchedForm.title} ${matchedForm.author}`.trim());
-      const res = await fetch(`https://openlibrary.org/search.json?limit=1&q=${q}`);
+      const fieldsParam = "&fields=key,title,author_name,number_of_pages_median,first_publish_year,subject,cover_i,isbn";
+      const res = await fetch(`https://openlibrary.org/search.json?limit=1&q=${q}${fieldsParam}`);
       if (!res.ok) return matchedForm;
       const data = await res.json();
       const doc = data.docs?.[0];
@@ -564,6 +566,16 @@ function BookModal({
               </div>
             </label>
             
+            <label className="field span-2">
+              <span>Book Description (Synopsis)</span>
+              <textarea
+                value={form.description || ""}
+                onChange={(event) => patchForm({ description: event.target.value })}
+                rows={4}
+                placeholder="Synopsis of the book from API search..."
+              />
+            </label>
+
             <label className="field span-2">
               <span>Notes & Thoughts</span>
               <textarea
