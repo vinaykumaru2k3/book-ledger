@@ -21,6 +21,8 @@ import {
   Sun,
   Moon,
   CheckCircle,
+  Sparkles,
+  Trophy,
 } from "lucide-react";
 import {
   onAuthStateChanged,
@@ -55,6 +57,8 @@ import LoadingPanel from "./components/LoadingPanel";
 import Toast from "./components/Toast";
 import DeleteConfirmModal from "./components/DeleteConfirmModal";
 import BookDetailsModal from "./components/BookDetailsModal";
+import Recommendations from "./components/Recommendations";
+import TopCharts from "./components/TopCharts";
 
 // Constants & Helpers
 import { STATUSES, SORTS, progressFor } from "./components/constants";
@@ -471,6 +475,7 @@ function App() {
   }, [books]);
 
   const visibleBooks = useMemo(() => {
+    if (statusFilter === "recommendations" || statusFilter === "topbooks") return [];
     const queryStr = libraryQuery.trim().toLowerCase();
     const filtered = books.filter((book) => {
       if (statusFilter === "favorites") {
@@ -871,6 +876,30 @@ function App() {
           </nav>
         </div>
 
+        <div className="sidebar-divider" />
+
+        <div className="sidebar-section">
+          <div className="sidebar-section-label">Discover</div>
+          <nav className="status-nav" aria-label="Discover navigation">
+            <button
+              className={statusFilter === "recommendations" ? "nav-item active" : "nav-item"}
+              onClick={() => setStatusFilter("recommendations")}
+              type="button"
+            >
+              <Sparkles size={17} />
+              <span>Recommendations</span>
+            </button>
+            <button
+              className={statusFilter === "topbooks" ? "nav-item active" : "nav-item"}
+              onClick={() => setStatusFilter("topbooks")}
+              type="button"
+            >
+              <Trophy size={17} />
+              <span>Top Books</span>
+            </button>
+          </nav>
+        </div>
+
         <div className="sidebar-actions">
           <AccountCard user={user} onSignOut={handleSignOut} />
           <button className="button primary full add-book-trigger" onClick={openNewBook} type="button">
@@ -906,8 +935,20 @@ function App() {
         <header className="dashboard-header">
           <div className="dashboard-header-top">
             <div className="dashboard-title-group">
-              <p className="section-kicker">Library Dashboard</p>
-              <h2 className="dashboard-title">My Library</h2>
+              <p className="section-kicker">
+                {statusFilter === "recommendations"
+                  ? "Personalized Discovery"
+                  : statusFilter === "topbooks"
+                  ? "Popular Charts"
+                  : "Library Dashboard"}
+              </p>
+              <h2 className="dashboard-title">
+                {statusFilter === "recommendations"
+                  ? "Book Recommendations"
+                  : statusFilter === "topbooks"
+                  ? "Discover Top Books"
+                  : "My Library"}
+              </h2>
             </div>
             <div className="topbar-actions">
               <button
@@ -931,183 +972,203 @@ function App() {
             </div>
           </div>
 
-          <div className="stats-strip" aria-label="Shelf stats summary">
-            <div className="stat-item">
-              <Library size={15} className="stat-icon teal" />
-              <strong>{stats.total}</strong>
-              <span>Total Books</span>
+          {statusFilter !== "recommendations" && statusFilter !== "topbooks" && (
+            <div className="stats-strip" aria-label="Shelf stats summary">
+              <div className="stat-item">
+                <Library size={15} className="stat-icon teal" />
+                <strong>{stats.total}</strong>
+                <span>Total Books</span>
+              </div>
+              <div className="stat-divider" />
+              <div className="stat-item">
+                <CheckCircle size={15} className="stat-icon plum" />
+                <strong>{stats.done}</strong>
+                <span>Finished</span>
+              </div>
+              <div className="stat-divider" />
+              <div className="stat-item">
+                <BookOpen size={15} className="stat-icon gold" />
+                <strong>{stats.reading}</strong>
+                <span>Reading</span>
+              </div>
+              <div className="stat-divider" />
+              <div className="stat-item">
+                <CalendarDays size={15} className="stat-icon plum" />
+                <strong>{stats.finishedThisYear}</strong>
+                <span>Completed {new Date().getFullYear()}</span>
+              </div>
+              <div className="stat-divider" />
+              <div className="stat-item">
+                <Star size={15} className="stat-icon coral" />
+                <strong>{stats.averageRating}</strong>
+                <span>Avg Rating</span>
+              </div>
             </div>
-            <div className="stat-divider" />
-            <div className="stat-item">
-              <CheckCircle size={15} className="stat-icon plum" />
-              <strong>{stats.done}</strong>
-              <span>Finished</span>
-            </div>
-            <div className="stat-divider" />
-            <div className="stat-item">
-              <BookOpen size={15} className="stat-icon gold" />
-              <strong>{stats.reading}</strong>
-              <span>Reading</span>
-            </div>
-            <div className="stat-divider" />
-            <div className="stat-item">
-              <CalendarDays size={15} className="stat-icon plum" />
-              <strong>{stats.finishedThisYear}</strong>
-              <span>Completed {new Date().getFullYear()}</span>
-            </div>
-            <div className="stat-divider" />
-            <div className="stat-item">
-              <Star size={15} className="stat-icon coral" />
-              <strong>{stats.averageRating}</strong>
-              <span>Avg Rating</span>
-            </div>
-          </div>
+          )}
         </header>
 
-        <section className="content-layout">
-          <div className="library-panel">
-            <div className="toolbar">
-              <label className="search-field">
-                <Search size={18} />
-                <input
-                  value={libraryQuery}
-                  onChange={(event) => setLibraryQuery(event.target.value)}
-                  placeholder="Filter by title, author, tags, notes..."
-                />
-              </label>
+        {statusFilter === "recommendations" ? (
+          <div className="library-panel recommendations-panel-wrapper">
+            <Recommendations
+              books={books}
+              quickAdd={quickAdd}
+              onViewDetails={setDetailsBook}
+            />
+          </div>
+        ) : statusFilter === "topbooks" ? (
+          <div className="library-panel recommendations-panel-wrapper">
+            <TopCharts
+              books={books}
+              quickAdd={quickAdd}
+              onViewDetails={setDetailsBook}
+            />
+          </div>
+        ) : (
+          <section className="content-layout">
+            <div className="library-panel">
+              <div className="toolbar">
+                <label className="search-field">
+                  <Search size={18} />
+                  <input
+                    value={libraryQuery}
+                    onChange={(event) => setLibraryQuery(event.target.value)}
+                    placeholder="Filter by title, author, tags, notes..."
+                  />
+                </label>
 
-              <div className="select-wrap library-sort-select">
-                <select value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
-                  {SORTS.map((sort) => (
-                    <option key={sort.value} value={sort.value}>
-                      {sort.label}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown size={14} />
-              </div>
-
-              <div className="view-toggle" aria-label="Toggle Layout Grid/List">
-                <button
-                  className={view === "grid" ? "active" : ""}
-                  onClick={() => setView("grid")}
-                  aria-label="Grid View"
-                  title="Grid Layout"
-                  type="button"
-                >
-                  <Grid3X3 size={15} />
-                </button>
-                <button
-                  className={view === "list" ? "active" : ""}
-                  onClick={() => setView("list")}
-                  aria-label="List View"
-                  title="List Layout"
-                  type="button"
-                >
-                  <List size={16} />
-                </button>
-              </div>
-            </div>
-
-            {booksLoading ? (
-              <LoadingPanel label="Connecting with Database ledger..." />
-            ) : visibleBooks.length ? (
-              <>
-                <div className={view === "grid" ? "book-grid" : "book-list"}>
-                  {paginatedBooks.map((book) => (
-                    <BookCard
-                      book={book}
-                      key={book.id}
-                      layout={view}
-                      onDelete={deleteBook}
-                      onEdit={openEditBook}
-                      onUpdate={updateBook}
-                      onViewDetails={setDetailsBook}
-                    />
-                  ))}
+                <div className="select-wrap library-sort-select">
+                  <select value={sortBy} onChange={(event) => setSortBy(event.target.value)}>
+                    {SORTS.map((sort) => (
+                      <option key={sort.value} value={sort.value}>
+                        {sort.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={14} />
                 </div>
 
-                {/* Folio Pagination Footer */}
-                {totalPages > 1 && (
-                  <div className="pagination-wrapper">
-                    <div className="pagination-info">
-                      Showing <strong>{startIndex + 1}</strong>–<strong>{Math.min(startIndex + BOOKS_PER_PAGE, visibleBooks.length)}</strong> of <strong>{visibleBooks.length}</strong> books
-                    </div>
-                    <div className="pagination-buttons">
-                      <button
-                        className="pagination-btn"
-                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                        disabled={activePage === 1}
-                        aria-label="Previous Page"
-                        type="button"
-                      >
-                        <ChevronLeft size={15} />
-                      </button>
-
-                      {Array.from({ length: totalPages }).map((_, idx) => {
-                        const pageNum = idx + 1;
-                        return (
-                          <button
-                            key={pageNum}
-                            className={`pagination-btn page-num ${activePage === pageNum ? "active" : ""}`}
-                            onClick={() => setCurrentPage(pageNum)}
-                            type="button"
-                          >
-                            {pageNum}
-                          </button>
-                        );
-                      })}
-
-                      <button
-                        className="pagination-btn"
-                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                        disabled={activePage === totalPages}
-                        aria-label="Next Page"
-                        type="button"
-                      >
-                        <ChevronRight size={15} />
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </>
-            ) : (
-              <EmptyState hasBooks={books.length > 0} onAdd={openNewBook} onReset={clearFilters} />
-            )}
-          </div>
-
-          <aside className="insights-panel">
-            <div className="insight-block">
-              <div className="panel-heading">
-                <BarChart3 size={15} />
-                <h3>Reading Progress</h3>
-                <span className="panel-badge">{stats.completionRate}% done</span>
+                <div className="view-toggle" aria-label="Toggle Layout Grid/List">
+                  <button
+                    className={view === "grid" ? "active" : ""}
+                    onClick={() => setView("grid")}
+                    aria-label="Grid View"
+                    title="Grid Layout"
+                    type="button"
+                  >
+                    <Grid3X3 size={15} />
+                  </button>
+                  <button
+                    className={view === "list" ? "active" : ""}
+                    onClick={() => setView("list")}
+                    aria-label="List View"
+                    title="List Layout"
+                    type="button"
+                  >
+                    <List size={16} />
+                  </button>
+                </div>
               </div>
-              <div className="completion-meter">
-                <span style={{ width: `${stats.completionRate}%` }} />
-              </div>
-              <div className="status-bars">
-                {Object.entries(STATUSES).map(([key, status]) => (
-                  <div className="status-bar-row" key={key}>
-                    <span className="status-bar-label">{status.longLabel}</span>
-                    <div className="status-bar-track">
-                      <i
-                        style={{
-                          width: `${stats.total ? (stats[key] / stats.total) * 100 : 0}%`,
-                          background: status.color,
-                        }}
+
+              {booksLoading ? (
+                <LoadingPanel label="Connecting with Database ledger..." />
+              ) : visibleBooks.length ? (
+                <>
+                  <div className={view === "grid" ? "book-grid" : "book-list"}>
+                    {paginatedBooks.map((book) => (
+                      <BookCard
+                        book={book}
+                        key={book.id}
+                        layout={view}
+                        onDelete={deleteBook}
+                        onEdit={openEditBook}
+                        onUpdate={updateBook}
+                        onViewDetails={setDetailsBook}
                       />
-                    </div>
-                    <strong>{stats[key]}</strong>
+                    ))}
                   </div>
-                ))}
-              </div>
+
+                  {/* Folio Pagination Footer */}
+                  {totalPages > 1 && (
+                    <div className="pagination-wrapper">
+                      <div className="pagination-info">
+                        Showing <strong>{startIndex + 1}</strong>–<strong>{Math.min(startIndex + BOOKS_PER_PAGE, visibleBooks.length)}</strong> of <strong>{visibleBooks.length}</strong> books
+                      </div>
+                      <div className="pagination-buttons">
+                        <button
+                          className="pagination-btn"
+                          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                          disabled={activePage === 1}
+                          aria-label="Previous Page"
+                          type="button"
+                        >
+                          <ChevronLeft size={15} />
+                        </button>
+
+                        {Array.from({ length: totalPages }).map((_, idx) => {
+                          const pageNum = idx + 1;
+                          return (
+                            <button
+                              key={pageNum}
+                              className={`pagination-btn page-num ${activePage === pageNum ? "active" : ""}`}
+                              onClick={() => setCurrentPage(pageNum)}
+                              type="button"
+                            >
+                              {pageNum}
+                            </button>
+                          );
+                        })}
+
+                        <button
+                          className="pagination-btn"
+                          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                          disabled={activePage === totalPages}
+                          aria-label="Next Page"
+                          type="button"
+                        >
+                          <ChevronRight size={15} />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <EmptyState hasBooks={books.length > 0} onAdd={openNewBook} onReset={clearFilters} />
+              )}
             </div>
 
-            <ReadingStack title="Reading Now" books={currentlyReading} empty="No active books." />
-            <ReadingStack title="Recently Finished" books={recentlyFinished} empty="No books completed yet." />
-          </aside>
-        </section>
+            <aside className="insights-panel">
+              <div className="insight-block">
+                <div className="panel-heading">
+                  <BarChart3 size={15} />
+                  <h3>Reading Progress</h3>
+                  <span className="panel-badge">{stats.completionRate}% done</span>
+                </div>
+                <div className="completion-meter">
+                  <span style={{ width: `${stats.completionRate}%` }} />
+                </div>
+                <div className="status-bars">
+                  {Object.entries(STATUSES).map(([key, status]) => (
+                    <div className="status-bar-row" key={key}>
+                      <span className="status-bar-label">{status.longLabel}</span>
+                      <div className="status-bar-track">
+                        <i
+                          style={{
+                            width: `${stats.total ? (stats[key] / stats.total) * 100 : 0}%`,
+                            background: status.color,
+                          }}
+                        />
+                      </div>
+                      <strong>{stats[key]}</strong>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <ReadingStack title="Reading Now" books={currentlyReading} empty="No active books." />
+              <ReadingStack title="Recently Finished" books={recentlyFinished} empty="No books completed yet." />
+            </aside>
+          </section>
+        )}
       </main>
 
       {modalOpen && (

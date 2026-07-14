@@ -1,5 +1,5 @@
-import React from "react";
-import { X, Calendar, Bookmark, Layers, Heart, BookOpen, Tag } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { X, Calendar, Bookmark, Layers, Heart, BookOpen, Tag, Loader2 } from "lucide-react";
 import Cover from "./Cover";
 import Rating from "./Rating";
 import { STATUSES, progressFor } from "./constants";
@@ -8,6 +8,45 @@ function BookDetailsModal({ book, onClose }) {
   const progress = progressFor(book);
   const StatusIcon = STATUSES[book.status]?.icon;
   const statusColor = STATUSES[book.status]?.color || "#10b981";
+
+  const isPlaceholder = book.description === "Fetching full description from Open Library...";
+  
+  const [description, setDescription] = useState(isPlaceholder ? "" : book.description || "");
+  const [loadingDesc, setLoadingDesc] = useState(
+    isPlaceholder || (!book.description && (book.sourceKey?.startsWith("/works/") || book.id?.startsWith("/works/")))
+  );
+
+  useEffect(() => {
+    let active = true;
+    const workKey = book.sourceKey || (book.id?.startsWith("/works/") ? book.id : null);
+    
+    if (loadingDesc && workKey) {
+      async function fetchDesc() {
+        try {
+          const response = await fetch(`https://openlibrary.org${workKey}.json`);
+          if (response.ok && active) {
+            const data = await response.json();
+            let desc = "";
+            if (typeof data.description === "string") {
+              desc = data.description;
+            } else if (data.description && typeof data.description.value === "string") {
+              desc = data.description.value;
+            }
+            setDescription(desc || "No description available for this book.");
+          }
+        } catch (e) {
+          console.error("Failed to fetch OL description in details:", e);
+          if (active) setDescription("Failed to load description.");
+        } finally {
+          if (active) setLoadingDesc(false);
+        }
+      }
+      fetchDesc();
+    }
+    return () => {
+      active = false;
+    };
+  }, [book, loadingDesc]);
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
@@ -118,19 +157,26 @@ function BookDetailsModal({ book, onClose }) {
             {/* Smart fallback: if it has an API key but no description field, treat notes as description */}
             {(() => {
               const hasAPI = Boolean(book.sourceKey);
-              const displayDescription = book.description || (hasAPI ? book.notes : "");
-              const displayNotes = book.description ? book.notes : (hasAPI ? "" : book.notes);
+              const displayDescription = description || (hasAPI ? book.notes : "");
+              const displayNotes = description ? book.notes : (hasAPI ? "" : book.notes);
 
               return (
                 <>
-                  {displayDescription ? (
-                    <div className="details-description-section">
-                      <h3 className="details-section-label">About This Book</h3>
-                      <div className="details-description-text">
+                  <div className="details-description-section">
+                    <h3 className="details-section-label">About This Book</h3>
+                    <div className="details-description-text">
+                      {loadingDesc ? (
+                        <div className="desc-loading-inline">
+                          <Loader2 size={16} className="spin" style={{ marginRight: 6 }} />
+                          <span>Fetching synopsis from Open Library...</span>
+                        </div>
+                      ) : displayDescription ? (
                         <p>{displayDescription}</p>
-                      </div>
+                      ) : (
+                        <p className="empty-desc">No description available for this book.</p>
+                      )}
                     </div>
-                  ) : null}
+                  </div>
 
                   <div className="details-description-section">
                     <h3 className="details-section-label">Personal Notes</h3>

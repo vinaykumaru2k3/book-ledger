@@ -3566,6 +3566,18 @@ textarea:focus-visible {
   color: var(--text-muted);
 }
 
+.desc-loading-inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.desc-loading-inline svg {
+  color: var(--accent-emerald);
+}
+
 @media (max-width: 640px) {
   .details-modal-body {
     grid-template-columns: 1fr;
@@ -3671,4 +3683,220 @@ textarea:focus-visible {
     gap: 12px;
     padding: 12px;
   }
+}
+
+/* Recommendations Panel Styles */
+.recommendations-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+.rec-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.rec-info-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.rec-info-banner svg {
+  color: var(--accent-emerald);
+  flex-shrink: 0;
+}
+
+.rec-refresh-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rec-loading-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 80px 20px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.rec-loading-panel svg {
+  color: var(--accent-emerald);
+}
+
+.rec-error-panel, .rec-empty-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 80px 20px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+/* Responsive 3-column grid for recommendations */
+.rec-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 1100px) {
+  .rec-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .rec-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* Specific styling modifications for rec cards */
+.rec-card .book-main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.rec-reason-badge {
+  align-self: flex-start;
+  padding: 4px 8px;
+  background-color: rgba(217, 119, 6, 0.08); /* amber tint */
+  border: 1px solid rgba(217, 119, 6, 0.15);
+  border-radius: var(--radius-sm);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--accent-emerald); /* gold/amber */
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 12px;
+}
+
+[data-theme="light"] .rec-reason-badge {
+  background-color: rgba(180, 83, 9, 0.06);
+  border-color: rgba(180, 83, 9, 0.12);
+}
+
+.inspiring-title {
+  color: var(--text-muted);
+  font-size: 0.62rem;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
+  margin-top: 1px;
+}
+
+.rec-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  width: 100%;
+}
+
+.rec-actions button {
+  flex: 1;
+}
+
+/* Sidebar Divider */
+.sidebar-divider {
+  height: 1px;
+  background-color: var(--border-subtle);
+  margin: 12px 24px;
+  opacity: 0.5;
+}
+
+/* Top Charts / Discover Tab Styles */
+.top-charts-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+.genre-selection-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0;
+}
+
+.genre-select-tab {
+  background: none;
+  border: none;
+  padding: 10px 16px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  position: relative;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px; /* Overlap border-bottom line */
+}
+
+.genre-select-tab:hover {
+  color: var(--text-primary);
+}
+
+.genre-select-tab.active {
+  color: var(--accent-emerald);
+  border-bottom-color: var(--accent-emerald);
+}
+
+.top-chart-card {
+  position: relative;
+}
+
+.chart-rank-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background-color: var(--accent-emerald);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 5;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Success status button styling for TopCharts */
+.button.success {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--accent-emerald);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  cursor: default;
 }
