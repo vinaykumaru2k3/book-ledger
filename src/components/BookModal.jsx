@@ -84,6 +84,14 @@ function BookModal({
     return Array.from(list).sort();
   }, [books]);
 
+  const displayedShelves = useMemo(() => {
+    const set = new Set(uniqueShelves);
+    if (Array.isArray(form.shelves)) {
+      form.shelves.forEach((s) => set.add(s));
+    }
+    return Array.from(set).sort();
+  }, [uniqueShelves, form.shelves]);
+
   const existingKeys = useMemo(
     () => new Set(books.map((book) => book.sourceKey).filter(Boolean)),
     [books]
@@ -580,26 +588,26 @@ function BookModal({
             <div className="field span-2 shelves-input-container">
               <span>Custom Shelves / Collections</span>
               
-              {uniqueShelves.length > 0 && (
+              {displayedShelves.length > 0 && (
                 <div className="shelves-checklist">
-                  {uniqueShelves.map((shelf) => {
+                  {displayedShelves.map((shelf) => {
                     const isChecked = (form.shelves || []).includes(shelf);
                     return (
-                      <label key={shelf} className={`shelf-pill-label ${isChecked ? "active" : ""}`}>
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => {
-                            const current = form.shelves || [];
-                            if (current.includes(shelf)) {
-                              patchForm({ shelves: current.filter((s) => s !== shelf) });
-                            } else {
-                              patchForm({ shelves: [...current, shelf] });
-                            }
-                          }}
-                        />
+                      <button
+                        type="button"
+                        key={shelf}
+                        className={`shelf-pill-label ${isChecked ? "active" : ""}`}
+                        onClick={() => {
+                          const current = form.shelves || [];
+                          if (current.includes(shelf)) {
+                            patchForm({ shelves: current.filter((s) => s !== shelf) });
+                          } else {
+                            patchForm({ shelves: [...current, shelf] });
+                          }
+                        }}
+                      >
                         <span>{shelf}</span>
-                      </label>
+                      </button>
                     );
                   })}
                 </div>
