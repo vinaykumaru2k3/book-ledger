@@ -140,7 +140,7 @@ function BookCard({ book, layout, uniqueShelves = [], onDelete, onEdit, onUpdate
           </div>
 
           {/* Action buttons (Favorite, Shelve, Edit, Delete) */}
-          <div className="book-actions" style={{ position: "relative" }}>
+          <div className={`book-actions ${showShelfPopover ? "open" : ""}`}>
             <button
               className={book.favorite ? "action-btn active favorite-btn" : "action-btn favorite-btn"}
               onClick={() => onUpdate(book.id, { favorite: !book.favorite })}
@@ -237,7 +237,7 @@ function BookCard({ book, layout, uniqueShelves = [], onDelete, onEdit, onUpdate
       </div>
 
       {/* Floating Action overlay on hover */}
-      <div className="book-actions" style={{ position: "relative" }}>
+      <div className={`book-actions ${showShelfPopover ? "open" : ""}`}>
         <button
           className={book.favorite ? "action-btn active favorite-btn" : "action-btn favorite-btn"}
           onClick={() => onUpdate(book.id, { favorite: !book.favorite })}

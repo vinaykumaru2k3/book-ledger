@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Plus, Trash2, FolderOpen, X, Layers } from "lucide-react";
+import { Plus, Trash2, FolderOpen, X, Layers, Edit2, Check } from "lucide-react";
 import Cover from "./Cover";
 
 const BOARD_PRESETS = [
@@ -19,6 +19,8 @@ function getPreset(shelfName) {
 function ShelvesDashboard({ books, onUpdateBook, onViewDetails }) {
   const [newShelfName, setNewShelfName] = useState("");
   const [tempEmptyShelves, setTempEmptyShelves] = useState([]);
+  const [editingShelf, setEditingShelf] = useState(null);
+  const [editNameValue, setEditNameValue] = useState("");
 
   // Extract unique shelves
   const uniqueShelves = useMemo(() => {
@@ -59,6 +61,34 @@ function ShelvesDashboard({ books, onUpdateBook, onViewDetails }) {
     }
   };
 
+  const handleRenameShelf = async (e, oldName) => {
+    e.preventDefault();
+    const newName = editNameValue.trim();
+    if (!newName || newName === oldName) {
+      setEditingShelf(null);
+      return;
+    }
+
+    if (allShelves.includes(newName) && newName !== oldName) {
+      alert("A shelf board with this name already exists!");
+      return;
+    }
+
+    // Rename oldName to newName in all books
+    const booksOnShelf = shelfBooks[oldName] || [];
+    for (const book of booksOnShelf) {
+      const updatedShelves = (book.shelves || []).map((s) => s === oldName ? newName : s);
+      await onUpdateBook(book.id, { shelves: updatedShelves });
+    }
+
+    // Update temp empty shelves if present
+    setTempEmptyShelves((prev) => 
+      prev.map((s) => s === oldName ? newName : s)
+    );
+
+    setEditingShelf(null);
+  };
+
   const handleDeleteShelf = async (shelfName) => {
     if (!window.confirm(`Are you sure you want to delete the shelf board "${shelfName}"? This will unshelf all books on this board.`)) {
       return;
@@ -82,16 +112,18 @@ function ShelvesDashboard({ books, onUpdateBook, onViewDetails }) {
 
   return (
     <div className="shelves-dashboard">
-      <div className="dashboard-header">
-        <div>
-          <span className="section-kicker">Workspace</span>
-          <h2>Custom Shelves & Collections</h2>
+      <div className="dashboard-intro-row">
+        <div className="intro-info">
+          <span className="section-kicker">Visual Boards</span>
+          <p className="intro-description">
+            Organize your library collections. Add empty board shelves below, and organize books using the quick-shelve folder icon on any book card.
+          </p>
         </div>
         
         <form className="add-board-form" onSubmit={handleAddShelf}>
           <input
             type="text"
-            placeholder="New Collection Board name..."
+            placeholder="Create new shelf board..."
             value={newShelfName}
             onChange={(e) => setNewShelfName(e.target.value)}
           />
@@ -106,31 +138,71 @@ function ShelvesDashboard({ books, onUpdateBook, onViewDetails }) {
         <div className="empty-dashboard-state">
           <FolderOpen size={48} />
           <h3>No collections created yet</h3>
-          <p>Type a collection name above to create your first visual board, or use the quick shelf tool on any book card!</p>
+          <p>Type a collection name above to create your first visual board, or organize books directly from their cards!</p>
         </div>
       ) : (
         <div className="boards-grid">
           {allShelves.map((shelf) => {
             const list = shelfBooks[shelf] || [];
             const preset = getPreset(shelf);
+            const isEditing = editingShelf === shelf;
             
             return (
               <div key={shelf} className={`shelf-board-card ${preset.class}`}>
                 <div className="board-card-header">
-                  <div className="board-title-group">
-                    <Layers size={16} style={{ color: preset.color }} />
-                    <h3>{shelf}</h3>
-                    <span className="board-count-badge">{list.length} {list.length === 1 ? "book" : "books"}</span>
-                  </div>
-                  <button 
-                    className="delete-board-btn" 
-                    onClick={() => handleDeleteShelf(shelf)}
-                    title="Delete this shelf board"
-                    aria-label="Delete shelf board"
-                    type="button"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                  {isEditing ? (
+                    <form onSubmit={(e) => handleRenameShelf(e, shelf)} className="rename-shelf-form">
+                      <input
+                        value={editNameValue}
+                        onChange={(e) => setEditNameValue(e.target.value)}
+                        className="rename-shelf-input"
+                        autoFocus
+                        required
+                      />
+                      <button type="submit" className="rename-btn save-btn" title="Save name">
+                        <Check size={14} />
+                      </button>
+                      <button type="button" className="rename-btn cancel-btn" onClick={() => setEditingShelf(null)} title="Cancel">
+                        <X size={14} />
+                      </button>
+                    </form>
+                  ) : (
+                    <div className="board-title-group">
+                      <Layers size={16} style={{ color: preset.color }} />
+                      <h3 onDoubleClick={() => {
+                        setEditingShelf(shelf);
+                        setEditNameValue(shelf);
+                      }}>
+                        {shelf}
+                      </h3>
+                      <button
+                        className="edit-shelf-btn"
+                        onClick={() => {
+                          setEditingShelf(shelf);
+                          setEditNameValue(shelf);
+                        }}
+                        title="Rename Shelf Board"
+                        type="button"
+                      >
+                        <Edit2 size={12} />
+                      </button>
+                      <span className="board-count-badge">
+                        {list.length} {list.length === 1 ? "book" : "books"}
+                      </span>
+                    </div>
+                  )}
+
+                  {!isEditing && (
+                    <button 
+                      className="delete-board-btn" 
+                      onClick={() => handleDeleteShelf(shelf)}
+                      title="Delete this shelf board"
+                      aria-label="Delete shelf board"
+                      type="button"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
                 </div>
 
                 <div className="board-books-track">

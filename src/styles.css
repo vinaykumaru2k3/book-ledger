@@ -4536,7 +4536,7 @@ textarea:focus-visible {
   padding: 4px;
 }
 
-.dashboard-header {
+.dashboard-intro-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -4546,11 +4546,25 @@ textarea:focus-visible {
 }
 
 @media (max-width: 768px) {
-  .dashboard-header {
+  .dashboard-intro-row {
     flex-direction: column;
     align-items: flex-start;
     gap: 14px;
   }
+}
+
+.intro-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.intro-description {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  max-width: 500px;
+  line-height: 1.4;
 }
 
 .add-board-form {
@@ -4655,7 +4669,7 @@ textarea:focus-visible {
 
 /* 1. Sepia Literary (Sandalwood / Antique Linen) */
 .shelf-board-card.shelf-board-sepia {
-  background: linear-gradient(135deg, rgba(245, 238, 223, 0.95) 0%, rgba(234, 222, 199, 0.95) 100%);
+  background: linear-gradient(135deg, rgba(246, 240, 228, 0.95) 0%, rgba(236, 226, 207, 0.95) 100%);
   border-left: 5px solid #d97706;
 }
 [data-theme="dark"] .shelf-board-card.shelf-board-sepia {
@@ -4772,6 +4786,77 @@ textarea:focus-visible {
   font-size: 1.05rem;
   font-weight: 700;
   margin: 0;
+  cursor: pointer;
+}
+
+.edit-shelf-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-smooth);
+}
+
+.edit-shelf-btn:hover {
+  color: var(--accent-emerald);
+  background-color: rgba(16, 185, 129, 0.08);
+}
+
+.rename-shelf-form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rename-shelf-input {
+  height: 28px;
+  padding: 0 8px;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  width: 150px;
+}
+
+.rename-shelf-input:focus {
+  outline: none;
+  border-color: var(--accent-emerald);
+}
+
+.rename-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--radius-sm);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.rename-btn.save-btn {
+  background-color: var(--accent-emerald);
+  color: #ffffff;
+}
+.rename-btn.save-btn:hover {
+  opacity: 0.9;
+}
+
+.rename-btn.cancel-btn {
+  background-color: var(--bg-ghost);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+.rename-btn.cancel-btn:hover {
+  background-color: var(--bg-ghost-hover);
 }
 
 .board-count-badge {
@@ -4807,15 +4892,30 @@ textarea:focus-visible {
 /* --- Horizontal scroll book list --- */
 .board-books-track {
   display: flex;
-  gap: 14px;
+  gap: 16px;
   overflow-x: auto;
-  padding: 6px 0 12px 0;
-  min-height: 120px;
+  padding: 12px 10px 24px 10px;
+  min-height: 175px;
+  position: relative;
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+  scrollbar-color: rgba(0, 0, 0, 0.08) transparent;
 }
 [data-theme="dark"] .board-books-track {
-  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+}
+
+/* Simulated Wooden Shelf Ledge Lined at the bottom of covers */
+.board-books-track::after {
+  content: "";
+  position: absolute;
+  bottom: 12px;
+  left: 4px;
+  right: 4px;
+  height: 8px;
+  background: linear-gradient(to bottom, #7c4f24, #573718);
+  border-radius: 3px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25), inset 0 1px 2px rgba(255,255,255,0.1);
+  z-index: 1;
 }
 
 .board-books-track::-webkit-scrollbar {
@@ -4841,6 +4941,7 @@ textarea:focus-visible {
   width: 100%;
   padding: 20px;
   text-align: center;
+  z-index: 2;
 }
 
 .empty-board-track span {
@@ -4854,29 +4955,32 @@ textarea:focus-visible {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  width: 72px;
+  gap: 8px;
+  width: 84px;
   flex-shrink: 0;
+  z-index: 2; /* Sit on top of wood ledge */
 }
 
 .board-book-cover-wrap {
   position: relative;
-  width: 72px;
-  height: 108px;
+  width: 84px;
+  height: 126px;
   border-radius: 3px;
-  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 3px 6px 12px rgba(0, 0, 0, 0.3);
   overflow: hidden;
-  transition: transform 0.2s ease;
+  transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  background-color: var(--bg-ghost);
 }
 
 .board-book-cover-wrap:hover {
-  transform: translateY(-2px);
-  box-shadow: 4px 8px 14px rgba(0, 0, 0, 0.35);
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 6px 12px 20px rgba(0, 0, 0, 0.45);
 }
 
 .board-book-cover-wrap .cover {
   width: 100% !important;
   height: 100% !important;
+  border-radius: 0;
 }
 
 .board-book-cover-wrap .clickable-cover {
@@ -4904,6 +5008,7 @@ textarea:focus-visible {
   transform: scale(0.8);
   transition: opacity 0.2s ease, transform 0.2s ease;
   padding: 0;
+  z-index: 10;
 }
 
 .board-book-cover-wrap:hover .remove-book-from-shelf-btn {
@@ -4926,6 +5031,7 @@ textarea:focus-visible {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-top: 4px;
 }
 
 /* ==========================================================================

@@ -889,33 +889,14 @@ function App() {
           <div className="sidebar-section-label">Shelves</div>
           <nav className="status-nav" aria-label="Custom Shelves navigation">
             {uniqueShelves.length > 0 ? (
-              <>
-                <button
-                  className={statusFilter === "shelves" ? "nav-item active" : "nav-item"}
-                  onClick={() => setStatusFilter("shelves")}
-                  type="button"
-                  style={{ marginBottom: "6px" }}
-                >
-                  <FolderOpen size={15} />
-                  <span>All Shelves</span>
-                </button>
-                {uniqueShelves.map((shelf) => {
-                  const filterKey = `shelf:${shelf}`;
-                  const count = books.filter((b) => b.shelves && b.shelves.includes(shelf)).length;
-                  return (
-                    <button
-                      className={statusFilter === filterKey ? "nav-item active" : "nav-item"}
-                      key={shelf}
-                      onClick={() => setStatusFilter(filterKey)}
-                      type="button"
-                    >
-                      <Layers size={15} />
-                      <span>{shelf}</span>
-                      <strong className="nav-item-badge">{count}</strong>
-                    </button>
-                  );
-                })}
-              </>
+              <button
+                className={statusFilter === "shelves" ? "nav-item active" : "nav-item"}
+                onClick={() => setStatusFilter("shelves")}
+                type="button"
+              >
+                <FolderOpen size={15} />
+                <span>All Shelves</span>
+              </button>
             ) : (
               <div className="sidebar-help-box">
                 <FolderOpen size={13} />
