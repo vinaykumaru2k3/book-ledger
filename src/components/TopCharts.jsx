@@ -153,23 +153,35 @@ function TopCharts({ books, quickAdd, onViewDetails }) {
       const data = await res.json();
       
       const seenKeys = new Set();
+      const seenTitles = new Set();
+      const authorBookCounts = {};
       const formatted = [];
       let rank = 1;
 
       for (const doc of (data.docs || [])) {
         if (!doc.key || seenKeys.has(doc.key)) continue;
 
-        // 1. Strict genre taxonomy validation
+        // 1. Deduplicate by normalized title to filter duplicate/regional editions
+        const normalizedTitle = doc.title.toLowerCase().trim().replace(/[^\w\s]/g, "");
+        if (seenTitles.has(normalizedTitle)) continue;
+
+        // 2. Limit the number of books from the same author to 2 per genre to prevent series saturation
+        const primaryAuthor = doc.author_name?.[0] || "Unknown Author";
+        if (authorBookCounts[primaryAuthor] >= 2) {
+          continue;
+        }
+
+        // 3. Strict genre taxonomy validation
         if (!validateGenre(doc, genre.id)) {
           continue;
         }
 
-        // 2. Filter out non-English editions/translations
+        // 4. Filter out non-English editions/translations
         if (!isProbablyEnglish(doc.title, doc.language)) {
           continue;
         }
 
-        // 2. Filter out textbooks and manual documents
+        // 5. Filter out textbooks and manual documents
         const lowerTitle = doc.title.toLowerCase();
         if (
           lowerTitle.includes("manual") ||
@@ -184,11 +196,13 @@ function TopCharts({ books, quickAdd, onViewDetails }) {
           continue;
         }
 
-        // 3. Filter out books with missing cover art or extremely small page counts (pamphlets)
+        // 6. Filter out books with missing cover art or extremely small page counts (pamphlets)
         if (!doc.cover_i) continue;
         if (doc.number_of_pages_median && doc.number_of_pages_median < 25) continue;
 
         seenKeys.add(doc.key);
+        seenTitles.add(normalizedTitle);
+        authorBookCounts[primaryAuthor] = (authorBookCounts[primaryAuthor] || 0) + 1;
         const author = doc.author_name?.join(", ") || "Unknown Author";
 
         formatted.push({

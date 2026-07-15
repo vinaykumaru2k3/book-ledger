@@ -153,12 +153,41 @@ function Recommendations({ books, quickAdd, onViewDetails }) {
 
       // Flatten and filter duplicates
       const seenKeys = new Set();
+      const seenTitles = new Set();
+      const authorCounts = {};
+      
       results.flat().forEach((doc) => {
         if (!doc.key || seenKeys.has(doc.key)) return;
         const author = doc.author_name?.join(", ") || "Unknown Author";
         if (alreadyInLibrary(doc.title, author)) return;
+
+        // 1. Deduplicate by normalized title to filter duplicate/regional editions
+        const normalizedTitle = doc.title.toLowerCase().trim().replace(/[^\w\s]/g, "");
+        if (seenTitles.has(normalizedTitle)) return;
+
+        // 2. Limit the number of books from the same author to 2 to prevent series saturation
+        const primaryAuthor = doc.author_name?.[0] || "Unknown Author";
+        if (authorCounts[primaryAuthor] >= 2) return;
+
+        // 3. Filter out textbooks and manual documents
+        const lowerTitle = doc.title.toLowerCase();
+        if (
+          lowerTitle.includes("manual") ||
+          lowerTitle.includes("handbook") ||
+          lowerTitle.includes("study guide") ||
+          lowerTitle.includes("textbook") ||
+          lowerTitle.includes("coursebook") ||
+          lowerTitle.includes("workbook") ||
+          lowerTitle.includes("colloquium") ||
+          lowerTitle.includes("proceedings")
+        ) return;
+
+        // 4. Require cover art for recommendations
+        if (!doc.cover_i) return;
         
         seenKeys.add(doc.key);
+        seenTitles.add(normalizedTitle);
+        authorCounts[primaryAuthor] = (authorCounts[primaryAuthor] || 0) + 1;
         recs.push({
           id: doc.key,
           title: doc.title,
