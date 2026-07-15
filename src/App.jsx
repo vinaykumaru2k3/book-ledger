@@ -1079,6 +1079,8 @@ function App() {
               books={books}
               onUpdateBook={updateBook}
               onViewDetails={setDetailsBook}
+              onDeleteBook={deleteBook}
+              onEditBook={openEditBook}
             />
           </div>
         ) : (

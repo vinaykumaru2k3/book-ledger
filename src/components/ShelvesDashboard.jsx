@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
-import { Trash2, FolderOpen, X, Layers, Edit2, Check } from "lucide-react";
+import { Trash2, FolderOpen, X, Layers, Edit2, Check, ArrowLeft } from "lucide-react";
 import Cover from "./Cover";
+import BookCard from "./BookCard";
 
 const BOARD_PRESETS = [
   { class: "shelf-board-sepia", color: "#d97706" },
@@ -16,7 +17,8 @@ function getPreset(shelfName) {
   return BOARD_PRESETS[codeSum % BOARD_PRESETS.length];
 }
 
-function ShelvesDashboard({ books, onUpdateBook, onViewDetails }) {
+function ShelvesDashboard({ books, onUpdateBook, onViewDetails, onDeleteBook, onEditBook }) {
+  const [activeShelf, setActiveShelf] = useState(null);
   const [editingShelf, setEditingShelf] = useState(null);
   const [editNameValue, setEditNameValue] = useState("");
 
@@ -65,6 +67,11 @@ function ShelvesDashboard({ books, onUpdateBook, onViewDetails }) {
       await onUpdateBook(book.id, { shelves: updatedShelves });
     }
 
+    // Update active shelf name if active
+    if (activeShelf === oldName) {
+      setActiveShelf(newName);
+    }
+
     setEditingShelf(null);
   };
 
@@ -79,12 +86,113 @@ function ShelvesDashboard({ books, onUpdateBook, onViewDetails }) {
       const updatedShelves = (book.shelves || []).filter((s) => s !== shelfName);
       await onUpdateBook(book.id, { shelves: updatedShelves });
     }
+
+    if (activeShelf === shelfName) {
+      setActiveShelf(null);
+    }
   };
 
-  const handleRemoveBookFromShelf = async (book, shelfName) => {
-    const updatedShelves = (book.shelves || []).filter((s) => s !== shelfName);
-    await onUpdateBook(book.id, { shelves: updatedShelves });
-  };
+  // If a shelf is clicked and opened, render the full grid view of books on that shelf
+  if (activeShelf) {
+    const list = shelfBooks[activeShelf] || [];
+    const preset = getPreset(activeShelf);
+    const isEditing = editingShelf === activeShelf;
+
+    return (
+      <div className="active-shelf-workspace">
+        <div className="active-shelf-header">
+          <button 
+            className="back-to-shelves-btn"
+            onClick={() => {
+              setActiveShelf(null);
+              setEditingShelf(null);
+            }}
+          >
+            <ArrowLeft size={16} />
+            <span>Back to Shelves</span>
+          </button>
+
+          <div className="active-shelf-meta">
+            {isEditing ? (
+              <form onSubmit={(e) => handleRenameShelf(e, activeShelf)} className="rename-shelf-form">
+                <input
+                  value={editNameValue}
+                  onChange={(e) => setEditNameValue(e.target.value)}
+                  className="rename-shelf-input"
+                  autoFocus
+                  required
+                />
+                <button type="submit" className="rename-btn save-btn" title="Save name">
+                  <Check size={14} />
+                </button>
+                <button type="button" className="rename-btn cancel-btn" onClick={() => setEditingShelf(null)} title="Cancel">
+                  <X size={14} />
+                </button>
+              </form>
+            ) : (
+              <div className="board-title-group">
+                <Layers size={20} style={{ color: preset.color }} />
+                <h2>{activeShelf}</h2>
+                <button
+                  className="edit-shelf-btn"
+                  onClick={() => {
+                    setEditingShelf(activeShelf);
+                    setEditNameValue(activeShelf);
+                  }}
+                  title="Rename Shelf Board"
+                  type="button"
+                >
+                  <Edit2 size={14} />
+                </button>
+                <span className="board-count-badge">
+                  {list.length} {list.length === 1 ? "book" : "books"}
+                </span>
+              </div>
+            )}
+
+            {!isEditing && (
+              <button 
+                className="delete-shelf-board-action" 
+                onClick={async () => {
+                  await handleDeleteShelf(activeShelf);
+                }}
+                title="Delete this shelf board"
+                type="button"
+              >
+                <Trash2 size={14} />
+                <span>Delete Board</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {list.length === 0 ? (
+          <div className="empty-dashboard-state">
+            <FolderOpen size={48} />
+            <h3>This shelf is empty</h3>
+            <p>Go back to the library view and use the folder icon on any book card to add books here!</p>
+          </div>
+        ) : (
+          <div className="books-grid-layout">
+            <div className="books-grid">
+              {list.map((book) => (
+                <BookCard
+                  key={book.id}
+                  book={book}
+                  layout="grid"
+                  uniqueShelves={uniqueShelves}
+                  onDelete={onDeleteBook}
+                  onEdit={onEditBook}
+                  onUpdate={onUpdateBook}
+                  onViewDetails={onViewDetails}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="shelves-dashboard">
@@ -92,7 +200,7 @@ function ShelvesDashboard({ books, onUpdateBook, onViewDetails }) {
         <div className="intro-info">
           <span className="section-kicker">Visual Boards</span>
           <p className="intro-description">
-            Organize your library collections. Manage shelf contents below, and organize books using the quick-shelve folder icon on any book card.
+            Organize your library collections. Click on any shelf board below to open it and view/manage all of its books in a full grid.
           </p>
         </div>
       </div>
@@ -111,8 +219,14 @@ function ShelvesDashboard({ books, onUpdateBook, onViewDetails }) {
             const isEditing = editingShelf === shelf;
             
             return (
-              <div key={shelf} className={`shelf-board-card ${preset.class}`}>
-                <div className="board-card-header">
+              <div 
+                key={shelf} 
+                className={`shelf-board-card clickable-board ${preset.class}`}
+                onClick={() => {
+                  setActiveShelf(shelf);
+                }}
+              >
+                <div className="board-card-header" onClick={(e) => e.stopPropagation()}>
                   {isEditing ? (
                     <form onSubmit={(e) => handleRenameShelf(e, shelf)} className="rename-shelf-form">
                       <input
@@ -168,33 +282,20 @@ function ShelvesDashboard({ books, onUpdateBook, onViewDetails }) {
                   )}
                 </div>
 
-                <div className="board-books-track">
+                {/* Overlapping cover fan preview area */}
+                <div className="board-preview-covers">
                   {list.length === 0 ? (
                     <div className="empty-board-track">
-                      <span>No books on this shelf yet. Use the card quick-shelf tool to add books!</span>
+                      <span>Empty collection. Click to open and add books.</span>
                     </div>
                   ) : (
-                    list.map((book) => (
-                      <div key={book.id} className="board-book-item">
-                        <div className="board-book-cover-wrap">
-                          <div 
-                            className="clickable-cover"
-                            onClick={() => onViewDetails(book)}
-                            title={`View details: ${book.title}`}
-                          >
-                            <Cover book={book} />
-                          </div>
-                          <button
-                            className="remove-book-from-shelf-btn"
-                            onClick={() => handleRemoveBookFromShelf(book, shelf)}
-                            title={`Remove from ${shelf}`}
-                            aria-label="Remove book from shelf"
-                            type="button"
-                          >
-                            <X size={12} />
-                          </button>
-                        </div>
-                        <span className="board-book-title" title={book.title}>{book.title}</span>
+                    list.slice(0, 5).map((book, idx) => (
+                      <div 
+                        key={book.id} 
+                        className="preview-cover-item"
+                        style={{ zIndex: idx + 1 }}
+                      >
+                        <Cover book={book} />
                       </div>
                     ))
                   )}
