@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 export const COVER_PALETTE = [
   ["#1e293b", "#f59e0b", "#f8fafc"], // Slate + Amber
@@ -28,14 +28,21 @@ export function getInitials(title = "") {
 
 function Cover({ book, className = "" }) {
   const seed = `${book.title || ""}${book.author || ""}`;
-  
+  const [imgFailed, setImgFailed] = useState(false);
+  const showImage = book.coverUrl && !imgFailed;
+
   return (
-    <div 
-      className={`cover ${className}`} 
+    <div
+      className={`cover ${className}`}
       style={getCoverStyle(seed)}
     >
-      {book.coverUrl ? (
-        <img src={book.coverUrl} alt={book.title || "Book Cover"} loading="lazy" />
+      {showImage ? (
+        <img
+          src={book.coverUrl}
+          alt={book.title || "Book Cover"}
+          loading="lazy"
+          onError={() => setImgFailed(true)}
+        />
       ) : (
         <div className="cover-fallback" aria-hidden="true">
           <span className="cover-initials">{getInitials(book.title)}</span>

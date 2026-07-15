@@ -1018,55 +1018,158 @@ textarea:focus-visible {
   gap: 20px;
 }
 
+/* === REFINED BOOK CARD - Physical Book Aesthetic === */
 .book-card {
   position: relative;
   background-color: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 24px 20px;
+  border-radius: 10px;
+  padding: 22px 18px 20px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  transition: var(--transition-smooth);
+  gap: 14px;
+  transition:
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease,
+    background-color 0.3s ease;
+  /* Subtle spine marker on left */
+  border-left: 4px solid transparent;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+}
+
+/* Staggered entrance animation for grid cards */
+.book-grid .book-card {
+  animation: bookCardEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+.book-grid .book-card:nth-child(1) { animation-delay: 0.03s; }
+.book-grid .book-card:nth-child(2) { animation-delay: 0.06s; }
+.book-grid .book-card:nth-child(3) { animation-delay: 0.09s; }
+.book-grid .book-card:nth-child(4) { animation-delay: 0.12s; }
+.book-grid .book-card:nth-child(5) { animation-delay: 0.15s; }
+.book-grid .book-card:nth-child(6) { animation-delay: 0.18s; }
+.book-grid .book-card:nth-child(7) { animation-delay: 0.21s; }
+.book-grid .book-card:nth-child(8) { animation-delay: 0.24s; }
+
+@keyframes bookCardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .book-card:hover {
-  border-color: var(--border-hover);
+  transform: translateY(-4px);
+  border-color: var(--accent-emerald);
   background-color: var(--bg-card-hover);
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.22),
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(217, 119, 6, 0.15) inset;
+  z-index: 5;
+}
+
+[data-theme="light"] .book-card:hover {
+  box-shadow:
+    0 16px 40px rgba(62, 54, 46, 0.12),
+    0 4px 12px rgba(62, 54, 46, 0.08),
+    0 0 0 1px rgba(180, 83, 9, 0.12) inset;
 }
 
 .cover-wrapper {
   position: relative;
   align-self: center;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
+  perspective: 800px;
+  transform-style: preserve-3d;
+  display: flex;
+  justify-content: center;
+}
+
+/* Subtle ambient glow behind cover on card hover */
+.cover-wrapper::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100px;
+  height: 150px;
+  transform: translate(-50%, -50%) translateZ(-20px);
+  background: radial-gradient(ellipse, var(--accent-emerald), transparent 70%);
+  opacity: 0;
+  filter: blur(30px);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.book-card:hover .cover-wrapper::before {
+  opacity: 0.15;
+  transform: translate(-50%, -50%) translateZ(-20px) scale(1.2);
 }
 
 .cover-favorite-badge {
   position: absolute;
-  top: -6px;
-  right: -6px;
-  width: 22px;
-  height: 22px;
-  background-color: var(--accent-coral);
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  background: linear-gradient(135deg, var(--accent-coral), #ef4444);
   color: #fff;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    0 2px 6px rgba(239, 68, 68, 0.4),
+    0 0 0 2px var(--bg-card);
   z-index: 4;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+.book-card:hover .cover-favorite-badge {
+  transform: scale(1.12);
+  box-shadow:
+    0 4px 12px rgba(239, 68, 68, 0.5),
+    0 0 0 2px var(--bg-card);
 }
 
 .book-card .cover {
-  width: 120px;
-  height: 180px;
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16);
-  transition: var(--transition-smooth);
+  width: 118px;
+  height: 177px;
+  border-radius: 3px 9px 9px 3px;
+  box-shadow:
+    3px 5px 12px rgba(0, 0, 0, 0.28),
+    6px 10px 24px rgba(0, 0, 0, 0.18),
+    inset -1px 0 4px rgba(0, 0, 0, 0.1);
+  transition:
+    transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.4s ease;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  position: relative;
+  z-index: 2;
 }
 
-.book-card:hover .cover {
-  transform: translateY(-2px) rotate(0.5deg);
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
+/* Cover spine highlight */
+.book-card .cover::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.18), transparent 35%, rgba(0,0,0,0.12));
+  border-radius: 3px 0 0 3px;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0.8;
 }
 
 /* Spine Crease Accent on Cover */
@@ -1075,18 +1178,33 @@ textarea:focus-visible {
   position: absolute;
   top: 0;
   bottom: 0;
-  left: 4px;
+  left: 5px;
   width: 2px;
-  background: rgba(0, 0, 0, 0.15);
-  box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.22), transparent);
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
   pointer-events: none;
   z-index: 3;
+}
+
+.book-card:hover .cover {
+  transform: perspective(800px) rotateY(-16deg) translateZ(10px) translateY(-4px);
+  box-shadow:
+    12px 14px 32px rgba(0, 0, 0, 0.35),
+    20px 24px 48px rgba(0, 0, 0, 0.22),
+    inset -2px 0 6px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .book-card:hover .cover {
+  box-shadow:
+    12px 14px 32px rgba(62, 54, 46, 0.2),
+    20px 24px 48px rgba(62, 54, 46, 0.12),
+    inset -2px 0 6px rgba(0, 0, 0, 0.08);
 }
 
 .book-main {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   flex: 1;
   min-width: 0;
 }
@@ -1094,7 +1212,7 @@ textarea:focus-visible {
 .book-heading {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .status-chip-row {
@@ -1105,32 +1223,41 @@ textarea:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 2px 8px;
-  font-size: 0.65rem;
+  padding: 3px 10px;
+  font-size: 0.62rem;
   font-weight: 700;
   border-radius: 99px;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   color: var(--status-color);
   background-color: var(--bg-segmented);
   border: 1px solid var(--border-subtle);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+.book-card:hover .status-chip {
+  border-color: var(--accent-emerald);
+  background-color: rgba(217, 119, 6, 0.08);
 }
 
 .book-title {
   font-family: var(--font-serif);
-  font-size: 1.15rem;
+  font-size: 1.12rem;
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 1.32;
   color: var(--text-primary);
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  margin: 4px 0 2px;
+  margin: 3px 0 1px;
+  transition: color 0.2s ease;
+}
+.book-card:hover .book-title {
+  color: var(--accent-emerald);
 }
 
 .book-author-meta {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
@@ -1140,57 +1267,77 @@ textarea:focus-visible {
 /* Floating actions overlay appearing on hover */
 .book-card .book-actions {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  top: 10px;
+  right: 10px;
   display: flex;
-  gap: 4px;
+  gap: 3px;
   opacity: 0;
-  transform: translateY(-4px);
+  transform: translateY(-6px) scale(0.95);
   background-color: var(--bg-surface-elevated);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 4px;
-  box-shadow: var(--shadow-md);
+  border-radius: 10px;
+  padding: 5px 6px;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset;
   z-index: 10;
-  transition: var(--transition-smooth);
+  transition:
+    opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .book-card:hover .book-actions {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 .book-actions .action-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-sm);
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-secondary);
   background-color: transparent;
   border: 1px solid transparent;
-  transition: var(--transition-smooth);
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.15s ease;
 }
-
 .book-actions .action-btn:hover {
-  background-color: transparent;
-  border-color: #b45309; /* Gold-brown border */
-  color: var(--text-primary);
+  background-color: var(--bg-ghost-hover);
+  border-color: var(--accent-emerald);
+  color: var(--accent-emerald);
+  transform: scale(1.08);
 }
 
 [data-theme="light"] .book-actions .action-btn:hover {
-  border-color: #5c2e16; /* Wood-bark border */
+  border-color: var(--accent-emerald);
+  background-color: rgba(180, 83, 9, 0.08);
 }
 
 .book-actions .action-btn.favorite-btn.active {
   color: var(--accent-coral);
-  border-color: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.25);
+  background-color: rgba(239, 68, 68, 0.08);
+}
+.book-actions .action-btn.favorite-btn.active:hover {
+  color: var(--accent-coral);
+  border-color: var(--accent-coral);
+  background-color: rgba(239, 68, 68, 0.15);
 }
 
 .book-actions .action-btn.danger:hover {
-  color: #ef4444;
-  border-color: #ef4444;
+  color: var(--accent-coral);
+  border-color: var(--accent-coral);
+  background-color: rgba(239, 68, 68, 0.08);
+}
+
+.book-actions .action-btn:active {
+  transform: scale(0.95);
 }
 
 .rating-row {
@@ -1235,9 +1382,9 @@ textarea:focus-visible {
 }
 
 .tag-badge {
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   font-weight: 600;
-  padding: 2px 8px;
+  padding: 3px 9px;
   background-color: var(--bg-segmented);
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
@@ -1246,81 +1393,128 @@ textarea:focus-visible {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+.book-card:hover .tag-badge {
+  border-color: var(--accent-emerald);
+  background-color: rgba(217, 119, 6, 0.1);
+  color: var(--accent-emerald);
 }
 
 .book-card-notes {
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   color: var(--text-muted);
-  line-height: 1.45;
-  background-color: var(--bg-segmented);
-  border-left: 2px solid var(--border-subtle);
-  padding: 8px 10px;
-  border-radius: var(--radius-sm);
+  line-height: 1.5;
+  background: linear-gradient(90deg, var(--bg-segmented), rgba(217, 119, 6, 0.03));
+  border-left: 3px solid var(--border-subtle);
+  padding: 9px 11px;
+  border-radius: 8px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  margin-top: 2px;
+  margin-top: 3px;
   width: 100%;
   box-sizing: border-box;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+.book-card:hover .book-card-notes {
+  border-left-color: var(--accent-emerald);
+  background: linear-gradient(90deg, var(--bg-segmented), rgba(217, 119, 6, 0.06));
 }
 
 .progress-area {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
   margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border-subtle);
 }
 
 .progress-copy {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-size: 0.76rem;
+  font-size: 0.74rem;
 }
 
 .progress-percentage {
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--accent-emerald);
+  font-variant-numeric: tabular-nums;
 }
 
 .progress-pages {
   color: var(--text-muted);
+  font-size: 0.7rem;
 }
 
 .progress-track {
-  height: 6px;
+  height: 7px;
   background-color: var(--bg-segmented);
   border-radius: 99px;
   overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+.progress-track::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%);
+  pointer-events: none;
 }
 
 .progress-track span {
   display: block;
   height: 100%;
   border-radius: 99px;
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(90deg, var(--accent-emerald), var(--accent-amber));
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.1);
+  transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.progress-track span::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.25), transparent);
+  border-radius: 99px;
+  pointer-events: none;
 }
 
 .card-controls {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 6px;
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border-subtle);
 }
 
 .status-select-wrap {
   position: relative;
   display: inline-flex;
   align-items: center;
-  border-radius: var(--radius-sm);
-  padding: 4px 10px;
+  border-radius: 8px;
+  padding: 4px 12px;
   gap: 6px;
-  height: 32px;
+  height: 34px;
   border: 1px solid var(--border-status);
   color: var(--border-status);
   background-color: var(--bg-ghost);
-  transition: var(--transition-smooth);
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
   width: auto;
   min-width: 120px;
   cursor: pointer;
@@ -1328,13 +1522,16 @@ textarea:focus-visible {
 
 .status-select-wrap:hover {
   background-color: var(--bg-ghost-hover);
+  border-color: var(--accent-emerald);
+  color: var(--accent-emerald);
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.1);
 }
 
 .status-select-wrap select {
   border: none;
   background: transparent;
   color: inherit;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 600;
   width: 100%;
   outline: none;
@@ -1349,7 +1546,7 @@ textarea:focus-visible {
   position: absolute;
   right: 10px;
   pointer-events: none;
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   color: inherit;
   opacity: 0.7;
 }
@@ -1359,27 +1556,33 @@ textarea:focus-visible {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  padding: 4px 8px;
+  padding: 4px 10px;
   background-color: var(--bg-segmented);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  font-size: 0.76rem;
+  border-radius: 8px;
+  font-size: 0.74rem;
   color: var(--text-muted);
   flex: 0.8;
-  height: 32px;
-  transition: var(--transition-smooth);
+  height: 34px;
+  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .page-field:hover {
-  border-color: var(--border-hover);
+  border-color: var(--accent-emerald);
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.1);
+}
+
+.page-field:focus-within {
+  border-color: var(--accent-emerald);
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
 }
 
 .page-field input {
-  width: 32px;
+  width: 36px;
   border: none;
   background: transparent;
   text-align: right;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
   color: var(--text-primary);
   outline: none;
@@ -1391,7 +1594,7 @@ textarea:focus-visible {
 }
 
 .page-total {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: var(--text-muted);
 }
 
@@ -1399,13 +1602,13 @@ textarea:focus-visible {
 .book-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
-/* Stack controls vertically in Grid view to prevent overlapping/clipping */
+/* === GRID VIEW OVERRIDES (default) === */
 .book-card:not(.row) {
-  padding: 16px !important;
-  gap: 12px !important;
+  padding: 22px 18px 20px !important;
+  gap: 14px !important;
 }
 
 .book-card:not(.row) .card-controls {
@@ -1414,7 +1617,9 @@ textarea:focus-visible {
   align-items: stretch !important;
   gap: 8px !important;
   width: 100% !important;
-  margin-top: 6px !important;
+  margin-top: 4px !important;
+  padding-top: 6px !important;
+  border-top: 1px dashed var(--border-subtle) !important;
 }
 
 .book-card:not(.row) .status-select-wrap {
@@ -1427,32 +1632,72 @@ textarea:focus-visible {
   flex: none !important;
 }
 
+/* === LIST VIEW (ROW) === */
 .book-card.row {
   display: flex !important;
   flex-direction: row !important;
   align-items: center !important;
   justify-content: space-between !important;
-  padding: 12px 18px !important;
+  padding: 14px 16px !important;
   gap: 16px !important;
   width: 100% !important;
   max-height: none !important;
   overflow: visible !important;
   background-color: var(--bg-card) !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--border-subtle) !important;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease,
+    background-color 0.25s ease;
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+}
+.book-card.row:hover {
+  transform: translateX(4px);
+  border-color: var(--accent-emerald);
+  background-color: var(--bg-card-hover);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(217, 119, 6, 0.1) inset;
+}
+
+[data-theme="light"] .book-card.row:hover {
+  box-shadow:
+    0 8px 24px rgba(62, 54, 46, 0.08),
+    0 0 0 1px rgba(180, 83, 9, 0.08) inset;
 }
 
 .book-card.row .cover-wrapper {
-  width: 52px !important;
+  width: 56px !important;
   margin-bottom: 0 !important;
   flex-shrink: 0 !important;
   display: flex !important;
+  perspective: 600px;
+}
+.book-card.row .cover-wrapper::before {
+  display: none;
 }
 
 .book-card.row .cover {
-  width: 52px !important;
-  height: 78px !important;
-  box-shadow: var(--shadow-sm) !important;
-  border-radius: 2px 4px 4px 2px !important;
+  width: 56px !important;
+  height: 84px !important;
+  box-shadow:
+    2px 4px 10px rgba(0, 0, 0, 0.2),
+    4px 8px 18px rgba(0, 0, 0, 0.12),
+    inset -1px 0 3px rgba(0, 0, 0, 0.08) !important;
+  border-radius: 2px 5px 5px 2px !important;
   transform: none !important; /* No tilt in list view */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.book-card.row:hover .cover {
+  transform: translateX(-2px) !important;
+  box-shadow:
+    4px 6px 16px rgba(0, 0, 0, 0.25),
+    8px 12px 28px rgba(0, 0, 0, 0.15),
+    inset -1px 0 4px rgba(0, 0, 0, 0.1) !important;
 }
 
 .book-card.row .book-main {
@@ -1471,20 +1716,24 @@ textarea:focus-visible {
   min-width: 0 !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 2px !important;
+  gap: 3px !important;
 }
 
 .book-card.row .book-title {
-  font-size: 1.12rem !important;
-  margin: 0 !important;
+  font-size: 1.08rem !important;
+  margin: 2px 0 1px !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   display: block !important;
+  transition: color 0.2s ease;
+}
+.book-card.row:hover .book-title {
+  color: var(--accent-emerald);
 }
 
 .book-card.row .book-author-meta {
-  font-size: 0.76rem !important;
+  font-size: 0.74rem !important;
   margin: 0 !important;
 }
 
@@ -1492,20 +1741,26 @@ textarea:focus-visible {
   flex: 1.2 !important;
   display: flex !important;
   align-items: center !important;
-  min-width: 120px !important;
+  min-width: 130px !important;
+}
+
+.book-card.row .status-chip {
+  padding: 3px 10px;
+  font-size: 0.6rem;
 }
 
 .book-card.row .progress-column {
   flex: 1.5 !important;
   display: flex !important;
   align-items: center !important;
-  font-size: 0.78rem !important;
+  font-size: 0.74rem !important;
   color: var(--text-secondary) !important;
-  min-width: 140px !important;
+  min-width: 150px !important;
 }
 
 .book-card.row .list-progress-text strong {
-  color: var(--text-primary) !important;
+  color: var(--accent-emerald) !important;
+  font-variant-numeric: tabular-nums;
 }
 
 .book-card.row .book-actions {
@@ -1518,7 +1773,29 @@ textarea:focus-visible {
   padding: 0 !important;
   flex-shrink: 0 !important;
   display: flex !important;
-  gap: 6px !important;
+  gap: 4px !important;
+}
+
+.book-card.row .book-actions .action-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  opacity: 0.6;
+  transition: opacity 0.2s ease, transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+.book-card.row .book-actions .action-btn:hover {
+  opacity: 1;
+  background-color: var(--bg-ghost-hover);
+  border-color: var(--accent-emerald);
+  color: var(--accent-emerald);
+  transform: scale(1.1);
+}
+
+.book-card.row .book-actions .action-btn.favorite-btn.active {
+  opacity: 1;
+  color: var(--accent-coral);
+  border-color: rgba(239, 68, 68, 0.25);
+  background-color: rgba(239, 68, 68, 0.08);
 }
 
 @media (max-width: 900px) {
@@ -1526,23 +1803,23 @@ textarea:focus-visible {
     flex-direction: column !important;
     align-items: stretch !important;
   }
-  
+
   .book-card.row .cover-wrapper {
-    width: 100px !important;
+    width: 90px !important;
     margin: 0 auto 12px !important;
   }
-  
+
   .book-card.row .cover {
-    width: 100px !important;
-    height: 150px !important;
+    width: 90px !important;
+    height: 135px !important;
   }
-  
+
   .book-card.row .book-main {
     display: flex !important;
     flex-direction: column !important;
-    gap: 16px !important;
+    gap: 14px !important;
   }
-  
+
   .book-card.row .book-heading,
   .book-card.row .rating-row,
   .book-card.row .tag-row,
@@ -1557,16 +1834,18 @@ textarea:focus-visible {
 
   .book-card.row .book-actions {
     position: absolute !important;
-    top: 12px !important;
-    right: 12px !important;
+    top: 10px !important;
+    right: 10px !important;
     opacity: 0 !important;
     background-color: var(--bg-surface-elevated) !important;
     border: 1px solid var(--border-subtle) !important;
-    border-radius: 99px !important;
+    border-radius: 9px !important;
     padding: 4px !important;
-    box-shadow: var(--shadow-md) !important;
+    box-shadow:
+      0 6px 20px rgba(0, 0, 0, 0.18),
+      0 0 0 1px rgba(255, 255, 255, 0.03) inset !important;
   }
-  
+
   .book-card.row:hover .book-actions {
     opacity: 1 !important;
   }
@@ -1899,6 +2178,17 @@ textarea:focus-visible {
 .search-spinner {
   margin-left: auto;
   color: var(--accent-emerald);
+}
+
+/* Loading spinner rotation (used by Loader2 / RefreshCw via className="spin") */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+  transform-origin: center;
 }
 
 .search-dropdown-menu {
@@ -3801,6 +4091,145 @@ textarea:focus-visible {
   flex: 1;
 }
 
+/* === REFINED REC CARD & TOP CHART CARD === */
+.rec-card,
+.top-chart-card {
+  border-radius: 10px !important;
+  border: 1px solid var(--border-subtle) !important;
+  background-color: var(--bg-card) !important;
+  padding: 20px 16px 18px !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+  transition:
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease,
+    background-color 0.3s ease;
+  border-left: 4px solid transparent !important;
+}
+.rec-card:hover,
+.top-chart-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-emerald) !important;
+  background-color: var(--bg-card-hover) !important;
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.2),
+    0 4px 12px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(217, 119, 6, 0.12) inset;
+  z-index: 3;
+}
+
+[data-theme="light"] .rec-card:hover,
+[data-theme="light"] .top-chart-card:hover {
+  box-shadow:
+    0 16px 40px rgba(62, 54, 46, 0.1),
+    0 4px 12px rgba(62, 54, 46, 0.06),
+    0 0 0 1px rgba(180, 83, 9, 0.1) inset;
+}
+
+.rec-card .book-main,
+.top-chart-card .book-main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 10px;
+}
+
+/* Rank badge refinement */
+.chart-rank-badge {
+  background: linear-gradient(135deg, var(--accent-emerald), var(--accent-amber)) !important;
+  box-shadow:
+    0 3px 10px rgba(217, 119, 6, 0.35),
+    0 0 0 2px var(--bg-card) !important;
+  border-radius: 8px !important;
+  padding: 4px 10px !important;
+  font-size: 0.6rem !important;
+  top: 10px !important;
+  left: 10px !important;
+}
+.chart-rank-badge .trophy {
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+}
+
+/* Reason badge refinement */
+.rec-reason-badge {
+  align-self: flex-start;
+  padding: 4px 10px;
+  background: linear-gradient(90deg, rgba(217, 119, 6, 0.1), rgba(245, 158, 11, 0.08));
+  border: 1px solid rgba(217, 119, 6, 0.18);
+  border-radius: 8px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--accent-emerald);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 10px;
+  backdrop-filter: blur(4px);
+}
+
+[data-theme="light"] .rec-reason-badge {
+  background: linear-gradient(90deg, rgba(180, 83, 9, 0.08), rgba(217, 119, 6, 0.06));
+  border-color: rgba(180, 83, 9, 0.15);
+}
+
+.inspiring-title {
+  color: var(--text-muted);
+  font-size: 0.58rem;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
+  margin-top: 1px;
+  font-style: italic;
+}
+
+.rec-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  width: 100%;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border-subtle);
+}
+
+.rec-actions button {
+  flex: 1;
+  height: 34px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.15s ease,
+    box-shadow 0.18s ease;
+}
+
+.rec-actions .button.primary {
+  background: linear-gradient(135deg, var(--accent-emerald), var(--accent-amber));
+  border: none;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
+}
+.rec-actions .button.primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.4);
+}
+
+.rec-actions .button.ghost {
+  background-color: var(--bg-ghost);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+.rec-actions .button.ghost:hover {
+  background-color: var(--bg-ghost-hover);
+  border-color: var(--accent-emerald);
+  color: var(--accent-emerald);
+}
+
 /* Sidebar Divider */
 .sidebar-divider {
   height: 1px;
@@ -3814,39 +4243,59 @@ textarea:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  animation: fadeIn 0.3s ease;
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .genre-selection-strip {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  margin-bottom: 24px;
+  gap: 6px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--border-subtle);
-  padding-bottom: 0;
+  background: linear-gradient(180deg, var(--bg-ghost), transparent);
+  padding: 8px 12px 20px;
+  border-radius: 12px;
+  margin-left: -12px;
+  margin-right: -12px;
+  padding-left: 12px;
+  padding-right: 12px;
 }
 
 .genre-select-tab {
-  background: none;
-  border: none;
-  padding: 10px 16px;
-  font-size: 0.86rem;
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 8px 16px;
+  font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-secondary);
   cursor: pointer;
   position: relative;
-  transition: color 0.15s ease, border-color 0.15s ease;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px; /* Overlap border-bottom line */
+  transition:
+    color 0.18s ease,
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.15s ease;
+  border-radius: 99px;
+  margin-bottom: 0;
 }
 
 .genre-select-tab:hover {
   color: var(--text-primary);
+  background-color: var(--bg-ghost-hover);
+  border-color: var(--border-hover);
+  transform: translateY(-1px);
 }
 
 .genre-select-tab.active {
-  color: var(--accent-emerald);
-  border-bottom-color: var(--accent-emerald);
+  color: #ffffff;
+  background-color: var(--accent-emerald);
+  border-color: var(--accent-emerald);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.28);
+}
+
+.genre-select-tab.active::after {
+  display: none;
 }
 
 .top-chart-card {
@@ -3857,17 +4306,19 @@ textarea:focus-visible {
   position: absolute;
   top: 12px;
   left: 12px;
-  background-color: var(--accent-emerald);
+  background: linear-gradient(135deg, var(--accent-emerald), var(--accent-amber));
   color: #fff;
   font-size: 0.65rem;
   font-weight: 700;
-  padding: 3px 8px;
-  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   gap: 4px;
   z-index: 5;
-  box-shadow: var(--shadow-sm);
+  box-shadow:
+    0 3px 10px rgba(217, 119, 6, 0.35),
+    0 0 0 2px var(--bg-card);
 }
 
 /* Success status button styling for TopCharts */
@@ -4529,11 +4980,41 @@ textarea:focus-visible {
    DEDICATED SHELVES WORKSPACE & DASHBOARD
    ========================================================================== */
 .shelves-dashboard {
-  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
   gap: 24px;
   padding: 4px;
+}
+
+/* Staggered entrance for board cards */
+.shelves-dashboard .shelf-board-card {
+  animation: boardCardEnter 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.shelves-dashboard .shelf-board-card:nth-child(1) { animation-delay: 0.05s; }
+.shelves-dashboard .shelf-board-card:nth-child(2) { animation-delay: 0.1s; }
+.shelves-dashboard .shelf-board-card:nth-child(3) { animation-delay: 0.15s; }
+.shelves-dashboard .shelf-board-card:nth-child(4) { animation-delay: 0.2s; }
+.shelves-dashboard .shelf-board-card:nth-child(5) { animation-delay: 0.25s; }
+.shelves-dashboard .shelf-board-card:nth-child(6) { animation-delay: 0.3s; }
+.shelves-dashboard .shelf-board-card:nth-child(7) { animation-delay: 0.35s; }
+.shelves-dashboard .shelf-board-card:nth-child(8) { animation-delay: 0.4s; }
+
+@keyframes boardCardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .dashboard-intro-row {
@@ -4643,6 +5124,19 @@ textarea:focus-visible {
   gap: 28px;
 }
 
+/* Staggered entrance animation for board cards (mirrors book-grid treatment) */
+.boards-grid .shelf-board-card {
+  animation: bookCardEnter 0.55s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+.boards-grid .shelf-board-card:nth-child(1) { animation-delay: 0.04s; }
+.boards-grid .shelf-board-card:nth-child(2) { animation-delay: 0.08s; }
+.boards-grid .shelf-board-card:nth-child(3) { animation-delay: 0.12s; }
+.boards-grid .shelf-board-card:nth-child(4) { animation-delay: 0.16s; }
+.boards-grid .shelf-board-card:nth-child(5) { animation-delay: 0.20s; }
+.boards-grid .shelf-board-card:nth-child(6) { animation-delay: 0.24s; }
+.boards-grid .shelf-board-card:nth-child(7) { animation-delay: 0.28s; }
+.boards-grid .shelf-board-card:nth-child(8) { animation-delay: 0.32s; }
+
 @media (max-width: 480px) {
   .boards-grid {
     grid-template-columns: 1fr;
@@ -4650,180 +5144,55 @@ textarea:focus-visible {
 }
 
 .shelf-board-card {
-  border-radius: var(--radius-md);
-  padding: 22px;
+  border-radius: 14px;
+  padding: 22px 22px 24px;
   display: flex;
   flex-direction: column;
   gap: 18px;
-  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
+  transition:
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease;
   position: relative;
   overflow: hidden;
+  background-color: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  border-left: 3px solid var(--board-accent, var(--border-subtle));
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.04),
+    0 2px 6px rgba(0, 0, 0, 0.04);
+  min-height: 260px;
 }
 
-/* --- Artistic Glassmorphic Presets with Neon Shadows --- */
-
-/* 1. Sepia Literary (Sandalwood / Antique Linen) */
-.shelf-board-card.shelf-board-sepia {
-  background: linear-gradient(135deg, #d97706 0, #d97706 60px, #fdfbf7 60px, #fdfbf7 100%);
-  border: 2px solid #ecdcb9;
-  box-shadow: var(--shadow-sm);
-}
-[data-theme="dark"] .shelf-board-card.shelf-board-sepia {
-  background: linear-gradient(135deg, #b45309 0, #b45309 60px, #211910 60px, #211910 100%);
-  border: 2px solid #433320;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-}
-.shelf-board-sepia:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-  border-color: #d97706;
-}
-[data-theme="dark"] .shelf-board-sepia:hover {
-  border-color: #b45309;
-}
-.shelf-board-sepia .board-title-group h3 {
-  font-family: var(--font-serif);
-  color: #5c3d14;
-}
-[data-theme="dark"] .shelf-board-sepia .board-title-group h3 {
-  color: #e5c195;
-}
-
-/* 2. Cosmic Midnight (Space Nebula) */
-.shelf-board-card.shelf-board-cosmic {
-  background: linear-gradient(135deg, #6366f1 0, #6366f1 60px, #f8faff 60px, #f8faff 100%);
-  border: 2px solid #d5dbfc;
-  box-shadow: var(--shadow-sm);
-}
-[data-theme="dark"] .shelf-board-card.shelf-board-cosmic {
-  background: linear-gradient(135deg, #4f46e5 0, #4f46e5 60px, #0e101f 60px, #0e101f 100%);
-  border: 2px solid #232747;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-}
-.shelf-board-cosmic:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-  border-color: #6366f1;
-}
-[data-theme="dark"] .shelf-board-cosmic:hover {
-  border-color: #4f46e5;
-}
-.shelf-board-cosmic .board-title-group h3 {
-  color: #312e81;
-}
-[data-theme="dark"] .shelf-board-cosmic .board-title-group h3 {
-  color: #c7d2fe;
-}
-
-/* 3. Sage Botanical (Herb / Olive Green) */
-.shelf-board-card.shelf-board-botanical {
-  background: linear-gradient(135deg, #10b981 0, #10b981 60px, #f9fdfb 60px, #f9fdfb 100%);
-  border: 2px solid #c9ebd5;
-  box-shadow: var(--shadow-sm);
-}
-[data-theme="dark"] .shelf-board-card.shelf-board-botanical {
-  background: linear-gradient(135deg, #059669 0, #059669 60px, #081710 60px, #081710 100%);
-  border: 2px solid #143826;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-}
-.shelf-board-botanical:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-  border-color: #10b981;
-}
-[data-theme="dark"] .shelf-board-botanical:hover {
-  border-color: #059669;
-}
-.shelf-board-botanical .board-title-group h3 {
-  color: #064e3b;
-}
-[data-theme="dark"] .shelf-board-botanical .board-title-group h3 {
-  color: #a7f3d0;
-}
-
-/* 4. Terracotta Crimson (Burnt Terracotta) */
-.shelf-board-card.shelf-board-crimson {
-  background: linear-gradient(135deg, #ef4444 0, #ef4444 60px, #fff8f8 60px, #fff8f8 100%);
-  border: 2px solid #fcd3d3;
-  box-shadow: var(--shadow-sm);
-}
-[data-theme="dark"] .shelf-board-card.shelf-board-crimson {
-  background: linear-gradient(135deg, #dc2626 0, #dc2626 60px, #1f0b0b 60px, #1f0b0b 100%);
-  border: 2px solid #4a1c1c;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-}
-.shelf-board-crimson:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-  border-color: #ef4444;
-}
-[data-theme="dark"] .shelf-board-crimson:hover {
-  border-color: #dc2626;
-}
-.shelf-board-crimson .board-title-group h3 {
-  color: #7f1d1d;
-}
-[data-theme="dark"] .shelf-board-crimson .board-title-group h3 {
-  color: #fca5a5;
-}
-
-/* 5. Honey Amber (Warm Gold) */
-.shelf-board-card.shelf-board-amber {
-  background: linear-gradient(135deg, #f59e0b 0, #f59e0b 60px, #fffefa 60px, #fffefa 100%);
-  border: 2px solid #fcebb3;
-  box-shadow: var(--shadow-sm);
-}
-[data-theme="dark"] .shelf-board-card.shelf-board-amber {
-  background: linear-gradient(135deg, #d97706 0, #d97706 60px, #201504 60px, #201504 100%);
-  border: 2px solid #452e0a;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-}
-.shelf-board-amber:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-  border-color: #f59e0b;
-}
-[data-theme="dark"] .shelf-board-amber:hover {
-  border-color: #d97706;
-}
-.shelf-board-amber .board-title-group h3 {
-  color: #78350f;
-}
-[data-theme="dark"] .shelf-board-amber .board-title-group h3 {
-  color: #fde68a;
-}
-
-/* 6. Oceanic Teal (Seabreeze) */
-.shelf-board-card.shelf-board-teal {
-  background: linear-gradient(135deg, #14b8a6 0, #14b8a6 60px, #f7fdfd 60px, #f7fdfd 100%);
-  border: 2px solid #c0f7ed;
-  box-shadow: var(--shadow-sm);
-}
-[data-theme="dark"] .shelf-board-card.shelf-board-teal {
-  background: linear-gradient(135deg, #0d9488 0, #0d9488 60px, #051716 60px, #051716 100%);
-  border: 2px solid #133b37;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-}
-.shelf-board-teal:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-md);
-  border-color: #14b8a6;
-}
-[data-theme="dark"] .shelf-board-teal:hover {
-  border-color: #0d9488;
-}
-.shelf-board-teal .board-title-group h3 {
-  color: #115e59;
-}
-[data-theme="dark"] .shelf-board-teal .board-title-group h3 {
-  color: #99f6e4;
-}
-
+/* Gentle, glow-free hover: a soft neutral lift */
 .shelf-board-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
+  border-color: var(--border-hover);
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.10),
+    0 4px 10px rgba(0, 0, 0, 0.06);
+}
+
+/* --- Subtle per-shelf accent presets ---
+   Each shelf keeps its identity through a slim accent bar, the tinted
+   icon, and a tinted count badge — no fills, no glows. */
+.shelf-board-card.shelf-board-sepia     { --board-accent: #b45309; }
+.shelf-board-card.shelf-board-cosmic    { --board-accent: #4f46e5; }
+.shelf-board-card.shelf-board-botanical { --board-accent: #059669; }
+.shelf-board-card.shelf-board-crimson   { --board-accent: #dc2626; }
+.shelf-board-card.shelf-board-amber     { --board-accent: #b45309; }
+.shelf-board-card.shelf-board-teal      { --board-accent: #0d9488; }
+
+[data-theme="dark"] .shelf-board-card.shelf-board-sepia     { --board-accent: #d97706; }
+[data-theme="dark"] .shelf-board-card.shelf-board-cosmic    { --board-accent: #818cf8; }
+[data-theme="dark"] .shelf-board-card.shelf-board-botanical { --board-accent: #34d399; }
+[data-theme="dark"] .shelf-board-card.shelf-board-crimson   { --board-accent: #f87171; }
+[data-theme="dark"] .shelf-board-card.shelf-board-amber     { --board-accent: #fbbf24; }
+[data-theme="dark"] .shelf-board-card.shelf-board-teal      { --board-accent: #2dd4bf; }
+
+/* Quiet identity cue: tint the count badge with the shelf's accent */
+.shelf-board-card .board-count-badge {
+  color: var(--board-accent, var(--text-secondary));
 }
 
 /* --- Card Header inside Board --- */
@@ -4833,6 +5202,8 @@ textarea:focus-visible {
   align-items: center;
   padding-bottom: 10px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  position: relative;
+  z-index: 1;
 }
 [data-theme="dark"] .board-card-header {
   border-bottom-color: rgba(255, 255, 255, 0.06);
@@ -4955,51 +5326,107 @@ textarea:focus-visible {
 /* --- Visual Shelf Board Card clickability & fanned covers --- */
 .shelf-board-card.clickable-board {
   cursor: pointer;
-  min-height: 220px;
+  min-height: 280px;
 }
 
 .board-preview-covers {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 140px;
-  padding: 10px 0;
+  min-height: 150px;
+  padding: 12px 0;
   position: relative;
   width: 100%;
+  perspective: 800px;
 }
 
 .preview-cover-item {
   width: 76px;
   height: 114px;
   border-radius: 2px 4px 4px 2px;
-  box-shadow: 3px 6px 12px rgba(0, 0, 0, 0.35);
-  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), margin-left 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.25),
+    0 2px 4px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition:
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    margin-left 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.4s ease,
+    z-index 0s;
   flex-shrink: 0;
   background-color: var(--bg-ghost);
   transform-origin: bottom center;
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+.preview-cover-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.2), rgba(0,0,0,0.05));
+  border-radius: 2px 0 0 2px;
+  pointer-events: none;
 }
 
 /* Tactile overlapping index spacing */
 .preview-cover-item:not(:first-child) {
-  margin-left: -32px;
+  margin-left: -28px;
 }
 
-/* Beautiful deterministic fanning offsets */
-.preview-cover-item:nth-child(1) { transform: rotate(-8deg) translateY(3px); }
-.preview-cover-item:nth-child(2) { transform: rotate(-4deg) translateY(-2px); }
-.preview-cover-item:nth-child(3) { transform: rotate(1deg) translateY(0px); }
-.preview-cover-item:nth-child(4) { transform: rotate(5deg) translateY(4px); }
-.preview-cover-item:nth-child(5) { transform: rotate(8deg) translateY(2px); }
+/* Beautiful deterministic fanning offsets - initial state */
+.preview-cover-item:nth-child(1) { transform: rotateY(-2deg) rotate(-7deg) translateY(2px) translateZ(0); z-index: 5; }
+.preview-cover-item:nth-child(2) { transform: rotateY(-1deg) rotate(-3deg) translateY(-1px) translateZ(0); z-index: 4; }
+.preview-cover-item:nth-child(3) { transform: rotateY(0deg) rotate(0deg) translateY(0px) translateZ(0); z-index: 3; }
+.preview-cover-item:nth-child(4) { transform: rotateY(1deg) rotate(4deg) translateY(3px) translateZ(0); z-index: 2; }
+.preview-cover-item:nth-child(5) { transform: rotateY(2deg) rotate(7deg) translateY(1px) translateZ(0); z-index: 1; }
+
+/* Staggered entrance animation */
+.shelf-board-card .preview-cover-item {
+  animation: coverFanEnter 0.6s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+.shelf-board-card .preview-cover-item:nth-child(1) { animation-delay: 0.08s; }
+.shelf-board-card .preview-cover-item:nth-child(2) { animation-delay: 0.14s; }
+.shelf-board-card .preview-cover-item:nth-child(3) { animation-delay: 0.2s; }
+.shelf-board-card .preview-cover-item:nth-child(4) { animation-delay: 0.26s; }
+.shelf-board-card .preview-cover-item:nth-child(5) { animation-delay: 0.32s; }
+
+@keyframes coverFanEnter {
+  from {
+    opacity: 0;
+    transform: rotateY(20deg) rotate(-15deg) translateY(40px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+  }
+}
 
 /* Playful expansion when hovering over the shelf board card */
 .shelf-board-card.clickable-board:hover .preview-cover-item {
-  margin-left: -18px;
+  margin-left: -14px;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.35),
+    0 4px 8px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
-.shelf-board-card.clickable-board:hover .preview-cover-item:nth-child(1) { transform: rotate(-10deg) translateY(2px) scale(1.02); }
-.shelf-board-card.clickable-board:hover .preview-cover-item:nth-child(2) { transform: rotate(-5deg) translateY(-4px) scale(1.02); }
-.shelf-board-card.clickable-board:hover .preview-cover-item:nth-child(3) { transform: rotate(0deg) translateY(-1px) scale(1.02); }
-.shelf-board-card.clickable-board:hover .preview-cover-item:nth-child(4) { transform: rotate(6deg) translateY(3px) scale(1.02); }
-.shelf-board-card.clickable-board:hover .preview-cover-item:nth-child(5) { transform: rotate(12deg) translateY(1px) scale(1.02); }
+.shelf-board-card.clickable-board:hover .preview-cover-item:nth-child(1) { transform: rotateY(-6deg) rotate(-10deg) translateY(1px) scale(1.03) translateZ(8px); z-index: 10; transition-delay: 0ms; }
+.shelf-board-card.clickable-board:hover .preview-cover-item:nth-child(2) { transform: rotateY(-3deg) rotate(-5deg) translateY(-3px) scale(1.03) translateZ(6px); z-index: 9; transition-delay: 30ms; }
+.shelf-board-card.clickable-board:hover .preview-cover-item:nth-child(3) { transform: rotateY(0deg) rotate(0deg) translateY(-2px) scale(1.03) translateZ(4px); z-index: 8; transition-delay: 60ms; }
+.shelf-board-card.clickable-board:hover .preview-cover-item:nth-child(4) { transform: rotateY(3deg) rotate(6deg) translateY(2px) scale(1.03) translateZ(6px); z-index: 7; transition-delay: 90ms; }
+.shelf-board-card.clickable-board:hover .preview-cover-item:nth-child(5) { transform: rotateY(6deg) rotate(10deg) translateY(0px) scale(1.03) translateZ(8px); z-index: 6; transition-delay: 120ms; }
+
+/* Subtle lift on individual cover hover within the fan */
+.preview-cover-item:hover {
+  z-index: 15 !important;
+  transform: rotateY(0deg) rotate(0deg) translateY(-6px) scale(1.08) translateZ(20px) !important;
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.4),
+    0 8px 16px rgba(0, 0, 0, 0.25);
+  transition-duration: 0.2s, 0.2s, 0.2s;
+}
 
 .empty-board-track {
   display: flex;
@@ -5092,7 +5519,39 @@ textarea:focus-visible {
 }
 
 .book-grid-layout {
-  padding-top: 4px;
+  padding-top: 8px;
+}
+
+/* Active shelf grid - staggered entrance for books */
+.book-grid-layout .book-grid {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.book-grid-layout .book-grid .book-card {
+  animation: bookCardEnter 0.4s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+.book-grid-layout .book-grid .book-card:nth-child(1) { animation-delay: 0.02s; }
+.book-grid-layout .book-grid .book-card:nth-child(2) { animation-delay: 0.05s; }
+.book-grid-layout .book-grid .book-card:nth-child(3) { animation-delay: 0.08s; }
+.book-grid-layout .book-grid .book-card:nth-child(4) { animation-delay: 0.11s; }
+.book-grid-layout .book-grid .book-card:nth-child(5) { animation-delay: 0.14s; }
+.book-grid-layout .book-grid .book-card:nth-child(6) { animation-delay: 0.17s; }
+.book-grid-layout .book-grid .book-card:nth-child(7) { animation-delay: 0.2s; }
+.book-grid-layout .book-grid .book-card:nth-child(8) { animation-delay: 0.23s; }
+
+/* Active shelf header - add subtle accent line */
+.active-shelf-header {
+  position: relative;
+}
+.active-shelf-header::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-emerald), transparent);
+  opacity: 0.3;
 }
 
 /* ==========================================================================
@@ -5116,21 +5575,23 @@ textarea:focus-visible {
   width: 220px;
   background-color: var(--bg-surface-elevated);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
-  padding: 12px;
+  border-radius: 12px;
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   z-index: 999;
-  animation: popoverSlideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: popoverSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   text-align: left;
 }
 
 @keyframes popoverSlideUp {
   from {
     opacity: 0;
-    transform: translateY(8px) scale(0.95);
+    transform: translateY(10px) scale(0.96);
   }
   to {
     opacity: 1;
@@ -5139,20 +5600,21 @@ textarea:focus-visible {
 }
 
 .popover-title {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   color: var(--text-muted);
   border-bottom: 1px solid var(--border-subtle);
-  padding-bottom: 6px;
+  padding-bottom: 8px;
+  margin-bottom: 2px;
 }
 
 .popover-checklist {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  max-height: 140px;
+  gap: 3px;
+  max-height: 160px;
   overflow-y: auto;
   padding-right: 4px;
 }
@@ -5170,10 +5632,11 @@ textarea:focus-visible {
 }
 
 .popover-empty-text {
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: var(--text-muted);
   font-style: italic;
-  padding: 6px 0;
+  padding: 8px 0;
+  text-align: center;
 }
 
 .popover-check-row {

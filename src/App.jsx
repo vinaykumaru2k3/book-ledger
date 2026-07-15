@@ -355,9 +355,6 @@ function App() {
 
       if (!bookToEnrich) return;
 
-      // Mark as checked immediately to prevent duplicate runs
-      checkedIdsRef.current.add(bookToEnrich.id);
-      
       console.log(`[Auto-Enrich] Interval scanner querying API details for: "${bookToEnrich.title}"`);
       try {
         let categories = [];
@@ -436,6 +433,10 @@ function App() {
           console.log(`[Auto-Enrich] Interval scanner updating details for "${bookToEnrich.title}":`, updates);
           await updateBook(bookToEnrich.id, updates);
         }
+        // Only mark as checked once the book is successfully enriched, so a
+        // failed fetch or write is retried on the next scan instead of being
+        // skipped forever.
+        checkedIdsRef.current.add(bookToEnrich.id);
       } catch (err) {
         console.error(`[Auto-Enrich] Interval scanner failed for "${bookToEnrich.title}":`, err);
       }
