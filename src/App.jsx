@@ -23,6 +23,8 @@ import {
   CheckCircle,
   Sparkles,
   Trophy,
+  Layers,
+  FolderOpen,
 } from "lucide-react";
 import {
   onAuthStateChanged,
@@ -59,6 +61,7 @@ import DeleteConfirmModal from "./components/DeleteConfirmModal";
 import BookDetailsModal from "./components/BookDetailsModal";
 import Recommendations from "./components/Recommendations";
 import TopCharts from "./components/TopCharts";
+import Analytics from "./components/Analytics";
 
 // Constants & Helpers
 import { STATUSES, SORTS, progressFor } from "./components/constants";
@@ -81,6 +84,7 @@ const EMPTY_FORM = {
   coverId: null,
   coverUrl: "",
   sourceKey: "",
+  shelves: [],
 };
 
 function uid() {
@@ -133,6 +137,12 @@ function normalizeBook(raw) {
     coverUrl: raw.coverUrl || "",
     sourceKey: raw.sourceKey || "",
     favorite: Boolean(raw.favorite),
+    shelves: Array.isArray(raw.shelves)
+      ? raw.shelves.map((s) => String(s).trim()).filter(Boolean)
+      : String(raw.shelves || "")
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean),
     addedAt,
     startedAt: raw.startedAt || (status === "reading" ? addedAt : null),
     finishedAt: done ? raw.finishedAt || Date.now() : raw.finishedAt || null,
@@ -169,6 +179,7 @@ function formFromBook(book) {
     coverId: book.coverId,
     coverUrl: book.coverUrl,
     sourceKey: book.sourceKey,
+    shelves: book.shelves || [],
   };
 }
 
@@ -201,6 +212,7 @@ function createBookFromForm(form, existing = null) {
     coverId: form.coverId,
     coverUrl: form.coverUrl,
     sourceKey: form.sourceKey,
+    shelves: form.shelves || [],
     addedAt: previous.addedAt || now,
     startedAt:
       status === "reading" ? previous.startedAt || now : status === "want" ? null : previous.startedAt,
@@ -474,12 +486,25 @@ function App() {
     };
   }, [books]);
 
+  const uniqueShelves = useMemo(() => {
+    const list = new Set();
+    books.forEach((book) => {
+      if (Array.isArray(book.shelves)) {
+        book.shelves.forEach((s) => list.add(s));
+      }
+    });
+    return Array.from(list).sort();
+  }, [books]);
+
   const visibleBooks = useMemo(() => {
-    if (statusFilter === "recommendations" || statusFilter === "topbooks") return [];
+    if (statusFilter === "recommendations" || statusFilter === "topbooks" || statusFilter === "analytics") return [];
     const queryStr = libraryQuery.trim().toLowerCase();
     const filtered = books.filter((book) => {
       if (statusFilter === "favorites") {
         if (!book.favorite) return false;
+      } else if (statusFilter.startsWith("shelf:")) {
+        const shelfName = statusFilter.substring(6);
+        if (!book.shelves || !book.shelves.includes(shelfName)) return false;
       } else if (statusFilter !== "all" && book.status !== statusFilter) {
         return false;
       }
@@ -877,6 +902,36 @@ function App() {
         </div>
 
         <div className="sidebar-divider" />
+        <div className="sidebar-section">
+          <div className="sidebar-section-label">Shelves</div>
+          <nav className="status-nav" aria-label="Custom Shelves navigation">
+            {uniqueShelves.length > 0 ? (
+              uniqueShelves.map((shelf) => {
+                const filterKey = `shelf:${shelf}`;
+                const count = books.filter((b) => b.shelves && b.shelves.includes(shelf)).length;
+                return (
+                  <button
+                    className={statusFilter === filterKey ? "nav-item active" : "nav-item"}
+                    key={shelf}
+                    onClick={() => setStatusFilter(filterKey)}
+                    type="button"
+                  >
+                    <Layers size={15} />
+                    <span>{shelf}</span>
+                    <strong className="nav-item-badge">{count}</strong>
+                  </button>
+                );
+              })
+            ) : (
+              <div className="sidebar-help-box">
+                <FolderOpen size={13} />
+                <span>Create shelves by editing any book and checking a shelf.</span>
+              </div>
+            )}
+          </nav>
+        </div>
+
+        <div className="sidebar-divider" />
 
         <div className="sidebar-section">
           <div className="sidebar-section-label">Discover</div>
@@ -896,6 +951,14 @@ function App() {
             >
               <Trophy size={17} />
               <span>Top Books</span>
+            </button>
+            <button
+              className={statusFilter === "analytics" ? "nav-item active" : "nav-item"}
+              onClick={() => setStatusFilter("analytics")}
+              type="button"
+            >
+              <BarChart3 size={17} />
+              <span>Insights</span>
             </button>
           </nav>
         </div>
@@ -940,6 +1003,8 @@ function App() {
                   ? "Personalized Discovery"
                   : statusFilter === "topbooks"
                   ? "Popular Charts"
+                  : statusFilter === "analytics"
+                  ? "Reading Insights"
                   : "Library Dashboard"}
               </p>
               <h2 className="dashboard-title">
@@ -947,6 +1012,10 @@ function App() {
                   ? "Book Recommendations"
                   : statusFilter === "topbooks"
                   ? "Discover Top Books"
+                  : statusFilter === "analytics"
+                  ? "Library Analytics"
+                  : statusFilter.startsWith("shelf:")
+                  ? `Shelf: ${statusFilter.substring(6)}`
                   : "My Library"}
               </h2>
             </div>
@@ -972,7 +1041,7 @@ function App() {
             </div>
           </div>
 
-          {statusFilter !== "recommendations" && statusFilter !== "topbooks" && (
+          {statusFilter !== "recommendations" && statusFilter !== "topbooks" && statusFilter !== "analytics" && (
             <div className="stats-strip" aria-label="Shelf stats summary">
               <div className="stat-item">
                 <Library size={15} className="stat-icon teal" />
@@ -1022,6 +1091,10 @@ function App() {
               quickAdd={quickAdd}
               onViewDetails={setDetailsBook}
             />
+          </div>
+        ) : statusFilter === "analytics" ? (
+          <div className="library-panel recommendations-panel-wrapper">
+            <Analytics books={books} />
           </div>
         ) : (
           <section className="content-layout">

@@ -65,6 +65,7 @@ function BookModal({
   onSubmit,
   quickAdd,
 }) {
+  const [newShelfName, setNewShelfName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("all"); // all, title, author, genre
   const [searchResults, setSearchResults] = useState([]);
@@ -72,6 +73,16 @@ function BookModal({
   const [searchError, setSearchError] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [duplicateWarning, setDuplicateWarning] = useState(null); // { title, author } of matched book
+
+  const uniqueShelves = useMemo(() => {
+    const list = new Set();
+    books.forEach((book) => {
+      if (Array.isArray(book.shelves)) {
+        book.shelves.forEach((s) => list.add(s));
+      }
+    });
+    return Array.from(list).sort();
+  }, [books]);
 
   const existingKeys = useMemo(
     () => new Set(books.map((book) => book.sourceKey).filter(Boolean)),
@@ -565,6 +576,73 @@ function BookModal({
                 />
               </div>
             </label>
+
+            <div className="field span-2 shelves-input-container">
+              <span>Custom Shelves / Collections</span>
+              
+              {uniqueShelves.length > 0 && (
+                <div className="shelves-checklist">
+                  {uniqueShelves.map((shelf) => {
+                    const isChecked = (form.shelves || []).includes(shelf);
+                    return (
+                      <label key={shelf} className={`shelf-pill-label ${isChecked ? "active" : ""}`}>
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => {
+                            const current = form.shelves || [];
+                            if (current.includes(shelf)) {
+                              patchForm({ shelves: current.filter((s) => s !== shelf) });
+                            } else {
+                              patchForm({ shelves: [...current, shelf] });
+                            }
+                          }}
+                        />
+                        <span>{shelf}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div className="add-shelf-row">
+                <input
+                  value={newShelfName}
+                  onChange={(e) => setNewShelfName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      const name = newShelfName.trim();
+                      if (name) {
+                        const current = form.shelves || [];
+                        if (!current.includes(name)) {
+                          patchForm({ shelves: [...current, name] });
+                        }
+                        setNewShelfName("");
+                      }
+                    }
+                  }}
+                  placeholder="Create new shelf (e.g. Summer Reads)"
+                />
+                <button
+                  type="button"
+                  className="button ghost compact"
+                  onClick={() => {
+                    const name = newShelfName.trim();
+                    if (name) {
+                      const current = form.shelves || [];
+                      if (!current.includes(name)) {
+                        patchForm({ shelves: [...current, name] });
+                      }
+                      setNewShelfName("");
+                    }
+                  }}
+                >
+                  <Plus size={14} />
+                  <span>Add Shelf</span>
+                </button>
+              </div>
+            </div>
             
             <label className="field span-2">
               <span>Book Description (Synopsis)</span>
