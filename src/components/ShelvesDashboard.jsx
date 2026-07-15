@@ -226,6 +226,9 @@ function ShelvesDashboard({ books, onUpdateBook, onViewDetails, onDeleteBook, on
                   setActiveShelf(shelf);
                 }}
               >
+                {/* Giant backdrop watermark icon */}
+                <Layers className="board-card-watermark" size={140} style={{ color: preset.color }} />
+
                 <div className="board-card-header" onClick={(e) => e.stopPropagation()}>
                   {isEditing ? (
                     <form onSubmit={(e) => handleRenameShelf(e, shelf)} className="rename-shelf-form">
