@@ -1,30 +1,107 @@
-import React, { useState, useEffect } from "react";
-import { Trash2, Edit3, Heart, Archive, BookOpen, CheckCircle, Search } from "lucide-react";
+import React from "react";
+import { Trash2, Edit3, Heart, HelpCircle } from "lucide-react";
 import Cover from "./Cover";
-import Rating from "./Rating";
-import { STATUSES, progressFor, formatDate } from "./constants";
+import { STATUSES, progressFor } from "./constants";
 
 function BookCard({ book, layout, onDelete, onEdit, onUpdate, onViewDetails }) {
   const progress = progressFor(book);
-  const StatusIcon = STATUSES[book.status]?.icon;
-  const statusColor = STATUSES[book.status]?.color || "#10b981";
-  const [pageDraft, setPageDraft] = useState(String(book.currentPage || 0));
+  const statusInfo = STATUSES[book.status] || { label: "Want to read", color: "#6b7280" };
+  const StatusIcon = statusInfo.icon || HelpCircle;
+  const statusColor = statusInfo.color || "#6b7280";
 
-  useEffect(() => {
-    setPageDraft(String(book.currentPage || 0));
-  }, [book.currentPage]);
+  if (layout === "list") {
+    return (
+      <article className="book-card row">
+        {/* Cover */}
+        <div 
+          className="cover-wrapper clickable-cover" 
+          onClick={() => onViewDetails(book)}
+          title="Click to view details"
+        >
+          <Cover book={book} />
+          {book.favorite && (
+            <div className="cover-favorite-badge">
+              <Heart size={10} fill="currentColor" />
+            </div>
+          )}
+        </div>
 
-  function commitPage() {
-    onUpdate(book.id, { currentPage: pageDraft });
+        {/* Book Main contents */}
+        <div className="book-main">
+          <div className="book-heading">
+            <h3 
+              className="book-title clickable-title" 
+              onClick={() => onViewDetails(book)}
+            >
+              {book.title}
+            </h3>
+            <p className="book-author-meta">
+              {book.author || "Unknown Author"}
+              {book.publishedYear ? ` • ${book.publishedYear}` : ""}
+            </p>
+          </div>
+
+          {/* Status Pill */}
+          <div className="status-pill-column">
+            <span className="status-chip" style={{ "--status-color": statusColor }}>
+              <StatusIcon size={12} />
+              <span>{statusInfo.longLabel || statusInfo.label}</span>
+            </span>
+          </div>
+
+          {/* Page Progress or Total pages */}
+          <div className="progress-column">
+            {book.status === "reading" ? (
+              <span className="list-progress-text">
+                <strong>{book.currentPage || 0}</strong> / {book.pages || 0} pages ({progress}%)
+              </span>
+            ) : (
+              <span className="list-pages-text">
+                {book.pages ? `${book.pages} pages` : "No page count"}
+              </span>
+            )}
+          </div>
+
+          {/* Action buttons (Favorite, Edit, Delete) */}
+          <div className="book-actions">
+            <button
+              className={book.favorite ? "action-btn active favorite-btn" : "action-btn favorite-btn"}
+              onClick={() => onUpdate(book.id, { favorite: !book.favorite })}
+              title="Toggle favorite"
+              type="button"
+            >
+              <Heart size={13} fill={book.favorite ? "currentColor" : "none"} />
+            </button>
+            <button
+              className="action-btn edit-btn"
+              onClick={() => onEdit(book)}
+              title="Edit book details"
+              type="button"
+            >
+              <Edit3 size={13} />
+            </button>
+            <button
+              className="action-btn danger delete-btn"
+              onClick={() => onDelete(book)}
+              title="Remove book"
+              type="button"
+            >
+              <Trash2 size={13} />
+            </button>
+          </div>
+        </div>
+      </article>
+    );
   }
 
+  // Grid view (compact design)
   return (
-    <article className={`book-card ${layout === "list" ? "row" : ""}`}>
+    <article className="book-card">
       {/* Cover wrapper with favorite badge */}
       <div 
         className="cover-wrapper clickable-cover" 
         onClick={() => onViewDetails(book)}
-        title="Click to view full details"
+        title="Click to view details"
       >
         <Cover book={book} />
         {book.favorite && (
@@ -36,11 +113,10 @@ function BookCard({ book, layout, onDelete, onEdit, onUpdate, onViewDetails }) {
       
       <div className="book-main">
         <div className="book-heading">
-
           <h3 
             className="book-title clickable-title" 
-            title="Click to view full details"
             onClick={() => onViewDetails(book)}
+            title={book.title}
           >
             {book.title}
           </h3>
@@ -50,39 +126,8 @@ function BookCard({ book, layout, onDelete, onEdit, onUpdate, onViewDetails }) {
           </p>
         </div>
 
-        <div className="rating-row">
-          <Rating value={book.rating} onChange={(rating) => onUpdate(book.id, { rating })} />
-          {book.finishedAt ? (
-            <span className="finish-date-label">Finished {formatDate(book.finishedAt)}</span>
-          ) : null}
-        </div>
-
-        {book.tags && book.tags.length ? (
-          <div className="tag-row">
-            {book.tags.slice(0, 2).map((tag) => (
-              <span key={tag} className="tag-badge">{tag}</span>
-            ))}
-          </div>
-        ) : null}
-
-        {(() => {
-          const hasAPI = Boolean(book.sourceKey);
-          const displayDescription = book.description || (hasAPI ? book.notes : "");
-          return displayDescription ? (
-            <div className="notes-preview-container">
-              <button 
-                className="read-more-link" 
-                onClick={() => onViewDetails(book)}
-                title="View full description"
-                type="button"
-              >
-                Read description →
-              </button>
-            </div>
-          ) : null;
-        })()}
-
-        {book.pages ? (
+        {/* Progress Bar ONLY if the status is currently reading */}
+        {book.status === "reading" && book.pages ? (
           <div className="progress-area">
             <div className="progress-copy">
               <strong className="progress-percentage">{progress}%</strong>
@@ -96,47 +141,20 @@ function BookCard({ book, layout, onDelete, onEdit, onUpdate, onViewDetails }) {
           </div>
         ) : null}
 
-        <div className="card-controls">
-          <div className="status-select-wrap" style={{ "--border-status": statusColor }}>
-            {StatusIcon && <StatusIcon size={12} style={{ color: statusColor }} />}
-            <select
-              value={book.status}
-              onChange={(e) => onUpdate(book.id, { status: e.target.value })}
-              aria-label="Change book status"
-            >
-              {Object.entries(STATUSES).map(([key, status]) => (
-                <option key={key} value={key}>
-                  {status.longLabel}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {book.pages ? (
-            <label className="page-field" title="Update current page">
-              <input
-                type="number"
-                min="0"
-                max={book.pages}
-                value={pageDraft}
-                onChange={(event) => setPageDraft(event.target.value)}
-                onBlur={commitPage}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") commitPage();
-                }}
-              />
-              <span className="page-total">/ {book.pages}</span>
-            </label>
-          ) : null}
+        {/* Compact status pill at the bottom */}
+        <div className="card-status-footer">
+          <span className="status-chip" style={{ "--status-color": statusColor }}>
+            <StatusIcon size={12} />
+            <span>{statusInfo.longLabel || statusInfo.label}</span>
+          </span>
         </div>
       </div>
 
-      {/* Floating Action Drawer overlay */}
+      {/* Floating Action overlay on hover */}
       <div className="book-actions">
         <button
           className={book.favorite ? "action-btn active favorite-btn" : "action-btn favorite-btn"}
           onClick={() => onUpdate(book.id, { favorite: !book.favorite })}
-          aria-label="Toggle favorite"
           title="Toggle favorite"
           type="button"
         >
@@ -145,8 +163,7 @@ function BookCard({ book, layout, onDelete, onEdit, onUpdate, onViewDetails }) {
         <button
           className="action-btn edit-btn"
           onClick={() => onEdit(book)}
-          aria-label="Edit book"
-          title="Edit book"
+          title="Edit book details"
           type="button"
         >
           <Edit3 size={14} />
@@ -154,7 +171,6 @@ function BookCard({ book, layout, onDelete, onEdit, onUpdate, onViewDetails }) {
         <button
           className="action-btn danger delete-btn"
           onClick={() => onDelete(book)}
-          aria-label="Remove book"
           title="Remove book"
           type="button"
         >

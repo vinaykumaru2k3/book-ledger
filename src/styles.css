@@ -1467,7 +1467,7 @@ textarea:focus-visible {
 }
 
 .book-card.row .book-heading {
-  flex: 2.2 !important;
+  flex: 2.5 !important;
   min-width: 0 !important;
   display: flex !important;
   flex-direction: column !important;
@@ -1488,88 +1488,24 @@ textarea:focus-visible {
   margin: 0 !important;
 }
 
-.book-card.row .rating-row {
+.book-card.row .status-pill-column {
   flex: 1.2 !important;
-  margin-top: 0 !important;
   display: flex !important;
-  flex-direction: column !important;
-  align-items: flex-start !important;
-  justify-content: center !important;
-  gap: 4px !important;
-  width: auto !important;
+  align-items: center !important;
+  min-width: 120px !important;
 }
 
-.book-card.row .finish-date-label {
-  font-size: 0.7rem !important;
-  color: var(--text-muted) !important;
-  white-space: nowrap !important;
-  margin: 0 !important;
-  font-weight: 500 !important;
-}
-
-.book-card.row .tag-row {
+.book-card.row .progress-column {
   flex: 1.5 !important;
   display: flex !important;
-  flex-direction: row !important;
-  flex-wrap: wrap !important;
-  gap: 4px !important;
-  margin: 0 !important;
-  width: 100% !important;
   align-items: center !important;
-}
-
-.book-card.row .tag-badge {
-  background-color: var(--bg-segmented) !important;
-  border: 1px solid var(--border-subtle) !important;
-  padding: 1px 6px !important;
-  font-size: 0.68rem !important;
+  font-size: 0.78rem !important;
   color: var(--text-secondary) !important;
-  text-transform: none !important;
-  font-weight: 500 !important;
-  letter-spacing: 0 !important;
-  white-space: nowrap !important;
-  box-shadow: none !important;
-  border-radius: 4px !important;
-  display: inline-block !important;
-  max-width: none !important;
+  min-width: 140px !important;
 }
 
-.book-card.row .progress-area {
-  flex: 2 !important;
-  margin-top: 0 !important;
-  width: 100% !important;
-  min-width: 110px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 4px !important;
-}
-
-.book-card.row .card-controls {
-  flex: 2.2 !important;
-  margin-top: 0 !important;
-  width: 100% !important;
-  display: flex !important;
-  flex-direction: row !important;
-  justify-content: flex-end !important;
-  align-items: center !important;
-  gap: 8px !important;
-}
-
-.book-card.row .status-select-wrap {
-  width: auto !important;
-  min-width: 110px !important;
-  flex: 1 !important;
-  height: 30px !important;
-}
-
-.book-card.row .page-field {
-  flex: 0.8 !important;
-  min-width: 62px !important;
-  height: 30px !important;
-}
-
-.book-card.row .notes-preview-container {
-  display: none !important; /* Hide read description link in list view to keep it compact */
+.book-card.row .list-progress-text strong {
+  color: var(--text-primary) !important;
 }
 
 .book-card.row .book-actions {
@@ -4581,4 +4517,10 @@ textarea:focus-visible {
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.3;
+}
+
+.card-status-footer {
+  display: flex;
+  margin-top: auto;
+  padding-top: 4px;
 }
