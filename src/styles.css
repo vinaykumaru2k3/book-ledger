@@ -4665,80 +4665,24 @@ textarea:focus-visible {
 
 /* --- Artistic Glassmorphic Presets with Neon Shadows --- */
 
-/* --- Abstract Decor Orbs --- */
-.board-card-decor-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(40px);
-  -webkit-filter: blur(40px);
-  z-index: 0;
-  pointer-events: none;
-  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
-  opacity: 0.15;
-}
-[data-theme="dark"] .board-card-decor-orb {
-  opacity: 0.22;
-}
-
-/* Orb 1: Bottom Right (Larger, matching primary preset accent color) */
-.orb-1 {
-  bottom: -40px;
-  right: -30px;
-  width: 150px;
-  height: 150px;
-  background-color: currentColor;
-}
-
-/* Orb 2: Top Left (Smaller, soft contrast) */
-.orb-2 {
-  top: -40px;
-  left: -20px;
-  width: 100px;
-  height: 100px;
-  background-color: currentColor;
-  opacity: 0.08;
-}
-[data-theme="dark"] .orb-2 {
-  opacity: 0.14;
-}
-
-/* Dynamic shifting morph on hover */
-.shelf-board-card:hover .orb-1 {
-  transform: scale(1.35) translate(-15px, -15px);
-  opacity: 0.22;
-}
-[data-theme="dark"] .shelf-board-card:hover .orb-1 {
-  opacity: 0.32;
-}
-
-.shelf-board-card:hover .orb-2 {
-  transform: scale(1.4) translate(15px, 15px);
-  opacity: 0.12;
-}
-[data-theme="dark"] .shelf-board-card:hover .orb-2 {
-  opacity: 0.22;
-}
-
 /* 1. Sepia Literary (Sandalwood / Antique Linen) */
 .shelf-board-card.shelf-board-sepia {
-  background: radial-gradient(circle at 80% 20%, rgba(217, 119, 6, 0.08) 0%, transparent 60%),
-              linear-gradient(135deg, rgba(251, 248, 243, 0.95) 0%, rgba(244, 235, 217, 0.95) 100%);
-  border-left: 6px solid #d97706;
-  border-color: rgba(217, 119, 6, 0.15);
-  box-shadow: 0 10px 30px rgba(217, 119, 6, 0.08), var(--shadow-sm);
+  background: linear-gradient(135deg, #d97706 0, #d97706 60px, #fdfbf7 60px, #fdfbf7 100%);
+  border: 2px solid #ecdcb9;
+  box-shadow: var(--shadow-sm);
 }
 [data-theme="dark"] .shelf-board-card.shelf-board-sepia {
-  background: radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.15) 0%, transparent 70%),
-              linear-gradient(135deg, rgba(36, 26, 18, 0.9) 0%, rgba(23, 16, 10, 0.9) 100%);
-  border-left-color: #b45309;
-  border-color: rgba(180, 83, 9, 0.25);
-  box-shadow: 0 12px 36px rgba(180, 83, 9, 0.2), 0 4px 10px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #b45309 0, #b45309 60px, #211910 60px, #211910 100%);
+  border: 2px solid #433320;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 .shelf-board-sepia:hover {
-  box-shadow: 0 15px 40px rgba(217, 119, 6, 0.16), var(--shadow-md);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: #d97706;
 }
 [data-theme="dark"] .shelf-board-sepia:hover {
-  box-shadow: 0 18px 48px rgba(180, 83, 9, 0.3), 0 8px 18px rgba(0, 0, 0, 0.4);
+  border-color: #b45309;
 }
 .shelf-board-sepia .board-title-group h3 {
   font-family: var(--font-serif);
@@ -4750,24 +4694,22 @@ textarea:focus-visible {
 
 /* 2. Cosmic Midnight (Space Nebula) */
 .shelf-board-card.shelf-board-cosmic {
-  background: radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.12) 0%, transparent 60%),
-              linear-gradient(135deg, rgba(245, 247, 255, 0.95) 0%, rgba(224, 228, 253, 0.95) 100%);
-  border-left: 6px solid #6366f1;
-  border-color: rgba(99, 102, 241, 0.15);
-  box-shadow: 0 10px 30px rgba(99, 102, 241, 0.08), var(--shadow-sm);
+  background: linear-gradient(135deg, #6366f1 0, #6366f1 60px, #f8faff 60px, #f8faff 100%);
+  border: 2px solid #d5dbfc;
+  box-shadow: var(--shadow-sm);
 }
 [data-theme="dark"] .shelf-board-card.shelf-board-cosmic {
-  background: radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.25) 0%, transparent 70%),
-              linear-gradient(135deg, rgba(17, 19, 38, 0.9) 0%, rgba(9, 10, 20, 0.9) 100%);
-  border-left-color: #4f46e5;
-  border-color: rgba(99, 102, 241, 0.25);
-  box-shadow: 0 12px 36px rgba(99, 102, 241, 0.2), 0 4px 10px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #4f46e5 0, #4f46e5 60px, #0e101f 60px, #0e101f 100%);
+  border: 2px solid #232747;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 .shelf-board-cosmic:hover {
-  box-shadow: 0 15px 40px rgba(99, 102, 241, 0.16), var(--shadow-md);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: #6366f1;
 }
 [data-theme="dark"] .shelf-board-cosmic:hover {
-  box-shadow: 0 18px 48px rgba(99, 102, 241, 0.3), 0 8px 18px rgba(0, 0, 0, 0.4);
+  border-color: #4f46e5;
 }
 .shelf-board-cosmic .board-title-group h3 {
   color: #312e81;
@@ -4778,24 +4720,22 @@ textarea:focus-visible {
 
 /* 3. Sage Botanical (Herb / Olive Green) */
 .shelf-board-card.shelf-board-botanical {
-  background: radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.1) 0%, transparent 60%),
-              linear-gradient(135deg, rgba(244, 253, 247, 0.95) 0%, rgba(222, 247, 231, 0.95) 100%);
-  border-left: 6px solid #10b981;
-  border-color: rgba(16, 185, 129, 0.15);
-  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.08), var(--shadow-sm);
+  background: linear-gradient(135deg, #10b981 0, #10b981 60px, #f9fdfb 60px, #f9fdfb 100%);
+  border: 2px solid #c9ebd5;
+  box-shadow: var(--shadow-sm);
 }
 [data-theme="dark"] .shelf-board-card.shelf-board-botanical {
-  background: radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.25) 0%, transparent 70%),
-              linear-gradient(135deg, rgba(11, 26, 17, 0.9) 0%, rgba(5, 14, 9, 0.9) 100%);
-  border-left-color: #059669;
-  border-color: rgba(16, 185, 129, 0.25);
-  box-shadow: 0 12px 36px rgba(16, 185, 129, 0.2), 0 4px 10px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #059669 0, #059669 60px, #081710 60px, #081710 100%);
+  border: 2px solid #143826;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 .shelf-board-botanical:hover {
-  box-shadow: 0 15px 40px rgba(16, 185, 129, 0.16), var(--shadow-md);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: #10b981;
 }
 [data-theme="dark"] .shelf-board-botanical:hover {
-  box-shadow: 0 18px 48px rgba(16, 185, 129, 0.3), 0 8px 18px rgba(0, 0, 0, 0.4);
+  border-color: #059669;
 }
 .shelf-board-botanical .board-title-group h3 {
   color: #064e3b;
@@ -4806,24 +4746,22 @@ textarea:focus-visible {
 
 /* 4. Terracotta Crimson (Burnt Terracotta) */
 .shelf-board-card.shelf-board-crimson {
-  background: radial-gradient(circle at 80% 20%, rgba(239, 68, 68, 0.1) 0%, transparent 60%),
-              linear-gradient(135deg, rgba(255, 245, 245, 0.95) 0%, rgba(253, 226, 226, 0.95) 100%);
-  border-left: 6px solid #ef4444;
-  border-color: rgba(239, 68, 68, 0.15);
-  box-shadow: 0 10px 30px rgba(239, 68, 68, 0.08), var(--shadow-sm);
+  background: linear-gradient(135deg, #ef4444 0, #ef4444 60px, #fff8f8 60px, #fff8f8 100%);
+  border: 2px solid #fcd3d3;
+  box-shadow: var(--shadow-sm);
 }
 [data-theme="dark"] .shelf-board-card.shelf-board-crimson {
-  background: radial-gradient(circle at 80% 20%, rgba(239, 68, 68, 0.25) 0%, transparent 70%),
-              linear-gradient(135deg, rgba(36, 15, 15, 0.9) 0%, rgba(20, 7, 7, 0.9) 100%);
-  border-left-color: #dc2626;
-  border-color: rgba(239, 68, 68, 0.25);
-  box-shadow: 0 12px 36px rgba(239, 68, 68, 0.2), 0 4px 10px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #dc2626 0, #dc2626 60px, #1f0b0b 60px, #1f0b0b 100%);
+  border: 2px solid #4a1c1c;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 .shelf-board-crimson:hover {
-  box-shadow: 0 15px 40px rgba(239, 68, 68, 0.16), var(--shadow-md);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: #ef4444;
 }
 [data-theme="dark"] .shelf-board-crimson:hover {
-  box-shadow: 0 18px 48px rgba(239, 68, 68, 0.3), 0 8px 18px rgba(0, 0, 0, 0.4);
+  border-color: #dc2626;
 }
 .shelf-board-crimson .board-title-group h3 {
   color: #7f1d1d;
@@ -4834,24 +4772,22 @@ textarea:focus-visible {
 
 /* 5. Honey Amber (Warm Gold) */
 .shelf-board-card.shelf-board-amber {
-  background: radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.1) 0%, transparent 60%),
-              linear-gradient(135deg, rgba(255, 251, 235, 0.95) 0%, rgba(254, 243, 199, 0.95) 100%);
-  border-left: 6px solid #f59e0b;
-  border-color: rgba(245, 158, 11, 0.15);
-  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.08), var(--shadow-sm);
+  background: linear-gradient(135deg, #f59e0b 0, #f59e0b 60px, #fffefa 60px, #fffefa 100%);
+  border: 2px solid #fcebb3;
+  box-shadow: var(--shadow-sm);
 }
 [data-theme="dark"] .shelf-board-card.shelf-board-amber {
-  background: radial-gradient(circle at 80% 20%, rgba(245, 158, 11, 0.25) 0%, transparent 70%),
-              linear-gradient(135deg, rgba(36, 22, 3, 0.9) 0%, rgba(20, 13, 1, 0.9) 100%);
-  border-left-color: #d97706;
-  border-color: rgba(245, 158, 11, 0.25);
-  box-shadow: 0 12px 36px rgba(245, 158, 11, 0.2), 0 4px 10px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #d97706 0, #d97706 60px, #201504 60px, #201504 100%);
+  border: 2px solid #452e0a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 .shelf-board-amber:hover {
-  box-shadow: 0 15px 40px rgba(245, 158, 11, 0.16), var(--shadow-md);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: #f59e0b;
 }
 [data-theme="dark"] .shelf-board-amber:hover {
-  box-shadow: 0 18px 48px rgba(245, 158, 11, 0.3), 0 8px 18px rgba(0, 0, 0, 0.4);
+  border-color: #d97706;
 }
 .shelf-board-amber .board-title-group h3 {
   color: #78350f;
@@ -4862,24 +4798,22 @@ textarea:focus-visible {
 
 /* 6. Oceanic Teal (Seabreeze) */
 .shelf-board-card.shelf-board-teal {
-  background: radial-gradient(circle at 80% 20%, rgba(20, 184, 166, 0.1) 0%, transparent 60%),
-              linear-gradient(135deg, rgba(240, 253, 250, 0.95) 0%, rgba(204, 251, 241, 0.95) 100%);
-  border-left: 6px solid #14b8a6;
-  border-color: rgba(20, 184, 166, 0.15);
-  box-shadow: 0 10px 30px rgba(20, 184, 166, 0.08), var(--shadow-sm);
+  background: linear-gradient(135deg, #14b8a6 0, #14b8a6 60px, #f7fdfd 60px, #f7fdfd 100%);
+  border: 2px solid #c0f7ed;
+  box-shadow: var(--shadow-sm);
 }
 [data-theme="dark"] .shelf-board-card.shelf-board-teal {
-  background: radial-gradient(circle at 80% 20%, rgba(20, 184, 166, 0.25) 0%, transparent 70%),
-              linear-gradient(135deg, rgba(5, 26, 24, 0.9) 0%, rgba(2, 15, 14, 0.9) 100%);
-  border-left-color: #0d9488;
-  border-color: rgba(20, 184, 166, 0.25);
-  box-shadow: 0 12px 36px rgba(20, 184, 166, 0.2), 0 4px 10px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #0d9488 0, #0d9488 60px, #051716 60px, #051716 100%);
+  border: 2px solid #133b37;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 .shelf-board-teal:hover {
-  box-shadow: 0 15px 40px rgba(20, 184, 166, 0.16), var(--shadow-md);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: #14b8a6;
 }
 [data-theme="dark"] .shelf-board-teal:hover {
-  box-shadow: 0 18px 48px rgba(20, 184, 166, 0.3), 0 8px 18px rgba(0, 0, 0, 0.4);
+  border-color: #0d9488;
 }
 .shelf-board-teal .board-title-group h3 {
   color: #115e59;

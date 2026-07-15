@@ -226,10 +226,6 @@ function ShelvesDashboard({ books, onUpdateBook, onViewDetails, onDeleteBook, on
                   setActiveShelf(shelf);
                 }}
               >
-                {/* Abstract decor background blobs */}
-                <div className="board-card-decor-orb orb-1" style={{ color: preset.color }} />
-                <div className="board-card-decor-orb orb-2" style={{ color: preset.color }} />
-
                 <div className="board-card-header" onClick={(e) => e.stopPropagation()}>
                   {isEditing ? (
                     <form onSubmit={(e) => handleRenameShelf(e, shelf)} className="rename-shelf-form">
