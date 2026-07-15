@@ -173,8 +173,8 @@ function ShelvesDashboard({ books, onUpdateBook, onViewDetails, onDeleteBook, on
             <p>Go back to the library view and use the folder icon on any book card to add books here!</p>
           </div>
         ) : (
-          <div className="books-grid-layout">
-            <div className="books-grid">
+          <div className="book-grid-layout">
+            <div className="book-grid">
               {list.map((book) => (
                 <BookCard
                   key={book.id}
