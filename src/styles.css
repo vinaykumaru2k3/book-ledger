@@ -201,16 +201,17 @@ textarea:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 4px;
+  margin-bottom: 16px;
 }
 
 .sidebar-section-label {
   font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.12em;
   color: var(--text-muted);
   padding: 0 8px;
+  margin-bottom: 6px;
 }
 
 .cover-strip {
@@ -296,25 +297,14 @@ textarea:focus-visible {
 }
 
 .nav-item.active {
-  background-color: var(--bg-ghost-hover);
-  color: var(--text-primary);
+  background-color: rgba(217, 119, 6, 0.08) !important;
+  color: var(--accent-emerald) !important;
   font-weight: 600;
 }
 
-.nav-item.active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 18px;
-  background-color: var(--accent-emerald);
-  border-radius: 0 2px 2px 0;
-}
-
 [data-theme="light"] .nav-item.active {
-  background-color: var(--bg-ghost-hover);
+  background-color: rgba(180, 83, 9, 0.08) !important;
+  color: var(--accent-emerald) !important;
 }
 
 .nav-item-badge {
@@ -1024,8 +1014,8 @@ textarea:focus-visible {
 /* Book Grid Layout */
 .book-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 20px;
 }
 
 .book-card {
@@ -1412,54 +1402,94 @@ textarea:focus-visible {
   gap: 12px;
 }
 
+/* Stack controls vertically in Grid view to prevent overlapping/clipping */
+.book-card:not(.row) {
+  padding: 16px !important;
+  gap: 12px !important;
+}
+
+.book-card:not(.row) .card-controls {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 8px !important;
+  width: 100% !important;
+  margin-top: 6px !important;
+}
+
+.book-card:not(.row) .status-select-wrap {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.book-card:not(.row) .page-field {
+  width: 100% !important;
+  flex: none !important;
+}
+
 .book-card.row {
+  display: flex !important;
   flex-direction: row !important;
   align-items: center !important;
-  padding: 14px 20px !important;
-  gap: 18px !important;
+  justify-content: space-between !important;
+  padding: 12px 18px !important;
+  gap: 16px !important;
   width: 100% !important;
   max-height: none !important;
   overflow: visible !important;
+  background-color: var(--bg-card) !important;
 }
 
 .book-card.row .cover-wrapper {
   width: 52px !important;
   margin-bottom: 0 !important;
   flex-shrink: 0 !important;
+  display: flex !important;
 }
 
 .book-card.row .cover {
   width: 52px !important;
   height: 78px !important;
   box-shadow: var(--shadow-sm) !important;
+  border-radius: 2px 4px 4px 2px !important;
+  transform: none !important; /* No tilt in list view */
 }
 
 .book-card.row .book-main {
-  display: grid !important;
-  grid-template-columns: 2.8fr 1.2fr 1.8fr 2.2fr !important;
-  grid-template-rows: auto auto !important;
+  display: flex !important;
+  flex-direction: row !important;
   align-items: center !important;
-  gap: 6px 20px !important;
+  justify-content: space-between !important;
+  flex: 1 !important;
+  gap: 16px !important;
   width: 100% !important;
+  min-width: 0 !important;
 }
 
 .book-card.row .book-heading {
-  grid-column: 1 !important;
-  grid-row: 1 !important;
+  flex: 2.2 !important;
   min-width: 0 !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 4px !important;
+  gap: 2px !important;
 }
 
 .book-card.row .book-title {
-  font-size: 1.15rem !important;
+  font-size: 1.12rem !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  display: block !important;
+}
+
+.book-card.row .book-author-meta {
+  font-size: 0.76rem !important;
   margin: 0 !important;
 }
 
 .book-card.row .rating-row {
-  grid-column: 2 !important;
-  grid-row: 1 / span 2 !important;
+  flex: 1.2 !important;
   margin-top: 0 !important;
   display: flex !important;
   flex-direction: column !important;
@@ -1470,7 +1500,7 @@ textarea:focus-visible {
 }
 
 .book-card.row .finish-date-label {
-  font-size: 0.72rem !important;
+  font-size: 0.7rem !important;
   color: var(--text-muted) !important;
   white-space: nowrap !important;
   margin: 0 !important;
@@ -1478,12 +1508,11 @@ textarea:focus-visible {
 }
 
 .book-card.row .tag-row {
-  grid-column: 3 !important;
-  grid-row: 1 / span 2 !important;
+  flex: 1.5 !important;
   display: flex !important;
   flex-direction: row !important;
   flex-wrap: wrap !important;
-  gap: 6px !important;
+  gap: 4px !important;
   margin: 0 !important;
   width: 100% !important;
   align-items: center !important;
@@ -1492,8 +1521,8 @@ textarea:focus-visible {
 .book-card.row .tag-badge {
   background-color: var(--bg-segmented) !important;
   border: 1px solid var(--border-subtle) !important;
-  padding: 2px 8px !important;
-  font-size: 0.7rem !important;
+  padding: 1px 6px !important;
+  font-size: 0.68rem !important;
   color: var(--text-secondary) !important;
   text-transform: none !important;
   font-weight: 500 !important;
@@ -1505,30 +1534,42 @@ textarea:focus-visible {
   max-width: none !important;
 }
 
-.book-card.row .tag-badge:not(:last-child)::after {
-  content: none !important;
-}
-
 .book-card.row .progress-area {
-  grid-column: 4 !important;
-  grid-row: 2 !important;
-  margin-top: 4px !important;
+  flex: 2 !important;
+  margin-top: 0 !important;
   width: 100% !important;
+  min-width: 110px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
 }
 
 .book-card.row .card-controls {
-  grid-column: 4 !important;
-  grid-row: 1 !important;
+  flex: 2.2 !important;
   margin-top: 0 !important;
   width: 100% !important;
-  justify-content: flex-start !important;
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
   gap: 8px !important;
 }
 
+.book-card.row .status-select-wrap {
+  width: auto !important;
+  min-width: 110px !important;
+  flex: 1 !important;
+  height: 30px !important;
+}
+
+.book-card.row .page-field {
+  flex: 0.8 !important;
+  min-width: 62px !important;
+  height: 30px !important;
+}
+
 .book-card.row .notes-preview-container {
-  grid-column: 1 !important;
-  grid-row: 2 !important;
-  margin-top: 4px !important;
+  display: none !important; /* Hide read description link in list view to keep it compact */
 }
 
 .book-card.row .book-actions {
@@ -4505,23 +4546,26 @@ textarea:focus-visible {
 /* Sidebar Custom Shelves Help box */
 .sidebar-help-box {
   margin-top: 8px;
-  padding: 12px 14px;
-  background-color: rgba(255, 255, 255, 0.02);
-  border: 1px dashed var(--border-subtle);
-  border-radius: 4px;
+  padding: 12px;
+  background-color: rgba(217, 119, 6, 0.03);
+  border: 1px dashed rgba(217, 119, 6, 0.25);
+  border-radius: 8px;
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 10px;
   color: var(--text-secondary);
 }
 
 [data-theme="light"] .sidebar-help-box {
-  background-color: rgba(92, 80, 67, 0.03);
+  background-color: rgba(180, 83, 9, 0.03);
+  border-color: rgba(180, 83, 9, 0.25);
 }
 
 .sidebar-help-box svg {
   color: var(--accent-emerald);
   flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .sidebar-help-box span {

@@ -856,24 +856,6 @@ function App() {
 
         <div className="sidebar-divider" />
 
-        {coverStrip.length > 0 && (
-          <div className="cover-strip" aria-hidden="true">
-            <div className="cover-strip-track">
-              {[...coverStrip, ...coverStrip].map((book, i) => (
-                <div
-                  className="mini-spine"
-                  key={`${book.id}-${i}`}
-                  style={{
-                    background: `linear-gradient(135deg, var(--cover-a, #1e293b), var(--cover-b, #475569))`,
-                  }}
-                >
-                  {book.coverUrl ? <img src={book.coverUrl} alt="" /> : null}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         <div className="sidebar-section">
           <div className="sidebar-section-label">Collection</div>
           <nav className="status-nav" aria-label="Shelf navigation">
