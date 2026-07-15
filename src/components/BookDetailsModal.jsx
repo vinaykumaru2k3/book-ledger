@@ -154,12 +154,7 @@ function BookDetailsModal({ book, onClose }) {
               </div>
             )}
 
-            {/* Smart fallback: if it has an API key but no description field, treat notes as description */}
             {(() => {
-              const hasAPI = Boolean(book.sourceKey);
-              const displayDescription = description || (hasAPI ? book.notes : "");
-              const displayNotes = description ? book.notes : (hasAPI ? "" : book.notes);
-
               return (
                 <>
                   <div className="details-description-section">
@@ -170,8 +165,8 @@ function BookDetailsModal({ book, onClose }) {
                           <Loader2 size={16} className="spin" style={{ marginRight: 6 }} />
                           <span>Fetching synopsis from Open Library...</span>
                         </div>
-                      ) : displayDescription ? (
-                        <p>{displayDescription}</p>
+                      ) : description ? (
+                        <p>{description}</p>
                       ) : (
                         <p className="empty-desc">No description available for this book.</p>
                       )}
@@ -181,8 +176,8 @@ function BookDetailsModal({ book, onClose }) {
                   <div className="details-description-section">
                     <h3 className="details-section-label">Personal Notes</h3>
                     <div className="details-description-text">
-                      {displayNotes ? (
-                        <p>{displayNotes}</p>
+                      {book.notes ? (
+                        <p>{book.notes}</p>
                       ) : (
                         <p className="empty-desc">No personal notes or review logged for this book yet.</p>
                       )}

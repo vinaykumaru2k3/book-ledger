@@ -331,7 +331,19 @@ function BookModal({
       matchedForm = await enrichWithOpenLibrary(matchedForm);
     }
     
-    onFormChange(matchedForm);
+    onFormChange((current) => ({
+      ...matchedForm,
+      // Retain existing user fields
+      status: current.status || matchedForm.status,
+      currentPage: current.currentPage || matchedForm.currentPage,
+      rating: current.rating || matchedForm.rating,
+      notes: current.notes || matchedForm.notes,
+      shelves: current.shelves && current.shelves.length > 0 ? current.shelves : (matchedForm.shelves || []),
+      // Retain manual title/author overrides if present
+      title: current.title && current.title.trim() ? current.title : matchedForm.title,
+      author: current.author && current.author.trim() ? current.author : matchedForm.author,
+    }));
+    
     setShowDropdown(false);
   }
 
