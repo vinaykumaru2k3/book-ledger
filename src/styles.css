@@ -4542,7 +4542,7 @@ textarea:focus-visible {
   align-items: center;
   gap: 20px;
   border-bottom: 1px dashed var(--border-subtle);
-  padding-bottom: 16px;
+  padding-bottom: 20px;
 }
 
 @media (max-width: 768px) {
@@ -4561,10 +4561,11 @@ textarea:focus-visible {
 
 .intro-description {
   margin: 0;
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   color: var(--text-muted);
-  max-width: 500px;
-  line-height: 1.4;
+  max-width: 540px;
+  line-height: 1.5;
+  font-weight: 500;
 }
 
 .add-board-form {
@@ -4582,11 +4583,11 @@ textarea:focus-visible {
 
 .add-board-form input {
   flex: 1;
-  height: 38px;
+  height: 40px;
   background-color: var(--bg-input);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  padding: 0 14px;
+  padding: 0 16px;
   color: var(--text-primary);
   font-size: 0.85rem;
   transition: var(--transition-smooth);
@@ -4599,7 +4600,7 @@ textarea:focus-visible {
 }
 
 .add-board-form button {
-  height: 38px;
+  height: 40px;
   white-space: nowrap;
 }
 
@@ -4609,36 +4610,37 @@ textarea:focus-visible {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 60px 20px;
+  padding: 70px 20px;
   background-color: var(--bg-surface);
   border: 1px dashed var(--border-subtle);
   border-radius: var(--radius-md);
   color: var(--text-muted);
+  box-shadow: var(--shadow-sm);
 }
 
 .empty-dashboard-state svg {
   color: var(--accent-emerald);
   margin-bottom: 16px;
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .empty-dashboard-state h3 {
   font-family: var(--font-serif);
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   color: var(--text-primary);
   margin-bottom: 8px;
 }
 
 .empty-dashboard-state p {
-  font-size: 0.85rem;
-  max-width: 360px;
+  font-size: 0.86rem;
+  max-width: 380px;
   line-height: 1.5;
 }
 
 .boards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 28px;
 }
 
 @media (max-width: 480px) {
@@ -4649,32 +4651,36 @@ textarea:focus-visible {
 
 .shelf-board-card {
   border-radius: var(--radius-md);
-  padding: 20px;
-  box-shadow: var(--shadow-md);
+  padding: 22px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  gap: 18px;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
   position: relative;
   overflow: hidden;
   border: 1px solid var(--border-subtle);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
-.shelf-board-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-lg);
-}
-
-/* --- Artistic Board Theme Presets --- */
+/* --- Artistic Glassmorphic Presets with Neon Shadows --- */
 
 /* 1. Sepia Literary (Sandalwood / Antique Linen) */
 .shelf-board-card.shelf-board-sepia {
-  background: linear-gradient(135deg, rgba(246, 240, 228, 0.95) 0%, rgba(236, 226, 207, 0.95) 100%);
-  border-left: 5px solid #d97706;
+  background: linear-gradient(135deg, rgba(247, 241, 230, 0.85) 0%, rgba(238, 228, 210, 0.8) 100%);
+  border-left: 6px solid #d97706;
+  box-shadow: 0 10px 30px rgba(217, 119, 6, 0.08), var(--shadow-sm);
 }
 [data-theme="dark"] .shelf-board-card.shelf-board-sepia {
-  background: linear-gradient(135deg, #261e14 0%, #1c150e 100%);
+  background: linear-gradient(135deg, rgba(38, 30, 20, 0.8) 0%, rgba(28, 21, 14, 0.75) 100%);
   border-left-color: #b45309;
+  box-shadow: 0 12px 36px rgba(180, 83, 9, 0.15), 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+.shelf-board-sepia:hover {
+  box-shadow: 0 15px 40px rgba(217, 119, 6, 0.15), var(--shadow-md);
+}
+[data-theme="dark"] .shelf-board-sepia:hover {
+  box-shadow: 0 18px 48px rgba(180, 83, 9, 0.25), 0 8px 18px rgba(0, 0, 0, 0.4);
 }
 .shelf-board-sepia .board-title-group h3 {
   font-family: var(--font-serif);
@@ -4686,12 +4692,20 @@ textarea:focus-visible {
 
 /* 2. Cosmic Midnight (Space Nebula) */
 .shelf-board-card.shelf-board-cosmic {
-  background: linear-gradient(135deg, rgba(238, 242, 255, 0.95) 0%, rgba(224, 231, 255, 0.95) 100%);
-  border-left: 5px solid #6366f1;
+  background: linear-gradient(135deg, rgba(238, 242, 255, 0.85) 0%, rgba(224, 231, 255, 0.8) 100%);
+  border-left: 6px solid #6366f1;
+  box-shadow: 0 10px 30px rgba(99, 102, 241, 0.08), var(--shadow-sm);
 }
 [data-theme="dark"] .shelf-board-card.shelf-board-cosmic {
-  background: linear-gradient(135deg, #131526 0%, #0d0f1c 100%);
+  background: linear-gradient(135deg, rgba(19, 21, 38, 0.8) 0%, rgba(13, 15, 28, 0.75) 100%);
   border-left-color: #4f46e5;
+  box-shadow: 0 12px 36px rgba(99, 102, 241, 0.15), 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+.shelf-board-cosmic:hover {
+  box-shadow: 0 15px 40px rgba(99, 102, 241, 0.15), var(--shadow-md);
+}
+[data-theme="dark"] .shelf-board-cosmic:hover {
+  box-shadow: 0 18px 48px rgba(99, 102, 241, 0.25), 0 8px 18px rgba(0, 0, 0, 0.4);
 }
 .shelf-board-cosmic .board-title-group h3 {
   color: #312e81;
@@ -4702,12 +4716,20 @@ textarea:focus-visible {
 
 /* 3. Sage Botanical (Herb / Olive Green) */
 .shelf-board-card.shelf-board-botanical {
-  background: linear-gradient(135deg, rgba(240, 253, 244, 0.95) 0%, rgba(220, 252, 231, 0.95) 100%);
-  border-left: 5px solid #10b981;
+  background: linear-gradient(135deg, rgba(240, 253, 244, 0.85) 0%, rgba(220, 252, 231, 0.8) 100%);
+  border-left: 6px solid #10b981;
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.08), var(--shadow-sm);
 }
 [data-theme="dark"] .shelf-board-card.shelf-board-botanical {
-  background: linear-gradient(135deg, #0e2217 0%, #08160e 100%);
+  background: linear-gradient(135deg, rgba(14, 34, 23, 0.8) 0%, rgba(8, 22, 14, 0.75) 100%);
   border-left-color: #059669;
+  box-shadow: 0 12px 36px rgba(16, 185, 129, 0.15), 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+.shelf-board-botanical:hover {
+  box-shadow: 0 15px 40px rgba(16, 185, 129, 0.15), var(--shadow-md);
+}
+[data-theme="dark"] .shelf-board-botanical:hover {
+  box-shadow: 0 18px 48px rgba(16, 185, 129, 0.25), 0 8px 18px rgba(0, 0, 0, 0.4);
 }
 .shelf-board-botanical .board-title-group h3 {
   color: #064e3b;
@@ -4718,12 +4740,20 @@ textarea:focus-visible {
 
 /* 4. Terracotta Crimson (Burnt Terracotta) */
 .shelf-board-card.shelf-board-crimson {
-  background: linear-gradient(135deg, rgba(254, 242, 242, 0.95) 0%, rgba(254, 226, 226, 0.95) 100%);
-  border-left: 5px solid #ef4444;
+  background: linear-gradient(135deg, rgba(254, 242, 242, 0.85) 0%, rgba(254, 226, 226, 0.8) 100%);
+  border-left: 6px solid #ef4444;
+  box-shadow: 0 10px 30px rgba(239, 68, 68, 0.08), var(--shadow-sm);
 }
 [data-theme="dark"] .shelf-board-card.shelf-board-crimson {
-  background: linear-gradient(135deg, #2a1212 0%, #1c0b0b 100%);
+  background: linear-gradient(135deg, rgba(42, 18, 18, 0.8) 0%, rgba(28, 11, 11, 0.75) 100%);
   border-left-color: #dc2626;
+  box-shadow: 0 12px 36px rgba(239, 68, 68, 0.15), 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+.shelf-board-crimson:hover {
+  box-shadow: 0 15px 40px rgba(239, 68, 68, 0.15), var(--shadow-md);
+}
+[data-theme="dark"] .shelf-board-crimson:hover {
+  box-shadow: 0 18px 48px rgba(239, 68, 68, 0.25), 0 8px 18px rgba(0, 0, 0, 0.4);
 }
 .shelf-board-crimson .board-title-group h3 {
   color: #7f1d1d;
@@ -4734,12 +4764,20 @@ textarea:focus-visible {
 
 /* 5. Honey Amber (Warm Gold) */
 .shelf-board-card.shelf-board-amber {
-  background: linear-gradient(135deg, rgba(255, 251, 235, 0.95) 0%, rgba(254, 243, 199, 0.95) 100%);
-  border-left: 5px solid #f59e0b;
+  background: linear-gradient(135deg, rgba(255, 251, 235, 0.85) 0%, rgba(254, 243, 199, 0.85) 100%);
+  border-left: 6px solid #f59e0b;
+  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.08), var(--shadow-sm);
 }
 [data-theme="dark"] .shelf-board-card.shelf-board-amber {
-  background: linear-gradient(135deg, #271a06 0%, #1a1102 100%);
+  background: linear-gradient(135deg, rgba(39, 26, 6, 0.8) 0%, rgba(26, 17, 2, 0.75) 100%);
   border-left-color: #d97706;
+  box-shadow: 0 12px 36px rgba(245, 158, 11, 0.15), 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+.shelf-board-amber:hover {
+  box-shadow: 0 15px 40px rgba(245, 158, 11, 0.15), var(--shadow-md);
+}
+[data-theme="dark"] .shelf-board-amber:hover {
+  box-shadow: 0 18px 48px rgba(245, 158, 11, 0.25), 0 8px 18px rgba(0, 0, 0, 0.4);
 }
 .shelf-board-amber .board-title-group h3 {
   color: #78350f;
@@ -4750,12 +4788,20 @@ textarea:focus-visible {
 
 /* 6. Oceanic Teal (Seabreeze) */
 .shelf-board-card.shelf-board-teal {
-  background: linear-gradient(135deg, rgba(240, 253, 250, 0.95) 0%, rgba(204, 251, 241, 0.95) 100%);
-  border-left: 5px solid #14b8a6;
+  background: linear-gradient(135deg, rgba(240, 253, 250, 0.85) 0%, rgba(204, 251, 241, 0.8) 100%);
+  border-left: 6px solid #14b8a6;
+  box-shadow: 0 10px 30px rgba(20, 184, 166, 0.08), var(--shadow-sm);
 }
 [data-theme="dark"] .shelf-board-card.shelf-board-teal {
-  background: linear-gradient(135deg, #071f1e 0%, #031414 100%);
+  background: linear-gradient(135deg, rgba(7, 31, 30, 0.8) 0%, rgba(3, 20, 20, 0.75) 100%);
   border-left-color: #0d9488;
+  box-shadow: 0 12px 36px rgba(20, 184, 166, 0.15), 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+.shelf-board-teal:hover {
+  box-shadow: 0 15px 40px rgba(20, 184, 166, 0.15), var(--shadow-md);
+}
+[data-theme="dark"] .shelf-board-teal:hover {
+  box-shadow: 0 18px 48px rgba(20, 184, 166, 0.25), 0 8px 18px rgba(0, 0, 0, 0.4);
 }
 .shelf-board-teal .board-title-group h3 {
   color: #115e59;
@@ -4764,16 +4810,20 @@ textarea:focus-visible {
   color: #99f6e4;
 }
 
+.shelf-board-card:hover {
+  transform: translateY(-5px);
+}
+
 /* --- Card Header inside Board --- */
 .board-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
 [data-theme="dark"] .board-card-header {
-  border-bottom-color: rgba(255, 255, 255, 0.05);
+  border-bottom-color: rgba(255, 255, 255, 0.06);
 }
 
 .board-title-group {
@@ -4783,10 +4833,11 @@ textarea:focus-visible {
 }
 
 .board-title-group h3 {
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 700;
   margin: 0;
   cursor: pointer;
+  letter-spacing: -0.01em;
 }
 
 .edit-shelf-btn {
@@ -4794,7 +4845,7 @@ textarea:focus-visible {
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  padding: 2px;
+  padding: 3px;
   border-radius: 4px;
   display: flex;
   align-items: center;
@@ -4804,7 +4855,7 @@ textarea:focus-visible {
 
 .edit-shelf-btn:hover {
   color: var(--accent-emerald);
-  background-color: rgba(16, 185, 129, 0.08);
+  background-color: rgba(16, 185, 129, 0.1);
 }
 
 .rename-shelf-form {
@@ -4814,15 +4865,15 @@ textarea:focus-visible {
 }
 
 .rename-shelf-input {
-  height: 28px;
-  padding: 0 8px;
+  height: 30px;
+  padding: 0 10px;
   background-color: var(--bg-input);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
-  font-size: 0.8rem;
-  font-weight: 600;
-  width: 150px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  width: 170px;
 }
 
 .rename-shelf-input:focus {
@@ -4831,8 +4882,8 @@ textarea:focus-visible {
 }
 
 .rename-btn {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: var(--radius-sm);
   border: none;
   display: flex;
@@ -4847,7 +4898,7 @@ textarea:focus-visible {
   color: #ffffff;
 }
 .rename-btn.save-btn:hover {
-  opacity: 0.9;
+  opacity: 0.95;
 }
 
 .rename-btn.cancel-btn {
@@ -4860,15 +4911,15 @@ textarea:focus-visible {
 }
 
 .board-count-badge {
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-weight: 700;
   padding: 2px 8px;
   border-radius: 99px;
-  background-color: rgba(0, 0, 0, 0.04);
+  background-color: rgba(0, 0, 0, 0.05);
   color: var(--text-secondary);
 }
 [data-theme="dark"] .board-count-badge {
-  background-color: rgba(255, 255, 255, 0.04);
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .delete-board-btn {
@@ -4886,16 +4937,16 @@ textarea:focus-visible {
 
 .delete-board-btn:hover {
   color: var(--accent-coral);
-  background-color: rgba(239, 68, 68, 0.08);
+  background-color: rgba(239, 68, 68, 0.1);
 }
 
 /* --- Horizontal scroll book list --- */
 .board-books-track {
   display: flex;
-  gap: 16px;
+  gap: 18px;
   overflow-x: auto;
-  padding: 12px 10px 24px 10px;
-  min-height: 175px;
+  padding: 12px 12px 28px 12px;
+  min-height: 185px;
   position: relative;
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.08) transparent;
@@ -4904,17 +4955,17 @@ textarea:focus-visible {
   scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
 }
 
-/* Simulated Wooden Shelf Ledge Lined at the bottom of covers */
+/* Beautiful simulated 3D Solid Wooden Bookshelf Board */
 .board-books-track::after {
   content: "";
   position: absolute;
   bottom: 12px;
-  left: 4px;
-  right: 4px;
-  height: 8px;
-  background: linear-gradient(to bottom, #7c4f24, #573718);
+  left: 6px;
+  right: 6px;
+  height: 10px;
+  background: linear-gradient(to bottom, #9d683c 0%, #7c4f24 40%, #573718 100%);
   border-radius: 3px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25), inset 0 1px 2px rgba(255,255,255,0.1);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   z-index: 1;
 }
 
@@ -4927,11 +4978,11 @@ textarea:focus-visible {
 }
 
 .board-books-track::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.12);
   border-radius: 99px;
 }
 [data-theme="dark"] .board-books-track::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.12);
 }
 
 .empty-board-track {
@@ -4939,16 +4990,16 @@ textarea:focus-visible {
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 20px;
+  padding: 24px;
   text-align: center;
   z-index: 2;
 }
 
 .empty-board-track span {
-  font-size: 0.76rem;
+  font-size: 0.78rem;
   color: var(--text-muted);
   font-style: italic;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .board-book-item {
@@ -4956,25 +5007,28 @@ textarea:focus-visible {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  width: 84px;
+  width: 86px;
   flex-shrink: 0;
   z-index: 2; /* Sit on top of wood ledge */
+  perspective: 1000px;
 }
 
 .board-book-cover-wrap {
   position: relative;
-  width: 84px;
-  height: 126px;
-  border-radius: 3px;
-  box-shadow: 3px 6px 12px rgba(0, 0, 0, 0.3);
+  width: 86px;
+  height: 129px;
+  border-radius: 2px 6px 6px 2px;
+  box-shadow: 4px 6px 12px rgba(0, 0, 0, 0.35);
   overflow: hidden;
-  transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
   background-color: var(--bg-ghost);
+  transform-origin: left center;
 }
 
-.board-book-cover-wrap:hover {
-  transform: translateY(-4px) scale(1.03);
-  box-shadow: 6px 12px 20px rgba(0, 0, 0, 0.45);
+/* 3D cover opening/tilting effect on hover inside the shelf */
+.board-book-item:hover .board-book-cover-wrap {
+  transform: rotateY(-10deg) translateZ(6px) translateY(-2px);
+  box-shadow: 12px 14px 22px rgba(0, 0, 0, 0.5);
 }
 
 .board-book-cover-wrap .cover {
@@ -4991,14 +5045,14 @@ textarea:focus-visible {
 
 .remove-book-from-shelf-btn {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: 5px;
+  right: 5px;
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background-color: rgba(15, 15, 18, 0.85);
+  background-color: rgba(15, 15, 18, 0.9);
   backdrop-filter: blur(4px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -5011,7 +5065,7 @@ textarea:focus-visible {
   z-index: 10;
 }
 
-.board-book-cover-wrap:hover .remove-book-from-shelf-btn {
+.board-book-item:hover .remove-book-from-shelf-btn {
   opacity: 1;
   transform: scale(1);
 }
@@ -5023,7 +5077,7 @@ textarea:focus-visible {
 }
 
 .board-book-title {
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   font-weight: 600;
   color: var(--text-secondary);
   text-align: center;
@@ -5032,6 +5086,11 @@ textarea:focus-visible {
   overflow: hidden;
   text-overflow: ellipsis;
   margin-top: 4px;
+  transition: color 0.2s ease;
+}
+
+.board-book-item:hover .board-book-title {
+  color: var(--text-primary);
 }
 
 /* ==========================================================================
