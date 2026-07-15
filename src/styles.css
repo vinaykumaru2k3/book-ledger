@@ -4665,23 +4665,58 @@ textarea:focus-visible {
 
 /* --- Artistic Glassmorphic Presets with Neon Shadows --- */
 
-/* --- Backdrop Watermarks --- */
-.board-card-watermark {
+/* --- Abstract Decor Orbs --- */
+.board-card-decor-orb {
   position: absolute;
-  right: -25px;
-  bottom: -25px;
-  opacity: 0.05;
-  transform: rotate(-12deg);
-  pointer-events: none;
-  transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.4s ease;
+  border-radius: 50%;
+  filter: blur(40px);
+  -webkit-filter: blur(40px);
   z-index: 0;
+  pointer-events: none;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+  opacity: 0.15;
 }
-[data-theme="dark"] .board-card-watermark {
-  opacity: 0.07;
+[data-theme="dark"] .board-card-decor-orb {
+  opacity: 0.22;
 }
-.shelf-board-card:hover .board-card-watermark {
-  transform: rotate(-22deg) scale(1.18) translateY(-5px);
-  opacity: 0.1;
+
+/* Orb 1: Bottom Right (Larger, matching primary preset accent color) */
+.orb-1 {
+  bottom: -40px;
+  right: -30px;
+  width: 150px;
+  height: 150px;
+  background-color: currentColor;
+}
+
+/* Orb 2: Top Left (Smaller, soft contrast) */
+.orb-2 {
+  top: -40px;
+  left: -20px;
+  width: 100px;
+  height: 100px;
+  background-color: currentColor;
+  opacity: 0.08;
+}
+[data-theme="dark"] .orb-2 {
+  opacity: 0.14;
+}
+
+/* Dynamic shifting morph on hover */
+.shelf-board-card:hover .orb-1 {
+  transform: scale(1.35) translate(-15px, -15px);
+  opacity: 0.22;
+}
+[data-theme="dark"] .shelf-board-card:hover .orb-1 {
+  opacity: 0.32;
+}
+
+.shelf-board-card:hover .orb-2 {
+  transform: scale(1.4) translate(15px, 15px);
+  opacity: 0.12;
+}
+[data-theme="dark"] .shelf-board-card:hover .orb-2 {
+  opacity: 0.22;
 }
 
 /* 1. Sepia Literary (Sandalwood / Antique Linen) */

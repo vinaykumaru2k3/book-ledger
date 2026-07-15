@@ -226,8 +226,9 @@ function ShelvesDashboard({ books, onUpdateBook, onViewDetails, onDeleteBook, on
                   setActiveShelf(shelf);
                 }}
               >
-                {/* Giant backdrop watermark icon */}
-                <Layers className="board-card-watermark" size={140} style={{ color: preset.color }} />
+                {/* Abstract decor background blobs */}
+                <div className="board-card-decor-orb orb-1" style={{ color: preset.color }} />
+                <div className="board-card-decor-orb orb-2" style={{ color: preset.color }} />
 
                 <div className="board-card-header" onClick={(e) => e.stopPropagation()}>
                   {isEditing ? (
