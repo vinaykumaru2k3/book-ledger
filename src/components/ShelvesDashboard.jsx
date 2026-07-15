@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { Plus, Trash2, FolderOpen, X, Layers, Edit2, Check } from "lucide-react";
+import { Trash2, FolderOpen, X, Layers, Edit2, Check } from "lucide-react";
 import Cover from "./Cover";
 
 const BOARD_PRESETS = [
@@ -17,8 +17,6 @@ function getPreset(shelfName) {
 }
 
 function ShelvesDashboard({ books, onUpdateBook, onViewDetails }) {
-  const [newShelfName, setNewShelfName] = useState("");
-  const [tempEmptyShelves, setTempEmptyShelves] = useState([]);
   const [editingShelf, setEditingShelf] = useState(null);
   const [editNameValue, setEditNameValue] = useState("");
 
@@ -47,20 +45,6 @@ function ShelvesDashboard({ books, onUpdateBook, onViewDetails }) {
     return map;
   }, [books]);
 
-  const allShelves = useMemo(() => {
-    const set = new Set([...uniqueShelves, ...tempEmptyShelves]);
-    return Array.from(set).sort();
-  }, [uniqueShelves, tempEmptyShelves]);
-
-  const handleAddShelf = (e) => {
-    e.preventDefault();
-    const name = newShelfName.trim();
-    if (name && !allShelves.includes(name)) {
-      setTempEmptyShelves((prev) => [...prev, name]);
-      setNewShelfName("");
-    }
-  };
-
   const handleRenameShelf = async (e, oldName) => {
     e.preventDefault();
     const newName = editNameValue.trim();
@@ -69,7 +53,7 @@ function ShelvesDashboard({ books, onUpdateBook, onViewDetails }) {
       return;
     }
 
-    if (allShelves.includes(newName) && newName !== oldName) {
+    if (uniqueShelves.includes(newName) && newName !== oldName) {
       alert("A shelf board with this name already exists!");
       return;
     }
@@ -80,11 +64,6 @@ function ShelvesDashboard({ books, onUpdateBook, onViewDetails }) {
       const updatedShelves = (book.shelves || []).map((s) => s === oldName ? newName : s);
       await onUpdateBook(book.id, { shelves: updatedShelves });
     }
-
-    // Update temp empty shelves if present
-    setTempEmptyShelves((prev) => 
-      prev.map((s) => s === oldName ? newName : s)
-    );
 
     setEditingShelf(null);
   };
@@ -100,9 +79,6 @@ function ShelvesDashboard({ books, onUpdateBook, onViewDetails }) {
       const updatedShelves = (book.shelves || []).filter((s) => s !== shelfName);
       await onUpdateBook(book.id, { shelves: updatedShelves });
     }
-    
-    // Remove from temp empty shelves if present
-    setTempEmptyShelves((prev) => prev.filter((s) => s !== shelfName));
   };
 
   const handleRemoveBookFromShelf = async (book, shelfName) => {
@@ -116,33 +92,20 @@ function ShelvesDashboard({ books, onUpdateBook, onViewDetails }) {
         <div className="intro-info">
           <span className="section-kicker">Visual Boards</span>
           <p className="intro-description">
-            Organize your library collections. Add empty board shelves below, and organize books using the quick-shelve folder icon on any book card.
+            Organize your library collections. Manage shelf contents below, and organize books using the quick-shelve folder icon on any book card.
           </p>
         </div>
-        
-        <form className="add-board-form" onSubmit={handleAddShelf}>
-          <input
-            type="text"
-            placeholder="Create new shelf board..."
-            value={newShelfName}
-            onChange={(e) => setNewShelfName(e.target.value)}
-          />
-          <button className="button primary compact" type="submit">
-            <Plus size={16} />
-            <span>Create Board</span>
-          </button>
-        </form>
       </div>
 
-      {allShelves.length === 0 ? (
+      {uniqueShelves.length === 0 ? (
         <div className="empty-dashboard-state">
           <FolderOpen size={48} />
           <h3>No collections created yet</h3>
-          <p>Type a collection name above to create your first visual board, or organize books directly from their cards!</p>
+          <p>Organize books directly from their cards using the quick-shelve folder icon to see them here!</p>
         </div>
       ) : (
         <div className="boards-grid">
-          {allShelves.map((shelf) => {
+          {uniqueShelves.map((shelf) => {
             const list = shelfBooks[shelf] || [];
             const preset = getPreset(shelf);
             const isEditing = editingShelf === shelf;
