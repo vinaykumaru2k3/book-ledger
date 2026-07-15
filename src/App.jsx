@@ -62,6 +62,7 @@ import BookDetailsModal from "./components/BookDetailsModal";
 import Recommendations from "./components/Recommendations";
 import TopCharts from "./components/TopCharts";
 import Analytics from "./components/Analytics";
+import ShelvesDashboard from "./components/ShelvesDashboard";
 
 // Constants & Helpers
 import { STATUSES, SORTS, progressFor } from "./components/constants";
@@ -497,7 +498,7 @@ function App() {
   }, [books]);
 
   const visibleBooks = useMemo(() => {
-    if (statusFilter === "recommendations" || statusFilter === "topbooks" || statusFilter === "analytics") return [];
+    if (statusFilter === "recommendations" || statusFilter === "topbooks" || statusFilter === "analytics" || statusFilter === "shelves") return [];
     const queryStr = libraryQuery.trim().toLowerCase();
     const filtered = books.filter((book) => {
       if (statusFilter === "favorites") {
@@ -888,22 +889,33 @@ function App() {
           <div className="sidebar-section-label">Shelves</div>
           <nav className="status-nav" aria-label="Custom Shelves navigation">
             {uniqueShelves.length > 0 ? (
-              uniqueShelves.map((shelf) => {
-                const filterKey = `shelf:${shelf}`;
-                const count = books.filter((b) => b.shelves && b.shelves.includes(shelf)).length;
-                return (
-                  <button
-                    className={statusFilter === filterKey ? "nav-item active" : "nav-item"}
-                    key={shelf}
-                    onClick={() => setStatusFilter(filterKey)}
-                    type="button"
-                  >
-                    <Layers size={15} />
-                    <span>{shelf}</span>
-                    <strong className="nav-item-badge">{count}</strong>
-                  </button>
-                );
-              })
+              <>
+                <button
+                  className={statusFilter === "shelves" ? "nav-item active" : "nav-item"}
+                  onClick={() => setStatusFilter("shelves")}
+                  type="button"
+                  style={{ marginBottom: "6px" }}
+                >
+                  <FolderOpen size={15} />
+                  <span>All Shelves</span>
+                </button>
+                {uniqueShelves.map((shelf) => {
+                  const filterKey = `shelf:${shelf}`;
+                  const count = books.filter((b) => b.shelves && b.shelves.includes(shelf)).length;
+                  return (
+                    <button
+                      className={statusFilter === filterKey ? "nav-item active" : "nav-item"}
+                      key={shelf}
+                      onClick={() => setStatusFilter(filterKey)}
+                      type="button"
+                    >
+                      <Layers size={15} />
+                      <span>{shelf}</span>
+                      <strong className="nav-item-badge">{count}</strong>
+                    </button>
+                  );
+                })}
+              </>
             ) : (
               <div className="sidebar-help-box">
                 <FolderOpen size={13} />
@@ -996,6 +1008,8 @@ function App() {
                   ? "Discover Top Books"
                   : statusFilter === "analytics"
                   ? "Library Analytics"
+                  : statusFilter === "shelves"
+                  ? "Custom Shelves"
                   : statusFilter.startsWith("shelf:")
                   ? `Shelf: ${statusFilter.substring(6)}`
                   : "My Library"}
@@ -1023,7 +1037,7 @@ function App() {
             </div>
           </div>
 
-          {statusFilter !== "recommendations" && statusFilter !== "topbooks" && statusFilter !== "analytics" && (
+          {statusFilter !== "recommendations" && statusFilter !== "topbooks" && statusFilter !== "analytics" && statusFilter !== "shelves" && (
             <div className="stats-strip" aria-label="Shelf stats summary">
               <div className="stat-item">
                 <Library size={15} className="stat-icon teal" />
@@ -1077,6 +1091,14 @@ function App() {
         ) : statusFilter === "analytics" ? (
           <div className="library-panel recommendations-panel-wrapper">
             <Analytics books={books} />
+          </div>
+        ) : statusFilter === "shelves" ? (
+          <div className="library-panel recommendations-panel-wrapper">
+            <ShelvesDashboard
+              books={books}
+              onUpdateBook={updateBook}
+              onViewDetails={setDetailsBook}
+            />
           </div>
         ) : (
           <section className="content-layout">
@@ -1134,6 +1156,7 @@ function App() {
                         book={book}
                         key={book.id}
                         layout={view}
+                        uniqueShelves={uniqueShelves}
                         onDelete={deleteBook}
                         onEdit={openEditBook}
                         onUpdate={updateBook}

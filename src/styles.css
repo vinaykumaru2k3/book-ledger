@@ -4524,3 +4524,580 @@ textarea:focus-visible {
   margin-top: auto;
   padding-top: 4px;
 }
+
+/* ==========================================================================
+   DEDICATED SHELVES WORKSPACE & DASHBOARD
+   ========================================================================== */
+.shelves-dashboard {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 4px;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 1px dashed var(--border-subtle);
+  padding-bottom: 16px;
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+}
+
+.add-board-form {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  max-width: 380px;
+}
+
+@media (max-width: 768px) {
+  .add-board-form {
+    max-width: 100%;
+  }
+}
+
+.add-board-form input {
+  flex: 1;
+  height: 38px;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0 14px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  transition: var(--transition-smooth);
+}
+
+.add-board-form input:focus {
+  outline: none;
+  border-color: var(--accent-emerald);
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.15);
+}
+
+.add-board-form button {
+  height: 38px;
+  white-space: nowrap;
+}
+
+.empty-dashboard-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 20px;
+  background-color: var(--bg-surface);
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+}
+
+.empty-dashboard-state svg {
+  color: var(--accent-emerald);
+  margin-bottom: 16px;
+  opacity: 0.8;
+}
+
+.empty-dashboard-state h3 {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.empty-dashboard-state p {
+  font-size: 0.85rem;
+  max-width: 360px;
+  line-height: 1.5;
+}
+
+.boards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 24px;
+}
+
+@media (max-width: 480px) {
+  .boards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.shelf-board-card {
+  border-radius: var(--radius-md);
+  padding: 20px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+}
+
+.shelf-board-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* --- Artistic Board Theme Presets --- */
+
+/* 1. Sepia Literary (Sandalwood / Antique Linen) */
+.shelf-board-card.shelf-board-sepia {
+  background: linear-gradient(135deg, rgba(245, 238, 223, 0.95) 0%, rgba(234, 222, 199, 0.95) 100%);
+  border-left: 5px solid #d97706;
+}
+[data-theme="dark"] .shelf-board-card.shelf-board-sepia {
+  background: linear-gradient(135deg, #261e14 0%, #1c150e 100%);
+  border-left-color: #b45309;
+}
+.shelf-board-sepia .board-title-group h3 {
+  font-family: var(--font-serif);
+  color: #5c3d14;
+}
+[data-theme="dark"] .shelf-board-sepia .board-title-group h3 {
+  color: #e5c195;
+}
+
+/* 2. Cosmic Midnight (Space Nebula) */
+.shelf-board-card.shelf-board-cosmic {
+  background: linear-gradient(135deg, rgba(238, 242, 255, 0.95) 0%, rgba(224, 231, 255, 0.95) 100%);
+  border-left: 5px solid #6366f1;
+}
+[data-theme="dark"] .shelf-board-card.shelf-board-cosmic {
+  background: linear-gradient(135deg, #131526 0%, #0d0f1c 100%);
+  border-left-color: #4f46e5;
+}
+.shelf-board-cosmic .board-title-group h3 {
+  color: #312e81;
+}
+[data-theme="dark"] .shelf-board-cosmic .board-title-group h3 {
+  color: #c7d2fe;
+}
+
+/* 3. Sage Botanical (Herb / Olive Green) */
+.shelf-board-card.shelf-board-botanical {
+  background: linear-gradient(135deg, rgba(240, 253, 244, 0.95) 0%, rgba(220, 252, 231, 0.95) 100%);
+  border-left: 5px solid #10b981;
+}
+[data-theme="dark"] .shelf-board-card.shelf-board-botanical {
+  background: linear-gradient(135deg, #0e2217 0%, #08160e 100%);
+  border-left-color: #059669;
+}
+.shelf-board-botanical .board-title-group h3 {
+  color: #064e3b;
+}
+[data-theme="dark"] .shelf-board-botanical .board-title-group h3 {
+  color: #a7f3d0;
+}
+
+/* 4. Terracotta Crimson (Burnt Terracotta) */
+.shelf-board-card.shelf-board-crimson {
+  background: linear-gradient(135deg, rgba(254, 242, 242, 0.95) 0%, rgba(254, 226, 226, 0.95) 100%);
+  border-left: 5px solid #ef4444;
+}
+[data-theme="dark"] .shelf-board-card.shelf-board-crimson {
+  background: linear-gradient(135deg, #2a1212 0%, #1c0b0b 100%);
+  border-left-color: #dc2626;
+}
+.shelf-board-crimson .board-title-group h3 {
+  color: #7f1d1d;
+}
+[data-theme="dark"] .shelf-board-crimson .board-title-group h3 {
+  color: #fca5a5;
+}
+
+/* 5. Honey Amber (Warm Gold) */
+.shelf-board-card.shelf-board-amber {
+  background: linear-gradient(135deg, rgba(255, 251, 235, 0.95) 0%, rgba(254, 243, 199, 0.95) 100%);
+  border-left: 5px solid #f59e0b;
+}
+[data-theme="dark"] .shelf-board-card.shelf-board-amber {
+  background: linear-gradient(135deg, #271a06 0%, #1a1102 100%);
+  border-left-color: #d97706;
+}
+.shelf-board-amber .board-title-group h3 {
+  color: #78350f;
+}
+[data-theme="dark"] .shelf-board-amber .board-title-group h3 {
+  color: #fde68a;
+}
+
+/* 6. Oceanic Teal (Seabreeze) */
+.shelf-board-card.shelf-board-teal {
+  background: linear-gradient(135deg, rgba(240, 253, 250, 0.95) 0%, rgba(204, 251, 241, 0.95) 100%);
+  border-left: 5px solid #14b8a6;
+}
+[data-theme="dark"] .shelf-board-card.shelf-board-teal {
+  background: linear-gradient(135deg, #071f1e 0%, #031414 100%);
+  border-left-color: #0d9488;
+}
+.shelf-board-teal .board-title-group h3 {
+  color: #115e59;
+}
+[data-theme="dark"] .shelf-board-teal .board-title-group h3 {
+  color: #99f6e4;
+}
+
+/* --- Card Header inside Board --- */
+.board-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+[data-theme="dark"] .board-card-header {
+  border-bottom-color: rgba(255, 255, 255, 0.05);
+}
+
+.board-title-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.board-title-group h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.board-count-badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 99px;
+  background-color: rgba(0, 0, 0, 0.04);
+  color: var(--text-secondary);
+}
+[data-theme="dark"] .board-count-badge {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.delete-board-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-smooth);
+}
+
+.delete-board-btn:hover {
+  color: var(--accent-coral);
+  background-color: rgba(239, 68, 68, 0.08);
+}
+
+/* --- Horizontal scroll book list --- */
+.board-books-track {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 6px 0 12px 0;
+  min-height: 120px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+}
+[data-theme="dark"] .board-books-track {
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.board-books-track::-webkit-scrollbar {
+  height: 5px;
+}
+
+.board-books-track::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.board-books-track::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 99px;
+}
+[data-theme="dark"] .board-books-track::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.empty-board-track {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 20px;
+  text-align: center;
+}
+
+.empty-board-track span {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.board-book-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 72px;
+  flex-shrink: 0;
+}
+
+.board-book-cover-wrap {
+  position: relative;
+  width: 72px;
+  height: 108px;
+  border-radius: 3px;
+  box-shadow: 2px 4px 8px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.board-book-cover-wrap:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 8px 14px rgba(0, 0, 0, 0.35);
+}
+
+.board-book-cover-wrap .cover {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.board-book-cover-wrap .clickable-cover {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.remove-book-from-shelf-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: rgba(15, 15, 18, 0.85);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  padding: 0;
+}
+
+.board-book-cover-wrap:hover .remove-book-from-shelf-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.remove-book-from-shelf-btn:hover {
+  background-color: #ef4444;
+  color: #ffffff;
+  border-color: #ef4444;
+}
+
+.board-book-title {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-align: center;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==========================================================================
+   INLINE CARD QUICK-SHELF FLOATING POPOVER
+   ========================================================================== */
+.popover-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: transparent;
+  z-index: 998;
+  cursor: default;
+}
+
+.card-shelf-popover {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  width: 220px;
+  background-color: var(--bg-surface-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 999;
+  animation: popoverSlideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+}
+
+@keyframes popoverSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.popover-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 6px;
+}
+
+.popover-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 140px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+/* Scrollbar styling for popover list */
+.popover-checklist::-webkit-scrollbar {
+  width: 4px;
+}
+.popover-checklist::-webkit-scrollbar-track {
+  background: transparent;
+}
+.popover-checklist::-webkit-scrollbar-thumb {
+  background-color: var(--border-subtle);
+  border-radius: 4px;
+}
+
+.popover-empty-text {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 6px 0;
+}
+
+.popover-check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 8px;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  text-align: left;
+}
+
+.popover-check-row:hover {
+  background-color: var(--bg-ghost-hover);
+  color: var(--text-primary);
+}
+
+.popover-checkbox {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid var(--border-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background-color: var(--bg-input);
+  transition: var(--transition-smooth);
+}
+
+.popover-check-row.active {
+  color: var(--accent-emerald);
+}
+
+.popover-checkbox.checked {
+  background-color: var(--accent-emerald);
+  border-color: var(--accent-emerald);
+  color: #ffffff;
+}
+
+.popover-shelf-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.popover-add-form {
+  display: flex;
+  gap: 6px;
+  border-top: 1px dashed var(--border-subtle);
+  padding-top: 8px;
+}
+
+.popover-add-form input {
+  flex: 1;
+  height: 28px;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0 8px;
+  font-size: 0.72rem;
+  color: var(--text-primary);
+}
+
+.popover-add-form input:focus {
+  outline: none;
+  border-color: var(--accent-emerald);
+}
+
+.popover-add-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background-color: var(--accent-emerald);
+  border: 1px solid var(--accent-emerald);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.popover-add-btn:hover {
+  opacity: 0.9;
+}

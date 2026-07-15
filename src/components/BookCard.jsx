@@ -1,13 +1,90 @@
-import React from "react";
-import { Trash2, Edit3, Heart, HelpCircle } from "lucide-react";
+import React, { useState } from "react";
+import { Trash2, Edit3, Heart, HelpCircle, FolderPlus, Plus, Check } from "lucide-react";
 import Cover from "./Cover";
 import { STATUSES, progressFor } from "./constants";
 
-function BookCard({ book, layout, onDelete, onEdit, onUpdate, onViewDetails }) {
+function BookCard({ book, layout, uniqueShelves = [], onDelete, onEdit, onUpdate, onViewDetails }) {
+  const [showShelfPopover, setShowShelfPopover] = useState(false);
+  const [newShelfName, setNewShelfName] = useState("");
+  
   const progress = progressFor(book);
   const statusInfo = STATUSES[book.status] || { label: "Want to read", color: "#6b7280" };
   const StatusIcon = statusInfo.icon || HelpCircle;
   const statusColor = statusInfo.color || "#6b7280";
+
+  const handleToggleShelf = (shelf) => {
+    const current = book.shelves || [];
+    const nextShelves = current.includes(shelf)
+      ? current.filter((s) => s !== shelf)
+      : [...current, shelf];
+    onUpdate(book.id, { shelves: nextShelves });
+  };
+
+  const handleAddShelf = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const name = newShelfName.trim();
+    if (name) {
+      const current = book.shelves || [];
+      if (!current.includes(name)) {
+        onUpdate(book.id, { shelves: [...current, name] });
+      }
+      setNewShelfName("");
+    }
+  };
+
+  const currentShelves = book.shelves || [];
+
+  const shelfPopover = showShelfPopover && (
+    <>
+      <div 
+        className="popover-backdrop" 
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowShelfPopover(false);
+        }} 
+      />
+      <div className="card-shelf-popover" onClick={(e) => e.stopPropagation()}>
+        <div className="popover-title">Add to Collections</div>
+        
+        <div className="popover-checklist">
+          {uniqueShelves.length === 0 ? (
+            <span className="popover-empty-text">No collections created yet.</span>
+          ) : (
+            uniqueShelves.map((shelf) => {
+              const isChecked = currentShelves.includes(shelf);
+              return (
+                <button
+                  type="button"
+                  key={shelf}
+                  className={`popover-check-row ${isChecked ? "active" : ""}`}
+                  onClick={() => handleToggleShelf(shelf)}
+                >
+                  <span className={`popover-checkbox ${isChecked ? "checked" : ""}`}>
+                    {isChecked && <Check size={10} />}
+                  </span>
+                  <span className="popover-shelf-name">{shelf}</span>
+                </button>
+              );
+            })
+          )}
+        </div>
+        
+        <form className="popover-add-form" onSubmit={handleAddShelf}>
+          <input
+            type="text"
+            placeholder="New shelf..."
+            value={newShelfName}
+            onChange={(e) => setNewShelfName(e.target.value)}
+            onClick={(e) => e.stopPropagation()}
+          />
+          <button type="submit" className="popover-add-btn" title="Create and add to shelf">
+            <Plus size={12} />
+          </button>
+        </form>
+      </div>
+    </>
+  );
 
   if (layout === "list") {
     return (
@@ -62,8 +139,8 @@ function BookCard({ book, layout, onDelete, onEdit, onUpdate, onViewDetails }) {
             )}
           </div>
 
-          {/* Action buttons (Favorite, Edit, Delete) */}
-          <div className="book-actions">
+          {/* Action buttons (Favorite, Shelve, Edit, Delete) */}
+          <div className="book-actions" style={{ position: "relative" }}>
             <button
               className={book.favorite ? "action-btn active favorite-btn" : "action-btn favorite-btn"}
               onClick={() => onUpdate(book.id, { favorite: !book.favorite })}
@@ -71,6 +148,14 @@ function BookCard({ book, layout, onDelete, onEdit, onUpdate, onViewDetails }) {
               type="button"
             >
               <Heart size={13} fill={book.favorite ? "currentColor" : "none"} />
+            </button>
+            <button
+              className={showShelfPopover ? "action-btn active shelve-btn" : "action-btn shelve-btn"}
+              onClick={() => setShowShelfPopover(!showShelfPopover)}
+              title="Quick Shelve"
+              type="button"
+            >
+              <FolderPlus size={13} />
             </button>
             <button
               className="action-btn edit-btn"
@@ -88,6 +173,7 @@ function BookCard({ book, layout, onDelete, onEdit, onUpdate, onViewDetails }) {
             >
               <Trash2 size={13} />
             </button>
+            {shelfPopover}
           </div>
         </div>
       </article>
@@ -151,7 +237,7 @@ function BookCard({ book, layout, onDelete, onEdit, onUpdate, onViewDetails }) {
       </div>
 
       {/* Floating Action overlay on hover */}
-      <div className="book-actions">
+      <div className="book-actions" style={{ position: "relative" }}>
         <button
           className={book.favorite ? "action-btn active favorite-btn" : "action-btn favorite-btn"}
           onClick={() => onUpdate(book.id, { favorite: !book.favorite })}
@@ -159,6 +245,14 @@ function BookCard({ book, layout, onDelete, onEdit, onUpdate, onViewDetails }) {
           type="button"
         >
           <Heart size={14} fill={book.favorite ? "currentColor" : "none"} />
+        </button>
+        <button
+          className={showShelfPopover ? "action-btn active shelve-btn" : "action-btn shelve-btn"}
+          onClick={() => setShowShelfPopover(!showShelfPopover)}
+          title="Quick Shelve"
+          type="button"
+        >
+          <FolderPlus size={14} />
         </button>
         <button
           className="action-btn edit-btn"
@@ -176,6 +270,7 @@ function BookCard({ book, layout, onDelete, onEdit, onUpdate, onViewDetails }) {
         >
           <Trash2 size={14} />
         </button>
+        {shelfPopover}
       </div>
     </article>
   );
