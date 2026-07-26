@@ -1,6 +1,6 @@
 # 🚀 Development Plan: Innovative Features for Pusthaka Reading Ledger
 
-This document serves as the master implementation blueprint for developing **Feature 2 (3D Interactive Knowledge Galaxy)** and **Feature 4 (Smart Ambient Soundscape Player)**.
+This document serves as the master implementation blueprint for developing **Feature 2 (3D Interactive Knowledge Galaxy)** and **Feature 4 (Historical Reading Time Machine)**.
 
 ---
 
@@ -40,44 +40,48 @@ Transform the traditional flat grid/list of books into a dynamic, interactive ce
 
 ---
 
-## 🎵 Feature 4: Smart Soundscape & Ambient Mood Player
+## ⏳ Feature 4: Historical Reading Time Machine & Era Map
 
 ### 1. Concept & Objectives
-An embedded procedural Web Audio API player that generates immersive ambient audio environments tailored to the genre or mood of the currently selected book or reading session.
+Plot all books in the user's library along a interactive historical timeline (from Ancient Antiquity ~800 BC to Modern 21st Century) based on their publication year (`publishedYear`) or historical era setting. Allow users to visually travel through time and explore how their library spans across human history.
 
-### 2. Audio Engine Architecture
-- **Web Audio API Engine (`src/utils/soundscapes.js`)**:
-  - Generates zero-dependency audio procedurally without external file dependencies:
-    - 🌧️ *Rain Noise*: Filtered pink/white noise with random amplitude droplets.
-    - 🔥 *Fireplace Crackle*: Sub-bass rumble + randomized impulse spikes.
-    - 🌌 *Cosmic Synth*: Multi-oscillator detuned sine/saw waves passing through a low-pass filter.
-    - ☕ *Cafe Ambiance*: Soft bandpass noise + warm electric piano chord loops.
-- **State Management & Controller (`src/hooks/useSoundscape.js`)**:
-  - Manages playing state (`isPlaying`), master volume (`volume`), active preset (`presetId`), and auto-genre matching.
+### 2. Historical Eras Taxonomy
+- 🏛️ **Ancient Antiquity** *(Pre-500 AD)* — e.g., Meditations, Odyssey
+- 🏰 **Medieval & Renaissance** *(500 – 1650 AD)* — e.g., Divine Comedy, Shakespeare
+- 📜 **Enlightenment & Industrial Era** *(1650 – 1900 AD)* — e.g., Pride and Prejudice, War and Peace
+- 📻 **20th Century & World Wars** *(1900 – 1999 AD)* — e.g., 1984, The Great Gatsby
+- 🚀 **Contemporary Era** *(2000 – Present)* — e.g., Sapiens, Atomic Habits
 
-### 3. Step-by-Step Task Breakdown
+### 3. Architecture & Components
+- **Timeline Parser (`src/utils/historyTimeline.js`)**:
+  - Extracts publication years, parses historical centuries, and categorizes books into historical eras.
+  - Computes statistics: Oldest book in library, most read historical century, era distribution percentage.
+- **Interactive Timeline Component (`src/components/HistoricalTimeMachine.jsx`)**:
+  - Horizontal & vertical timeline view with interactive era markers, century ticks, and floating book cards.
+  - Century Jump Minimap ("Jump to 1800s", "Jump to Ancient Era").
+  - Click-to-inspect integration with `BookDetailsModal`.
 
-- [ ] **Task 4.1: Audio Generator Core (`src/utils/soundscapes.js`)**
-  - Initialize `AudioContext` with browser user-interaction resume policy.
-  - Implement synthesized audio modules: `createRainNode`, `createFireNode`, `createSpaceSynthNode`, `createCafeNode`.
-  - Add crossfade transitions between ambient presets.
+### 4. Step-by-Step Task Breakdown
 
-- [ ] **Task 4.2: Soundscape React Hook (`src/hooks/useSoundscape.js`)**
-  - Provide `play()`, `pause()`, `setPreset(id)`, `setVolume(val)`, and `autoMatchBookGenre(book)`.
+- [ ] **Task 4.1: Timeline Data Engine (`src/utils/historyTimeline.js`)**
+  - Implement `parseHistoricalTimeline(books)` to group books by Era, Century, and Year.
+  - Calculate library historical breadth and era analytics.
 
-- [ ] **Task 4.3: Ambient Player UI Component (`src/components/SoundscapePlayer.jsx`)**
-  - Design a compact floating or topbar widget with:
-    - Play / Pause toggle with animated frequency bars.
-    - Preset selector dropdown (Rainy Study, Cosmic Synth, Fireplace Hearth, Lo-Fi Cafe).
-    - Volume slider with mute button.
+- [ ] **Task 4.2: Time Machine UI Component (`src/components/HistoricalTimeMachine.jsx`)**
+  - Build interactive timeline track with era milestone headers, glowing century markers, and book card nodes.
+  - Implement smooth scroll and touch swipe navigation.
 
-- [ ] **Task 4.4: App Header Integration (`src/App.jsx`)**
-  - Integrate `<SoundscapePlayer />` into the workspace topbar next to theme toggle and search controls.
+- [ ] **Task 4.3: Century Minimap & Quick Jump Controls**
+  - Add quick navigation chips to jump directly to specific historical epochs.
+
+- [ ] **Task 4.4: App Navigation Integration (`src/App.jsx`)**
+  - Add "Time Machine" view item to the sidebar navigation (`<CalendarDays />` / `<Compass />` icon).
+  - Render `<HistoricalTimeMachine />` in workspace panel when selected.
 
 ---
 
 ## 📅 Execution Strategy & Next Steps
 
-1. **Phase 1**: Develop Soundscape Web Audio Engine & UI Player Component (`Task 4.1 - 4.4`).
-2. **Phase 2**: Develop Graph Data Engine & Canvas Constellation Component (`Task 2.1 - 2.4`).
+1. **Phase 1**: Develop Graph Data Engine & Canvas Constellation Component (`Feature 2`).
+2. **Phase 2**: Develop Timeline Engine & Historical Time Machine Component (`Feature 4`).
 3. **Phase 3**: End-to-end testing, visual styling, responsive design polish, and deployment.
