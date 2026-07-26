@@ -1,7 +1,10 @@
 import React, { useState, useMemo } from "react";
 import { Trophy, BookOpen, Star, Calendar, ArrowRight } from "lucide-react";
+import { useBooks } from "../context/AppContext";
 
-function Analytics({ books }) {
+function Analytics({ books: propBooks }) {
+  const { books: contextBooks } = useBooks();
+  const books = propBooks || contextBooks || [];
   const currentYear = new Date().getFullYear();
   const [challengeGoal, setChallengeGoal] = useState(() => {
     const saved = localStorage.getItem("pusthaka-challenge-goal");

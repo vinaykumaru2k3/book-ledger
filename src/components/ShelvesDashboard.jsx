@@ -1,51 +1,14 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { Trash2, FolderOpen, X, Layers, Edit2, Check, ArrowLeft } from "lucide-react";
 import Cover from "./Cover";
 import BookCard from "./BookCard";
+import { useShelves } from "../context/AppContext";
 
-const BOARD_PRESETS = [
-  { class: "shelf-board-sepia", color: "#d97706" },
-  { class: "shelf-board-cosmic", color: "#6366f1" },
-  { class: "shelf-board-botanical", color: "#10b981" },
-  { class: "shelf-board-crimson", color: "#ef4444" },
-  { class: "shelf-board-amber", color: "#f59e0b" },
-  { class: "shelf-board-teal", color: "#14b8a6" }
-];
-
-function getPreset(shelfName) {
-  const codeSum = shelfName.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return BOARD_PRESETS[codeSum % BOARD_PRESETS.length];
-}
-
-function ShelvesDashboard({ books, onUpdateBook, onViewDetails, onDeleteBook, onEditBook }) {
+function ShelvesDashboard() {
+  const { uniqueShelves, shelfBooks, getPreset, renameShelf, deleteShelf } = useShelves();
   const [activeShelf, setActiveShelf] = useState(null);
   const [editingShelf, setEditingShelf] = useState(null);
   const [editNameValue, setEditNameValue] = useState("");
-
-  // Extract unique shelves
-  const uniqueShelves = useMemo(() => {
-    const list = new Set();
-    books.forEach((book) => {
-      if (Array.isArray(book.shelves)) {
-        book.shelves.forEach((s) => list.add(s));
-      }
-    });
-    return Array.from(list).sort();
-  }, [books]);
-
-  // Group books by shelf
-  const shelfBooks = useMemo(() => {
-    const map = {};
-    books.forEach((book) => {
-      if (Array.isArray(book.shelves)) {
-        book.shelves.forEach((shelf) => {
-          if (!map[shelf]) map[shelf] = [];
-          map[shelf].push(book);
-        });
-      }
-    });
-    return map;
-  }, [books]);
 
   const handleRenameShelf = async (e, oldName) => {
     e.preventDefault();
@@ -60,12 +23,7 @@ function ShelvesDashboard({ books, onUpdateBook, onViewDetails, onDeleteBook, on
       return;
     }
 
-    // Rename oldName to newName in all books
-    const booksOnShelf = shelfBooks[oldName] || [];
-    for (const book of booksOnShelf) {
-      const updatedShelves = (book.shelves || []).map((s) => s === oldName ? newName : s);
-      await onUpdateBook(book.id, { shelves: updatedShelves });
-    }
+    await renameShelf(oldName, newName);
 
     // Update active shelf name if active
     if (activeShelf === oldName) {
@@ -79,13 +37,8 @@ function ShelvesDashboard({ books, onUpdateBook, onViewDetails, onDeleteBook, on
     if (!window.confirm(`Are you sure you want to delete the shelf board "${shelfName}"? This will unshelf all books on this board.`)) {
       return;
     }
-    
-    // Remove shelfName from all books' shelves
-    const booksOnShelf = shelfBooks[shelfName] || [];
-    for (const book of booksOnShelf) {
-      const updatedShelves = (book.shelves || []).filter((s) => s !== shelfName);
-      await onUpdateBook(book.id, { shelves: updatedShelves });
-    }
+
+    await deleteShelf(shelfName);
 
     if (activeShelf === shelfName) {
       setActiveShelf(null);
@@ -176,16 +129,7 @@ function ShelvesDashboard({ books, onUpdateBook, onViewDetails, onDeleteBook, on
           <div className="book-grid-layout">
             <div className="book-grid">
               {list.map((book) => (
-                <BookCard
-                  key={book.id}
-                  book={book}
-                  layout="grid"
-                  uniqueShelves={uniqueShelves}
-                  onDelete={onDeleteBook}
-                  onEdit={onEditBook}
-                  onUpdate={onUpdateBook}
-                  onViewDetails={onViewDetails}
-                />
+                <BookCard key={book.id} book={book} layout="grid" />
               ))}
             </div>
           </div>

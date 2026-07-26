@@ -2,10 +2,22 @@ import React, { useState } from "react";
 import { Trash2, Edit3, Heart, HelpCircle, FolderPlus, Plus, Check } from "lucide-react";
 import Cover from "./Cover";
 import { STATUSES, progressFor } from "./constants";
+import { useBooks, useUi, useShelves } from "../context/AppContext";
 
-function BookCard({ book, layout, uniqueShelves = [], onDelete, onEdit, onUpdate, onViewDetails }) {
+function BookCard({ book, layout }) {
   const [showShelfPopover, setShowShelfPopover] = useState(false);
   const [newShelfName, setNewShelfName] = useState("");
+  const { updateBook, deleteBook } = useBooks();
+  const { openEditBook, openDetails, openDeleteConfirm } = useUi();
+  const { uniqueShelves } = useShelves();
+  
+  const handleDelete = (b) => {
+    if (openDeleteConfirm) {
+      openDeleteConfirm(b);
+    } else {
+      deleteBook(b);
+    }
+  };
   
   const progress = progressFor(book);
   const statusInfo = STATUSES[book.status] || { label: "Want to read", color: "#6b7280" };
@@ -17,7 +29,7 @@ function BookCard({ book, layout, uniqueShelves = [], onDelete, onEdit, onUpdate
     const nextShelves = current.includes(shelf)
       ? current.filter((s) => s !== shelf)
       : [...current, shelf];
-    onUpdate(book.id, { shelves: nextShelves });
+    updateBook(book.id, { shelves: nextShelves });
   };
 
   const handleAddShelf = (e) => {
@@ -27,7 +39,7 @@ function BookCard({ book, layout, uniqueShelves = [], onDelete, onEdit, onUpdate
     if (name) {
       const current = book.shelves || [];
       if (!current.includes(name)) {
-        onUpdate(book.id, { shelves: [...current, name] });
+        updateBook(book.id, { shelves: [...current, name] });
       }
       setNewShelfName("");
     }
@@ -92,7 +104,7 @@ function BookCard({ book, layout, uniqueShelves = [], onDelete, onEdit, onUpdate
         {/* Cover */}
         <div 
           className="cover-wrapper clickable-cover" 
-          onClick={() => onViewDetails(book)}
+          onClick={() => openDetails(book)}
           title="Click to view details"
         >
           <Cover book={book} />
@@ -108,7 +120,7 @@ function BookCard({ book, layout, uniqueShelves = [], onDelete, onEdit, onUpdate
           <div className="book-heading">
             <h3 
               className="book-title clickable-title" 
-              onClick={() => onViewDetails(book)}
+              onClick={() => openDetails(book)}
             >
               {book.title}
             </h3>
@@ -143,7 +155,7 @@ function BookCard({ book, layout, uniqueShelves = [], onDelete, onEdit, onUpdate
           <div className={`book-actions ${showShelfPopover ? "open" : ""}`}>
             <button
               className={book.favorite ? "action-btn active favorite-btn" : "action-btn favorite-btn"}
-              onClick={() => onUpdate(book.id, { favorite: !book.favorite })}
+              onClick={() => updateBook(book.id, { favorite: !book.favorite })}
               title="Toggle favorite"
               type="button"
             >
@@ -159,7 +171,7 @@ function BookCard({ book, layout, uniqueShelves = [], onDelete, onEdit, onUpdate
             </button>
             <button
               className="action-btn edit-btn"
-              onClick={() => onEdit(book)}
+              onClick={() => openEditBook(book)}
               title="Edit book details"
               type="button"
             >
@@ -167,7 +179,7 @@ function BookCard({ book, layout, uniqueShelves = [], onDelete, onEdit, onUpdate
             </button>
             <button
               className="action-btn danger delete-btn"
-              onClick={() => onDelete(book)}
+              onClick={() => handleDelete(book)}
               title="Remove book"
               type="button"
             >
@@ -186,7 +198,7 @@ function BookCard({ book, layout, uniqueShelves = [], onDelete, onEdit, onUpdate
       {/* Cover wrapper with favorite badge */}
       <div 
         className="cover-wrapper clickable-cover" 
-        onClick={() => onViewDetails(book)}
+        onClick={() => openDetails(book)}
         title="Click to view details"
       >
         <Cover book={book} />
@@ -201,7 +213,7 @@ function BookCard({ book, layout, uniqueShelves = [], onDelete, onEdit, onUpdate
         <div className="book-heading">
           <h3 
             className="book-title clickable-title" 
-            onClick={() => onViewDetails(book)}
+            onClick={() => openDetails(book)}
             title={book.title}
           >
             {book.title}
@@ -240,7 +252,7 @@ function BookCard({ book, layout, uniqueShelves = [], onDelete, onEdit, onUpdate
       <div className={`book-actions ${showShelfPopover ? "open" : ""}`}>
         <button
           className={book.favorite ? "action-btn active favorite-btn" : "action-btn favorite-btn"}
-          onClick={() => onUpdate(book.id, { favorite: !book.favorite })}
+          onClick={() => updateBook(book.id, { favorite: !book.favorite })}
           title="Toggle favorite"
           type="button"
         >
@@ -256,7 +268,7 @@ function BookCard({ book, layout, uniqueShelves = [], onDelete, onEdit, onUpdate
         </button>
         <button
           className="action-btn edit-btn"
-          onClick={() => onEdit(book)}
+          onClick={() => openEditBook(book)}
           title="Edit book details"
           type="button"
         >
@@ -264,7 +276,7 @@ function BookCard({ book, layout, uniqueShelves = [], onDelete, onEdit, onUpdate
         </button>
         <button
           className="action-btn danger delete-btn"
-          onClick={() => onDelete(book)}
+          onClick={() => handleDelete(book)}
           title="Remove book"
           type="button"
         >

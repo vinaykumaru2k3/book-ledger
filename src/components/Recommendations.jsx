@@ -1,8 +1,16 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { Sparkles, RefreshCw, Plus, Loader2, BookOpen, ThumbsUp, Compass } from "lucide-react";
 import Cover from "./Cover";
+import { useBooks, useModal, useUi } from "../context/AppContext";
 
-function Recommendations({ books, quickAdd, onViewDetails }) {
+function Recommendations({ books: propBooks, quickAdd: propQuickAdd, onViewDetails: propOnViewDetails }) {
+  const { books: contextBooks } = useBooks();
+  const modal = useModal();
+  const ui = useUi();
+  const books = propBooks || contextBooks || [];
+  const quickAdd = propQuickAdd || modal?.quickAdd;
+  const onViewDetails = propOnViewDetails || ui?.openDetails;
+
   const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");

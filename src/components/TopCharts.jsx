@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Plus, Loader2, Trophy, Check } from "lucide-react";
 import Cover from "./Cover";
+import { useBooks, useModal, useUi } from "../context/AppContext";
 
 const GENRES = [
   { id: "fantasy", label: "Fantasy", subjectKey: "fantasy" },
@@ -127,7 +128,14 @@ function validateGenre(book, genreId) {
   }
 }
 
-function TopCharts({ books, quickAdd, onViewDetails }) {
+function TopCharts({ books: propBooks, quickAdd: propQuickAdd, onViewDetails: propOnViewDetails }) {
+  const { books: contextBooks } = useBooks();
+  const modal = useModal();
+  const ui = useUi();
+  const books = propBooks || contextBooks || [];
+  const quickAdd = propQuickAdd || modal?.quickAdd;
+  const onViewDetails = propOnViewDetails || ui?.openDetails;
+
   const [selectedGenre, setSelectedGenre] = useState(GENRES[0]);
   const [booksList, setBooksList] = useState([]);
   const [loading, setLoading] = useState(false);

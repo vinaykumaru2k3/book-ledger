@@ -3,6 +3,7 @@ import { X, Search, Loader2, Plus, Import, Sparkles, BookOpen, Tags, AlertTriang
 import Cover from "./Cover";
 import Rating from "./Rating";
 import { STATUSES } from "./constants";
+import { useBooks, useModal } from "../context/AppContext";
 
 function formFromGoogleVolume(volume) {
   const info = volume.volumeInfo || {};
@@ -56,15 +57,9 @@ function formFromGoogleVolume(volume) {
   };
 }
 
-function BookModal({
-  books,
-  editing,
-  form,
-  onClose,
-  onFormChange,
-  onSubmit,
-  quickAdd,
-}) {
+function BookModal() {
+  const { books } = useBooks();
+  const { editing, form, onFormChange, onSubmit, onClose, quickAdd } = useModal();
   const [newShelfName, setNewShelfName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchType, setSearchType] = useState("all"); // all, title, author, genre
@@ -86,11 +81,11 @@ function BookModal({
 
   const displayedShelves = useMemo(() => {
     const set = new Set(uniqueShelves);
-    if (Array.isArray(form.shelves)) {
+    if (form && Array.isArray(form.shelves)) {
       form.shelves.forEach((s) => set.add(s));
     }
     return Array.from(set).sort();
-  }, [uniqueShelves, form.shelves]);
+  }, [uniqueShelves, form?.shelves]);
 
   const existingKeys = useMemo(
     () => new Set(books.map((book) => book.sourceKey).filter(Boolean)),
@@ -121,10 +116,10 @@ function BookModal({
 
   // Check for duplicates when form title or author changes
   useEffect(() => {
-    if (editing) { setDuplicateWarning(null); return; }
+    if (!form || editing) { setDuplicateWarning(null); return; }
     const dup = findDuplicate(form.sourceKey, form.title, form.author);
     setDuplicateWarning(dup ? { title: dup.title, author: dup.author, status: dup.status } : null);
-  }, [form.title, form.author, form.sourceKey, editing, findDuplicate]);
+  }, [form?.title, form?.author, form?.sourceKey, editing, findDuplicate]);
 
   // Auto-suggest autocomplete logic with debounce
   useEffect(() => {
@@ -371,6 +366,8 @@ function BookModal({
     await quickAdd(matchedForm);
     setShowDropdown(false);
   }
+
+  if (!form) return null;
 
   return (
     <div className="modal-backdrop" onClick={() => setShowDropdown(false)}>

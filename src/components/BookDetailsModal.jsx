@@ -3,20 +3,21 @@ import { X, Calendar, Bookmark, Layers, Heart, BookOpen, Tag, Loader2 } from "lu
 import Cover from "./Cover";
 import Rating from "./Rating";
 import { STATUSES, progressFor } from "./constants";
+import { useApp, useUi } from "../context/AppContext";
 
-function BookDetailsModal({ book, onClose }) {
-  const progress = progressFor(book);
-  const StatusIcon = STATUSES[book.status]?.icon;
-  const statusColor = STATUSES[book.status]?.color || "#10b981";
+function BookDetailsModal() {
+  const { detailsBook: book } = useApp();
+  const { closeDetails: onClose } = useUi();
 
-  const isPlaceholder = book.description === "Fetching full description from Open Library...";
+  const isPlaceholder = book?.description === "Fetching full description from Open Library...";
   
-  const [description, setDescription] = useState(isPlaceholder ? "" : book.description || "");
+  const [description, setDescription] = useState(isPlaceholder ? "" : book?.description || "");
   const [loadingDesc, setLoadingDesc] = useState(
-    isPlaceholder || (!book.description && (book.sourceKey?.startsWith("/works/") || book.id?.startsWith("/works/")))
+    Boolean(isPlaceholder || (!book?.description && (book?.sourceKey?.startsWith("/works/") || book?.id?.startsWith("/works/"))))
   );
 
   useEffect(() => {
+    if (!book) return;
     let active = true;
     const workKey = book.sourceKey || (book.id?.startsWith("/works/") ? book.id : null);
     
@@ -47,6 +48,12 @@ function BookDetailsModal({ book, onClose }) {
       active = false;
     };
   }, [book, loadingDesc]);
+
+  if (!book) return null;
+
+  const progress = progressFor(book);
+  const StatusIcon = STATUSES[book.status]?.icon;
+  const statusColor = STATUSES[book.status]?.color || "#10b981";
 
   return (
     <div className="modal-backdrop" onClick={onClose}>

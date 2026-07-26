@@ -1,5 +1,6 @@
 import React from "react";
 import { LogOut } from "lucide-react";
+import { useAuth } from "../context/AppContext";
 
 function displayNameFor(user) {
   return user?.displayName || user?.email || "Reader";
@@ -11,7 +12,9 @@ function initialsFor(name = "") {
   return parts.map((part) => part[0]).join("").toUpperCase();
 }
 
-function AccountCard({ user, onSignOut }) {
+
+function AccountCard() {
+  const { user, signOut } = useAuth();
   const name = displayNameFor(user);
 
   return (
@@ -29,7 +32,8 @@ function AccountCard({ user, onSignOut }) {
       </div>
       <button 
         className="icon-button account-signout" 
-        onClick={onSignOut} 
+
+        onClick={signOut} 
         aria-label="Sign out" 
         title="Sign out" 
         type="button"

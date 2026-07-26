@@ -27,9 +27,12 @@ export function getInitials(title = "") {
 }
 
 function Cover({ book, className = "" }) {
-  const seed = `${book.title || ""}${book.author || ""}`;
+  const title = book?.title || "";
+  const author = book?.author || "";
+  const coverUrl = book?.coverUrl || "";
+  const seed = `${title}${author}`;
   const [imgFailed, setImgFailed] = useState(false);
-  const showImage = book.coverUrl && !imgFailed;
+  const showImage = coverUrl && !imgFailed;
 
   return (
     <div
@@ -38,14 +41,14 @@ function Cover({ book, className = "" }) {
     >
       {showImage ? (
         <img
-          src={book.coverUrl}
-          alt={book.title || "Book Cover"}
+          src={coverUrl}
+          alt={title || "Book Cover"}
           loading="lazy"
           onError={() => setImgFailed(true)}
         />
       ) : (
         <div className="cover-fallback" aria-hidden="true">
-          <span className="cover-initials">{getInitials(book.title)}</span>
+          <span className="cover-initials">{getInitials(title)}</span>
           <div className="cover-spine-accent" />
         </div>
       )}
