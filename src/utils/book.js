@@ -30,14 +30,17 @@ export function reconcileBookStatus(book) {
   const now = Date.now();
 
   const originalStatus = status;
+  const explicitStatusChange = book._statusExplicitlySet;
 
-  // 1. Auto-promote status based on page progress
-  if (pages > 0 && currentPage >= pages && status !== "done") {
-    status = "done";
-    logTransition(book, "Reached final page", originalStatus, status);
-  } else if (currentPage > 0 && currentPage < pages && status === "want") {
-    status = "reading";
-    logTransition(book, "Started reading", originalStatus, status);
+  // 1. Auto-promote status based on page progress (only if status wasn't explicitly chosen)
+  if (!explicitStatusChange) {
+    if (pages > 0 && currentPage >= pages && status !== "done") {
+      status = "done";
+      logTransition(book, "Reached final page", originalStatus, status);
+    } else if (currentPage > 0 && currentPage < pages && status === "want") {
+      status = "reading";
+      logTransition(book, "Started reading", originalStatus, status);
+    }
   }
 
   // 2. Enforce constraints based on status
@@ -49,7 +52,7 @@ export function reconcileBookStatus(book) {
     currentPage = 1;
   }
 
-  return {
+  const result = {
     ...book,
     pages,
     currentPage,
@@ -57,6 +60,8 @@ export function reconcileBookStatus(book) {
     startedAt: status === "reading" && !book.startedAt ? now : (status === "want" ? null : book.startedAt),
     finishedAt: status === "done" && !book.finishedAt ? now : (status === "done" ? book.finishedAt : null)
   };
+  delete result._statusExplicitlySet;
+  return result;
 }
 
 export function normalizeBook(raw) {
@@ -89,6 +94,7 @@ export function normalizeBook(raw) {
     startedAt: raw.startedAt,
     finishedAt: raw.finishedAt,
     updatedAt: raw.updatedAt || Date.now(),
+    _statusExplicitlySet: raw._statusExplicitlySet,
   };
 
   return reconcileBookStatus(book);
@@ -129,9 +135,12 @@ export function formFromBook(book) {
 
 export function createBookFromForm(form, existing = null) {
   const previous = existing || {};
+  const explicitStatusChange = form.status !== undefined && (!existing || form.status !== previous.status);
+  
   return normalizeBook({
     ...previous,
     ...form,
     updatedAt: Date.now(),
+    _statusExplicitlySet: explicitStatusChange,
   });
 }
