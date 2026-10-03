@@ -14,36 +14,68 @@ export function toNumber(value, fallback = 0) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-export function normalizeBook(raw) {
-  const pages = Math.max(0, toNumber(raw.pages, 0));
-  const currentPage = clamp(toNumber(raw.currentPage, 0), 0, pages || 999999);
-  const status = STATUSES[raw.status] ? raw.status : "want";
-  const done = status === "done";
-  const title = String(raw.title || "Untitled").trim();
-  const addedAt = raw.addedAt || Date.now();
+// Add debug logger toggle (can be enabled via localStorage)
+const DEBUG_MODE = typeof window !== 'undefined' && localStorage.getItem('book-ledger:debug') === 'true';
+
+function logTransition(book, reason, oldStatus, newStatus) {
+  if (DEBUG_MODE || process.env.NODE_ENV === 'development') {
+    console.debug(`[BookSync] "${book.title}": ${reason} (${oldStatus} -> ${newStatus})`);
+  }
+}
+
+export function reconcileBookStatus(book) {
+  const pages = Math.max(0, toNumber(book.pages, 0));
+  let currentPage = clamp(toNumber(book.currentPage, 0), 0, pages || 999999);
+  let status = STATUSES[book.status] ? book.status : "want";
+  const now = Date.now();
+
+  const originalStatus = status;
+
+  // 1. Auto-promote status based on page progress
+  if (pages > 0 && currentPage >= pages && status !== "done") {
+    status = "done";
+    logTransition(book, "Reached final page", originalStatus, status);
+  } else if (currentPage > 0 && currentPage < pages && status === "want") {
+    status = "reading";
+    logTransition(book, "Started reading", originalStatus, status);
+  }
+
+  // 2. Enforce constraints based on status
+  if (status === "want") {
+    currentPage = 0;
+  } else if (status === "done" && pages > 0) {
+    currentPage = pages;
+  } else if (status === "reading" && currentPage === 0 && pages > 0) {
+    currentPage = 1;
+  }
 
   return {
-    id: raw.id || uid(),
-    title,
-    author: String(raw.author || "").trim(),
+    ...book,
     pages,
-    currentPage: done && pages ? pages : currentPage,
+    currentPage,
     status,
+    startedAt: status === "reading" && !book.startedAt ? now : (status === "want" ? null : book.startedAt),
+    finishedAt: status === "done" && !book.finishedAt ? now : (status === "done" ? book.finishedAt : null)
+  };
+}
+
+export function normalizeBook(raw) {
+  const book = {
+    id: raw.id || uid(),
+    title: String(raw.title || "Untitled").trim(),
+    author: String(raw.author || "").trim(),
+    pages: raw.pages,
+    currentPage: raw.currentPage,
+    status: raw.status,
     rating: clamp(toNumber(raw.rating, 0), 0, 5),
     tags: Array.isArray(raw.tags)
       ? raw.tags.map((tag) => String(tag).trim()).filter(Boolean)
-      : String(raw.tags || "")
-          .split(",")
-          .map((tag) => tag.trim())
-          .filter(Boolean),
+      : String(raw.tags || "").split(",").map((tag) => tag.trim()).filter(Boolean),
     notes: String(raw.notes || ""),
     description: String(raw.description || ""),
     genres: Array.isArray(raw.genres)
       ? raw.genres.map((g) => String(g).trim()).filter(Boolean)
-      : String(raw.genres || "")
-          .split(",")
-          .map((g) => g.trim())
-          .filter(Boolean),
+      : String(raw.genres || "").split(",").map((g) => g.trim()).filter(Boolean),
     publishedYear: raw.publishedYear ? String(raw.publishedYear) : "",
     isbn: raw.isbn ? String(raw.isbn) : "",
     coverId: raw.coverId || null,
@@ -52,15 +84,14 @@ export function normalizeBook(raw) {
     favorite: Boolean(raw.favorite),
     shelves: Array.isArray(raw.shelves)
       ? raw.shelves.map((s) => String(s).trim()).filter(Boolean)
-      : String(raw.shelves || "")
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean),
-    addedAt,
-    startedAt: raw.startedAt || (status === "reading" ? addedAt : null),
-    finishedAt: done ? raw.finishedAt || Date.now() : raw.finishedAt || null,
+      : String(raw.shelves || "").split(",").map((s) => s.trim()).filter(Boolean),
+    addedAt: raw.addedAt || Date.now(),
+    startedAt: raw.startedAt,
+    finishedAt: raw.finishedAt,
     updatedAt: raw.updatedAt || Date.now(),
   };
+
+  return reconcileBookStatus(book);
 }
 
 export function loadBooks() {
@@ -97,39 +128,10 @@ export function formFromBook(book) {
 }
 
 export function createBookFromForm(form, existing = null) {
-  const pages = Math.max(0, toNumber(form.pages, 0));
-  const status = STATUSES[form.status] ? form.status : "want";
-  let currentPage = clamp(toNumber(form.currentPage, 0), 0, pages || 999999);
-
-  if (status === "want") currentPage = 0;
-  if (status === "done" && pages) currentPage = pages;
-  if (status === "reading" && currentPage === 0 && pages) currentPage = 1;
-
-  const now = Date.now();
   const previous = existing || {};
-
   return normalizeBook({
     ...previous,
-    title: form.title,
-    author: form.author,
-    pages,
-    currentPage,
-    status,
-    rating: form.rating,
-    tags: form.tags,
-    notes: form.notes,
-    description: form.description,
-    genres: form.genres,
-    publishedYear: form.publishedYear,
-    isbn: form.isbn,
-    coverId: form.coverId,
-    coverUrl: form.coverUrl,
-    sourceKey: form.sourceKey,
-    shelves: form.shelves || [],
-    addedAt: previous.addedAt || now,
-    startedAt:
-      status === "reading" ? previous.startedAt || now : status === "want" ? null : previous.startedAt,
-    finishedAt: status === "done" ? previous.finishedAt || now : null,
-    updatedAt: now,
+    ...form,
+    updatedAt: Date.now(),
   });
 }

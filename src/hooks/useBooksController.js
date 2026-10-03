@@ -241,38 +241,9 @@ export function useBooksController(user, notify) {
     const existing = booksRef.current.find((book) => book.id === id);
     if (!existing) return;
 
+    // We no longer need manual status promotion logic here.
+    // We just merge the updates and let the central reconcileBookStatus (inside normalizeBook) handle it.
     const merged = { ...existing, ...updates, updatedAt: Date.now() };
-
-    if (updates.status === "want") {
-      merged.currentPage = 0;
-      merged.startedAt = null;
-      merged.finishedAt = null;
-    }
-
-    if (updates.status === "reading") {
-      merged.startedAt = merged.startedAt || Date.now();
-      merged.finishedAt = null;
-      if (merged.pages && merged.currentPage === 0) merged.currentPage = 1;
-    }
-
-    if (updates.status === "done") {
-      merged.currentPage = merged.pages || merged.currentPage;
-      merged.finishedAt = merged.finishedAt || Date.now();
-    }
-
-    if (updates.currentPage !== undefined) {
-      merged.currentPage = clamp(toNumber(updates.currentPage, 0), 0, merged.pages || 999999);
-      if (merged.pages && merged.currentPage >= merged.pages) {
-        merged.status = "done";
-        merged.finishedAt = merged.finishedAt || Date.now();
-      } else if (merged.currentPage > 0 && merged.status === "want") {
-        merged.status = "reading";
-        merged.startedAt = merged.startedAt || Date.now();
-      } else if (merged.status === "done" && merged.pages && merged.currentPage < merged.pages) {
-        merged.status = "reading";
-        merged.finishedAt = null;
-      }
-    }
 
     await saveBook(normalizeBook(merged));
   }

@@ -25,6 +25,7 @@ import {
   Trophy,
   Layers,
   FolderOpen,
+  Telescope,
 } from "lucide-react";
 
 // Modular Component Imports
@@ -45,10 +46,12 @@ import Recommendations from "./components/Recommendations";
 import TopCharts from "./components/TopCharts";
 import Analytics from "./components/Analytics";
 import ShelvesDashboard from "./components/ShelvesDashboard";
+import ConstellationGraph from "./components/ConstellationGraph";
 
 // Constants & context
 import { STATUSES, SORTS, progressFor } from "./components/constants";
 import { AppProvider, useAuth, useBooks, useShelves, useTheme, useUi, useModal, useToast, useApp } from "./context/AppContext";
+import { usePathRoute } from "./hooks/usePathRoute";
 
 function AppShell() {
   const auth = useAuth();
@@ -61,7 +64,7 @@ function AppShell() {
   const { toast, toastType } = useToast();
   const { deleteConfirmBook, detailsBook } = useApp();
 
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = usePathRoute("all");
   const [libraryQuery, setLibraryQuery] = useState("");
   const [sortBy, setSortBy] = useState("recent");
   const [view, setView] = useState("grid");
@@ -114,7 +117,8 @@ function AppShell() {
       statusFilter === "recommendations" ||
       statusFilter === "topbooks" ||
       statusFilter === "analytics" ||
-      statusFilter === "shelves"
+      statusFilter === "shelves" ||
+      statusFilter === "galaxy"
     )
       return [];
     const queryStr = libraryQuery.trim().toLowerCase();
@@ -296,6 +300,14 @@ function AppShell() {
               <BarChart3 size={17} />
               <span>Insights</span>
             </button>
+            <button
+              className={statusFilter === "galaxy" ? "nav-item active" : "nav-item"}
+              onClick={() => setStatusFilter("galaxy")}
+              type="button"
+            >
+              <Telescope size={17} />
+              <span>Knowledge Galaxy</span>
+            </button>
           </nav>
         </div>
 
@@ -432,6 +444,10 @@ function AppShell() {
         ) : statusFilter === "shelves" ? (
           <div className="library-panel recommendations-panel-wrapper">
             <ShelvesDashboard />
+          </div>
+        ) : statusFilter === "galaxy" ? (
+          <div className="library-panel recommendations-panel-wrapper" style={{ padding: 0, overflow: 'hidden' }}>
+            <ConstellationGraph books={books} onViewDetails={openDetails} />
           </div>
         ) : (
           <section className="content-layout">
