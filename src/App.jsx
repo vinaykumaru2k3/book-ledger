@@ -46,7 +46,7 @@ import Recommendations from "./components/Recommendations";
 import TopCharts from "./components/TopCharts";
 import Analytics from "./components/Analytics";
 import ShelvesDashboard from "./components/ShelvesDashboard";
-import ConstellationGraph from "./components/ConstellationGraph";
+
 
 // Constants & context
 import { STATUSES, SORTS, progressFor } from "./components/constants";
@@ -117,8 +117,7 @@ function AppShell() {
       statusFilter === "recommendations" ||
       statusFilter === "topbooks" ||
       statusFilter === "analytics" ||
-      statusFilter === "shelves" ||
-      statusFilter === "galaxy"
+      statusFilter === "shelves"
     )
       return [];
     const queryStr = libraryQuery.trim().toLowerCase();
@@ -300,14 +299,6 @@ function AppShell() {
               <BarChart3 size={17} />
               <span>Insights</span>
             </button>
-            <button
-              className={statusFilter === "galaxy" ? "nav-item active" : "nav-item"}
-              onClick={() => setStatusFilter("galaxy")}
-              type="button"
-            >
-              <Telescope size={17} />
-              <span>Knowledge Galaxy</span>
-            </button>
           </nav>
         </div>
 
@@ -379,15 +370,6 @@ function AppShell() {
                 <Plus size={15} />
                 <span>Add Book</span>
               </button>
-              <button
-                className="theme-toggle-btn"
-                onClick={toggleTheme}
-                aria-label="Toggle theme"
-                title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
-                type="button"
-              >
-                {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-              </button>
             </div>
           </div>
 
@@ -444,10 +426,6 @@ function AppShell() {
         ) : statusFilter === "shelves" ? (
           <div className="library-panel recommendations-panel-wrapper">
             <ShelvesDashboard />
-          </div>
-        ) : statusFilter === "galaxy" ? (
-          <div className="library-panel recommendations-panel-wrapper" style={{ padding: 0, overflow: 'hidden' }}>
-            <ConstellationGraph books={books} onViewDetails={openDetails} />
           </div>
         ) : (
           <section className="content-layout">

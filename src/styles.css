@@ -4960,3 +4960,45 @@ textarea:focus-visible {
   line-height: 1.4;
   font-weight: 500;
 }
+/* Custom Shelves Board Covers */
+.board-preview-covers {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 1rem 0;
+  overflow: hidden;
+}
+
+.preview-cover-item {
+  width: 60px;
+  height: 90px;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease, margin 0.2s ease;
+  flex-shrink: 0;
+}
+
+.preview-cover-item:not(:first-child) {
+  margin-left: -30px;
+}
+
+.preview-cover-item:hover {
+  transform: translateY(-8px) rotate(2deg);
+  z-index: 10 !important;
+}
+
+.empty-board-track {
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  font-style: italic;
+  padding: 1rem 0;
+}
+
+
+.preview-cover-item .cover {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 4px !important;
+}
+
