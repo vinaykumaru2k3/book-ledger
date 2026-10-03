@@ -245,6 +245,10 @@ export function useBooksController(user, notify) {
     // We just merge the updates and let the central reconcileBookStatus (inside normalizeBook) handle it.
     const merged = { ...existing, ...updates, updatedAt: Date.now() };
 
+    if (updates.status && updates.status !== existing.status) {
+      merged._statusExplicitlySet = true;
+    }
+
     await saveBook(normalizeBook(merged));
   }
 
