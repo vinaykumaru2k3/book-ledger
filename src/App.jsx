@@ -46,7 +46,7 @@ import Recommendations from "./components/Recommendations";
 import TopCharts from "./components/TopCharts";
 import Analytics from "./components/Analytics";
 import ShelvesDashboard from "./components/ShelvesDashboard";
-import ConstellationGraph from "./components/ConstellationGraph";
+
 
 // Constants & context
 import { STATUSES, SORTS, progressFor } from "./components/constants";
@@ -69,7 +69,7 @@ function AppShell() {
   const [sortBy, setSortBy] = useState("recent");
   const [view, setView] = useState("grid");
   const [currentPage, setCurrentPage] = useState(1);
-  const [showLanding, setShowLanding] = useState(true);
+  
 
   useEffect(() => {
     setCurrentPage(1);
@@ -117,8 +117,7 @@ function AppShell() {
       statusFilter === "recommendations" ||
       statusFilter === "topbooks" ||
       statusFilter === "analytics" ||
-      statusFilter === "shelves" ||
-      statusFilter === "galaxy"
+      statusFilter === "shelves"
     )
       return [];
     const queryStr = libraryQuery.trim().toLowerCase();
@@ -193,21 +192,28 @@ function AppShell() {
     return <LoadingScreen label="Connecting with Database Ledger" />;
   }
 
-  if (!auth.user && showLanding) {
-    return <LandingPage onEnter={() => setShowLanding(false)} theme={theme} toggleTheme={toggleTheme} />;
-  }
-
   if (!auth.user) {
+    if (statusFilter !== "auth") {
+      // Default unauthenticated route is welcome/landing
+      if (statusFilter !== "welcome") {
+        setTimeout(() => setStatusFilter("welcome"), 0);
+      }
+      return <LandingPage onEnter={() => setStatusFilter("auth")} />;
+    }
+    
     return (
       <AuthScreen
         error={auth.authError}
         onEmailSubmit={auth.signInWithEmail}
         onGoogleSignIn={auth.signInWithGoogle}
-        onBackToLanding={() => setShowLanding(true)}
-        theme={theme}
-        toggleTheme={toggleTheme}
+        onBackToLanding={() => setStatusFilter("welcome")}
       />
     );
+  }
+
+  // Once authenticated, if stuck on an auth route, redirect to "all"
+  if (statusFilter === "welcome" || statusFilter === "auth") {
+    setTimeout(() => setStatusFilter("all"), 0);
   }
 
   return (
@@ -300,14 +306,6 @@ function AppShell() {
               <BarChart3 size={17} />
               <span>Insights</span>
             </button>
-            <button
-              className={statusFilter === "galaxy" ? "nav-item active" : "nav-item"}
-              onClick={() => setStatusFilter("galaxy")}
-              type="button"
-            >
-              <Telescope size={17} />
-              <span>Knowledge Galaxy</span>
-            </button>
           </nav>
         </div>
 
@@ -379,15 +377,6 @@ function AppShell() {
                 <Plus size={15} />
                 <span>Add Book</span>
               </button>
-              <button
-                className="theme-toggle-btn"
-                onClick={toggleTheme}
-                aria-label="Toggle theme"
-                title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
-                type="button"
-              >
-                {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-              </button>
             </div>
           </div>
 
@@ -445,14 +434,10 @@ function AppShell() {
           <div className="library-panel recommendations-panel-wrapper">
             <ShelvesDashboard />
           </div>
-        ) : statusFilter === "galaxy" ? (
-          <div className="library-panel recommendations-panel-wrapper" style={{ padding: 0, overflow: 'hidden' }}>
-            <ConstellationGraph books={books} onViewDetails={openDetails} />
-          </div>
         ) : (
           <section className="content-layout">
             <div className="library-panel">
-              <div className="toolbar">
+              <form className="toolbar" onSubmit={(e) => e.preventDefault()}>
                 <label className="search-field">
                   <Search size={18} />
                   <input
@@ -493,7 +478,7 @@ function AppShell() {
                     <List size={16} />
                   </button>
                 </div>
-              </div>
+              </form>
 
               {booksLoading ? (
                 <LoadingPanel label="Connecting with Database ledger..." />

@@ -78,14 +78,14 @@ export function AppProvider({ children }) {
   const [deleteConfirmBook, setDeleteConfirmBook] = useState(null);
   const [detailsBook, setDetailsBook] = useState(null);
 
-  const [theme, setTheme] = useState(() => localStorage.getItem("book-ledger:theme") || "dark");
+  const theme = "light";
 
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("book-ledger:theme", theme);
-  }, [theme]);
+    document.documentElement.setAttribute("data-theme", "light");
+    localStorage.setItem("book-ledger:theme", "light");
+  }, []);
 
-  const toggleTheme = () => setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  const toggleTheme = () => {};
 
   // Close modals when the user signs out
   useEffect(() => {

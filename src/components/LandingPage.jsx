@@ -42,15 +42,6 @@ function LandingPage({ onEnter, theme, toggleTheme }) {
           <span className="landing-brand-name">Pusthaka</span>
         </div>
         <div className="landing-nav-actions">
-          <button
-            className="landing-theme-toggle"
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
-            title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            type="button"
-          >
-            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-          </button>
           <button className="landing-signin-button" onClick={onEnter} type="button">
             Sign In
           </button>
