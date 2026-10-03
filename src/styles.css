@@ -5002,3 +5002,61 @@ textarea:focus-visible {
   border-radius: 4px !important;
 }
 
+
+/* Better Shelf Board Covers */
+.board-preview-covers {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 1rem 0;
+  overflow: visible;
+}
+
+.preview-cover-item {
+  width: 70px;
+  height: 105px;
+  border-radius: 4px;
+  overflow: visible;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), margin 0.3s ease;
+  flex-shrink: 0;
+  position: relative;
+  transform-origin: bottom center;
+}
+
+.preview-cover-item:not(:first-child) {
+  margin-left: -40px;
+}
+
+.preview-cover-item .cover {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 4px !important;
+  box-shadow: -2px 4px 14px rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.preview-cover-item:nth-child(1) { transform: rotate(-6deg) translateY(2px); }
+.preview-cover-item:nth-child(2) { transform: rotate(-3deg) translateY(0px); }
+.preview-cover-item:nth-child(3) { transform: rotate(0deg) translateY(-2px); }
+.preview-cover-item:nth-child(4) { transform: rotate(3deg) translateY(0px); }
+.preview-cover-item:nth-child(5) { transform: rotate(6deg) translateY(2px); }
+
+.preview-cover-item:hover {
+  transform: translateY(-15px) scale(1.1) rotate(0deg) !important;
+  z-index: 20 !important;
+}
+
+.shelf-board-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+}
+
+.shelf-board-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+

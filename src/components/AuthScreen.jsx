@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Library, LogIn, Mail, Loader2, UserPlus, ShieldCheck, Sun, Moon } from "lucide-react";
 
-function AuthScreen({ error, onEmailSubmit, onGoogleSignIn, onBackToLanding, theme, toggleTheme }) {
+function AuthScreen({ error, onEmailSubmit, onGoogleSignIn, onBackToLanding }) {
   const [mode, setMode] = useState("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -198,16 +198,6 @@ function AuthScreen({ error, onEmailSubmit, onGoogleSignIn, onBackToLanding, the
                 ← Back to Overview
               </button>
             ) : <div />}
-            <button 
-              className="icon-button theme-toggle-btn" 
-              onClick={toggleTheme} 
-              aria-label="Toggle theme"
-              title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
-              type="button"
-              style={{ width: "32px", height: "32px" }}
-            >
-              {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
-            </button>
           </div>
 
           <div className="segmented auth-tabs">

@@ -69,7 +69,7 @@ function AppShell() {
   const [sortBy, setSortBy] = useState("recent");
   const [view, setView] = useState("grid");
   const [currentPage, setCurrentPage] = useState(1);
-  const [showLanding, setShowLanding] = useState(true);
+  
 
   useEffect(() => {
     setCurrentPage(1);
@@ -192,21 +192,28 @@ function AppShell() {
     return <LoadingScreen label="Connecting with Database Ledger" />;
   }
 
-  if (!auth.user && showLanding) {
-    return <LandingPage onEnter={() => setShowLanding(false)} theme={theme} toggleTheme={toggleTheme} />;
-  }
-
   if (!auth.user) {
+    if (statusFilter !== "auth") {
+      // Default unauthenticated route is welcome/landing
+      if (statusFilter !== "welcome") {
+        setTimeout(() => setStatusFilter("welcome"), 0);
+      }
+      return <LandingPage onEnter={() => setStatusFilter("auth")} />;
+    }
+    
     return (
       <AuthScreen
         error={auth.authError}
         onEmailSubmit={auth.signInWithEmail}
         onGoogleSignIn={auth.signInWithGoogle}
-        onBackToLanding={() => setShowLanding(true)}
-        theme={theme}
-        toggleTheme={toggleTheme}
+        onBackToLanding={() => setStatusFilter("welcome")}
       />
     );
+  }
+
+  // Once authenticated, if stuck on an auth route, redirect to "all"
+  if (statusFilter === "welcome" || statusFilter === "auth") {
+    setTimeout(() => setStatusFilter("all"), 0);
   }
 
   return (
