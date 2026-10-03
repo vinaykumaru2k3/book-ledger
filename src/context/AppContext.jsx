@@ -137,7 +137,8 @@ export function AppProvider({ children }) {
 
   const openDetails = (book) => setDetailsBook(book);
 
-  const submitForm = async () => {
+  const submitForm = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
     if (!form || !form.title.trim()) return;
     await booksApi.submitBook(editingId, form);
     closeModal();
