@@ -452,7 +452,7 @@ function AppShell() {
         ) : (
           <section className="content-layout">
             <div className="library-panel">
-              <div className="toolbar">
+              <form className="toolbar" onSubmit={(e) => e.preventDefault()}>
                 <label className="search-field">
                   <Search size={18} />
                   <input
@@ -493,7 +493,7 @@ function AppShell() {
                     <List size={16} />
                   </button>
                 </div>
-              </div>
+              </form>
 
               {booksLoading ? (
                 <LoadingPanel label="Connecting with Database ledger..." />

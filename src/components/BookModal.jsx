@@ -391,7 +391,7 @@ function BookModal() {
         {!editing && (
           <div className="lookup-section">
             <div className="lookup-controls">
-              <div className="search-field-container">
+              <form className="search-field-container" onSubmit={(e) => e.preventDefault()}>
                 <div className="search-field">
                   <Search size={18} />
                   <input
@@ -476,7 +476,7 @@ function BookModal() {
                     )}
                   </div>
                 )}
-              </div>
+              </form>
 
               <div className="select-wrap search-type-select">
                 <select value={searchType} onChange={(event) => setSearchType(event.target.value)}>
@@ -501,7 +501,7 @@ function BookModal() {
           </div>
         )}
 
-        <form className="book-form" onSubmit={onSubmit}>
+        <form className="book-form" onSubmit={(e) => { e.preventDefault(); onSubmit(e); }}>
           <div className="form-cover-preview">
             <Cover
               book={{
