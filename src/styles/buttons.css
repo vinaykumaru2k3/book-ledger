@@ -52,12 +52,6 @@
   transform: none !important;
 }
 
-.split-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
 .visually-hidden {
   position: absolute;
   width: 1px;

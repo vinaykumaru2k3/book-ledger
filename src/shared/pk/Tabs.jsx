@@ -8,6 +8,8 @@ import React, { useId, useRef } from "react";
 function Tabs({ tabs, value, onChange, label }) {
   const prefix = useId();
   const refs = useRef({});
+  // When `value` matches no tab (e.g. a shelf is open), the first tab stays reachable by keyboard.
+  const focusable = tabs.some((tab) => tab.id === value) ? value : tabs[0]?.id;
 
   const move = (index) => {
     const next = tabs[(index + tabs.length) % tabs.length];
@@ -35,7 +37,7 @@ function Tabs({ tabs, value, onChange, label }) {
             role="tab"
             type="button"
             aria-selected={selected}
-            tabIndex={selected ? 0 : -1}
+            tabIndex={tab.id === focusable ? 0 : -1}
             className={selected ? "pk-tab pk-tab--active" : "pk-tab"}
             onClick={() => onChange(tab.id)}
             onKeyDown={(event) => onKeyDown(event, index)}

@@ -106,7 +106,7 @@ No UI kit, no Tailwind, no router library for now (small route-param support add
 
 Size: S ≈ a few hours, M ≈ a day, L ≈ several days.
 
-### R0: Foundations (M) — **built, in review**
+### R0: Foundations (M) — **done**
 - **First, a safe dev environment:** Firebase Auth + Firestore **emulators** with a seeded test user (including sample
   Kannada books), `npm run emulators` / `npm run seed` / `npm run dev:emulated`. Dev-only, excluded from production builds,
   so every later phase can be clicked through signed in without touching real data.
@@ -119,7 +119,7 @@ Size: S ≈ a few hours, M ≈ a day, L ≈ several days.
 - CI: Firebase preview channels per PR; wire `npm run validate:data` into CI (used from K0).
 - **Done when:** primitives pass contrast at 3 widths, Kannada and Latin both render with the right fonts, old app unchanged.
 
-### R1: App shell (M)
+### R1: App shell (M) — **built, in review**
 - Slim rail / bottom tab bar, account menu, **language toggle (ಕ / EN)**, command bar (`/`, ⌘K).
 - **Public routes + nested routes:** the shell works signed out for public pages; route params (`/kannada/author/:id`).
 - **Done when:** any route reachable by mouse, touch and keyboard; signed-out visitors can open public pages; no layout shift.

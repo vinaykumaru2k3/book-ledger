@@ -1,32 +1,7 @@
 /* Workspace, page header, stats strip, metrics, content columns */
 /* Workspace Area */
-.workspace {
-  padding: 36px 48px;
-  overflow-y: auto;
-  max-width: 1440px;
-  margin: 0 auto;
-  width: 100%;
-}
 
 /* ── Dashboard Header ──────────────────────────────────────────── */
-.dashboard-header {
-  border-bottom: 1px solid var(--border-subtle);
-  padding-bottom: 24px;
-  margin-bottom: 28px;
-}
-
-.dashboard-header-top {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.dashboard-title-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
 
 .section-kicker {
   font-size: 0.7rem;
@@ -37,21 +12,6 @@
   display: flex;
   align-items: center;
   gap: 6px;
-}
-
-.dashboard-title {
-  font-family: var(--font-serif);
-  font-size: 2rem;
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  color: var(--text-primary);
-  line-height: 1.1;
-}
-
-.topbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
 
 /* Stats strip — inline horizontal row of numbers */
@@ -101,18 +61,6 @@
   background-color: var(--border-subtle);
   flex-shrink: 0;
   margin-right: 24px;
-}
-
-.add-book-header-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 0 14px;
-  height: 34px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  flex-shrink: 0;
 }
 
 .sync-pill {
