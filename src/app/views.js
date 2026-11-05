@@ -15,7 +15,7 @@ export const PAGES = {
   recommendations: { Component: lazy(() => import("../features/discover/Recommendations")) },
   topbooks: { Component: lazy(() => import("../features/discover/TopCharts")) },
   analytics: { Component: lazy(() => import("../features/insights/Analytics")) },
-  shelves: { Component: lazy(() => import("../features/shelves/ShelvesDashboard")) },
+  shelves: { Component: lazy(() => import("../features/shelves/ShelvesDashboard")), bare: true },
   galaxy: {
     Component: lazy(() => import("../features/galaxy/ConstellationGraph")),
     fullBleed: true, // draws edge to edge, without the panel padding

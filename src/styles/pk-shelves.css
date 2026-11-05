@@ -1,0 +1,111 @@
+/* Shelves: the shelf cards (miniature wooden shelves), back link and the shelf menu. Reads only --pk-* tokens. */
+
+.pk-shelves-intro {
+  max-width: 60ch;
+  margin-bottom: var(--pk-space-5);
+  font: 400 var(--pk-text-md) / var(--pk-leading-body) var(--pk-font-ui);
+  color: var(--pk-ink-2);
+}
+
+.pk-shelfgrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: var(--pk-space-5);
+}
+
+.pk-shelfcard {
+  --shelf-accent: var(--pk-accent);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--pk-surface);
+  border: 1px solid var(--pk-line);
+  border-top: 4px solid var(--shelf-accent);
+  border-radius: var(--pk-radius-lg);
+  box-shadow: var(--pk-shadow-1);
+  color: var(--pk-ink);
+  text-decoration: none;
+  transition: transform var(--pk-duration-2) var(--pk-ease), box-shadow var(--pk-duration-2) var(--pk-ease);
+}
+.pk-shelfcard:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--pk-shadow-2);
+}
+.pk-shelfcard:focus-visible {
+  outline: 3px solid var(--pk-focus);
+  outline-offset: 2px;
+}
+
+/* The books standing on the shelf. */
+.pk-shelfcard__scene {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 138px;
+  padding: var(--pk-space-4) var(--pk-space-4) 0;
+  overflow: hidden;
+}
+.pk-shelfcard .pk-spine {
+  pointer-events: none;
+  border-top-width: 5px;
+}
+.pk-shelfcard .pk-spine__title {
+  font-size: 0.6rem;
+  margin: var(--pk-space-2) 0;
+}
+.pk-shelfcard:hover .pk-spine,
+.pk-shelfcard:focus-visible .pk-spine {
+  transform: translateY(-8px);
+}
+.pk-shelfcard .pk-spine:nth-child(2n) {
+  transition-delay: 30ms;
+}
+.pk-shelfcard .pk-spine:nth-child(3n) {
+  transition-delay: 60ms;
+}
+
+/* The wooden plank under them. */
+.pk-shelfcard__plank {
+  height: 12px;
+  background: linear-gradient(to bottom, #a4713f, #8a5a2b 35%, #5e3b1a 80%, #3f2710);
+}
+.pk-shelfcard__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--pk-space-3) var(--pk-space-4) var(--pk-space-4);
+}
+.pk-shelfcard__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 600 var(--pk-text-lg) / var(--pk-leading-tight) var(--pk-font-display);
+}
+.pk-shelfcard__count {
+  font: 500 var(--pk-text-sm) var(--pk-font-ui);
+  color: var(--pk-ink-3);
+}
+
+/* Back link above the title on a shelf's page. */
+.pk-backlink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pk-space-1);
+  margin-bottom: var(--pk-space-2);
+  color: var(--pk-ink-3);
+  text-decoration: none;
+  font: 600 var(--pk-text-sm) var(--pk-font-ui);
+}
+.pk-backlink:hover {
+  color: var(--pk-accent);
+}
+.pk-backlink:focus-visible {
+  outline: 3px solid var(--pk-focus);
+  outline-offset: 2px;
+  border-radius: var(--pk-radius-sm);
+}
+
+.pk-shelf-menu {
+  border: 1px solid var(--pk-line-strong);
+  background: var(--pk-surface-raised);
+}

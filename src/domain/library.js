@@ -18,6 +18,8 @@ export const SORT_OPTIONS = [
 
 const SHELF_PREFIX = "shelf:";
 export const shelfRoute = (name) => `${SHELF_PREFIX}${name}`;
+/** URL path of a shelf, e.g. "/shelf%3ASummer%20Reads". */
+export const shelfPath = (name) => `/${encodeURIComponent(shelfRoute(name))}`;
 export const shelfFromRoute = (route) => (route.startsWith(SHELF_PREFIX) ? route.slice(SHELF_PREFIX.length) : null);
 
 /**
