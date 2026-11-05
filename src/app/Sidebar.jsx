@@ -72,7 +72,7 @@ function Sidebar({ route, stats, onNavigate }) {
         <div className="brand-mark-img-wrap" aria-hidden="true">
           <img src="/stack-of-books.png" alt="" className="brand-logo-img" />
         </div>
-        <h1>Pusthaka</h1>
+        <h1>Pustaka</h1>
       </div>
 
       <NavSection label="Collection" ariaLabel="Shelf navigation">

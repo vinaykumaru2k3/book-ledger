@@ -1,4 +1,4 @@
-# 📚 Pustaka (Pusthaka) — Book Ledger
+# 📚 Pustaka — Book Ledger
 
 A private, fast reading tracker. Search for a book, put it on a shelf, track your progress page by page, and
 see your reading life as stats and as a constellation. Your library syncs across devices through your own

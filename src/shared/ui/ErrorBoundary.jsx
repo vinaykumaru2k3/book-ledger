@@ -22,7 +22,7 @@ export default class ErrorBoundary extends React.Component {
         <h1 style={{ fontFamily: "'Playfair Display', serif" }}>Something went wrong</h1>
         <p>Your books are safe. Reloading the page usually fixes this.</p>
         <button className="button primary" type="button" onClick={() => window.location.assign("/")}>
-          Reload Pusthaka
+          Reload Pustaka
         </button>
       </div>
     );

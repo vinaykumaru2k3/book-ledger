@@ -141,7 +141,7 @@ function AuthArt() {
           </g>
         </svg>
       </div>
-      <h1 className="auth-book-title">Pusthaka</h1>
+      <h1 className="auth-book-title">Pustaka</h1>
       <div className="auth-book-divider" />
       <p className="auth-book-tagline">A private, real-time synced journal for cataloging your reading journey.</p>
       <div className="auth-book-footer">

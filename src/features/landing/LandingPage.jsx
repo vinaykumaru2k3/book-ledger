@@ -36,8 +36,8 @@ function LandingPage({ onEnter }) {
       {/* ── Navigation ── */}
       <header className="landing-nav">
         <div className="landing-nav-brand">
-          <img src="/stack-of-books.png" alt="Pusthaka logo" className="landing-brand-logo-img" />
-          <span className="landing-brand-name">Pusthaka</span>
+          <img src="/stack-of-books.png" alt="Pustaka logo" className="landing-brand-logo-img" />
+          <span className="landing-brand-name">Pustaka</span>
         </div>
         <div className="landing-nav-actions">
           <button className="landing-signin-button" onClick={onEnter} type="button">
@@ -51,14 +51,14 @@ function LandingPage({ onEnter }) {
         <section className="landing-hero">
           <div className="landing-hero-text">
             <div className="landing-kicker">
-              <span>Pusthaka Library</span>
+              <span>Pustaka Library</span>
             </div>
             <h1 className="landing-hero-title">
               Your personal library,<br />
               <span className="serif-italic">thoughtfully cataloged.</span>
             </h1>
             <p className="landing-hero-sub">
-              Pusthaka is a quiet harbor for your books, reading progress, and thoughts. No feeds, no noise, no pressure. Just a digital shelf that belongs to you.
+              Pustaka is a quiet harbor for your books, reading progress, and thoughts. No feeds, no noise, no pressure. Just a digital shelf that belongs to you.
             </p>
             <div className="landing-hero-actions">
               <button className="landing-cta-btn" onClick={onEnter} type="button">
@@ -243,7 +243,7 @@ function LandingPage({ onEnter }) {
       </main>
 
       <footer className="landing-footer">
-        <p>&copy; {new Date().getFullYear()} Pusthaka. Between the first page and the last.</p>
+        <p>&copy; {new Date().getFullYear()} Pustaka. Between the first page and the last.</p>
       </footer>
     </div>
   );

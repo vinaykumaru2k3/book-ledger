@@ -1,6 +1,6 @@
 # Architecture
 
-Pustaka (shipped as "Pusthaka") is a single-page React app. There is no custom backend: the browser talks
+Pustaka is a single-page React app. There is no custom backend: the browser talks
 directly to Firebase (Auth + Firestore) and to two public book catalogues (Google Books, Open Library).
 Security is enforced by `firestore.rules`, not by the client.
 
