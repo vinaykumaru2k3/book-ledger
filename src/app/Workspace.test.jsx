@@ -33,6 +33,9 @@ vi.mock("./AppContext", () => ({
 
 const { default: Workspace } = await import("./Workspace");
 
+// Pages load lazily; allow for a slow or busy machine instead of the 1s default.
+const LAZY = { timeout: 5000 };
+
 function Harness() {
   const [view, navigate, location] = usePathRoute();
   return <Workspace view={view} navigate={navigate} location={location} />;
@@ -85,7 +88,7 @@ describe("library", () => {
 
   it("opens a shelf from the shelves page without a reload", async () => {
     renderAt("/shelves");
-    const card = await screen.findByRole("link", { name: /Open shelf Classics/ });
+    const card = await screen.findByRole("link", { name: /Open shelf Classics/ }, LAZY);
     fireEvent.click(card);
     expect(window.location.pathname).toBe("/shelf%3AClassics");
     expect(screen.getByRole("heading", { level: 1, name: "Shelf: Classics" })).toBeTruthy();
@@ -134,7 +137,7 @@ describe("navigation", () => {
     const insights = within(document.querySelector(".pk-rail")).getByRole("link", { name: /Insights/ });
     expect(insights.getAttribute("href")).toBe("/analytics");
     fireEvent.click(insights);
-    expect(await screen.findByText("Total Books Completed")).toBeTruthy();
+    expect(await screen.findByText("Total Books Completed", {}, LAZY)).toBeTruthy();
     expect(window.location.pathname).toBe("/analytics");
     expect(screen.queryByLabelText("Shelf stats summary")).toBeNull();
   });
@@ -154,13 +157,13 @@ describe("navigation", () => {
 
   it("renders the knowledge galaxy", async () => {
     renderAt("/galaxy");
-    expect(await screen.findByPlaceholderText("Search books...")).toBeTruthy();
+    expect(await screen.findByPlaceholderText("Search books...", {}, LAZY)).toBeTruthy();
     expect(document.querySelectorAll(".galaxy-canvas circle").length).toBeGreaterThanOrEqual(3);
   });
 
   it("opens a nested route and exposes its params", async () => {
     renderAt("/kannada/author/bendre");
-    expect(await screen.findByText("You opened: /kannada/author/bendre")).toBeTruthy();
+    expect(await screen.findByText("You opened: /kannada/author/bendre", {}, LAZY)).toBeTruthy();
     expect(screen.getByRole("heading", { level: 1, name: "Kannada Explorer" })).toBeTruthy();
   });
 

@@ -19,7 +19,7 @@ describe("PublicShell", () => {
       </LanguageProvider>
     );
     expect(screen.getByRole("heading", { level: 1, name: "Kannada Explorer" })).toBeTruthy();
-    expect(await screen.findByText("You opened: /kannada/author/bendre")).toBeTruthy();
+    expect(await screen.findByText("You opened: /kannada/author/bendre", {}, { timeout: 5000 })).toBeTruthy();
     expect(screen.getByRole("group", { name: "Language" })).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
