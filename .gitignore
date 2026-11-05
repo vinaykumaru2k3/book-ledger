@@ -5,3 +5,9 @@ dist
 .env.local
 .DS_Store
 *.log
+
+# Firebase emulator logs
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+firebase-export-*/

@@ -8,7 +8,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "emulators": "npx firebase-tools@13 emulators:start --only auth,firestore --project book-ledger-2a2e4",
+    "seed": "node scripts/seed-emulator.mjs",
+    "dev:emulated": "vite --mode emulated"
   },
   "dependencies": {
     "firebase": "^12.16.0",
