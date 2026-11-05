@@ -53,9 +53,10 @@ installs, runs the tests, builds and publishes to Firebase Hosting. Pull request
 (`.github/workflows/ci.yml`) without deploying.
 
 One-time setup: add a repository secret named `FIREBASE_SERVICE_ACCOUNT` (a Firebase service-account JSON key
-with the *Firebase Hosting Admin* role; `firebase init hosting:github` creates it for you).
-Deploy `firestore.rules` separately with `firebase deploy --only firestore:rules`. To deploy by hand:
-`npm run build && firebase deploy --only hosting`.
+with the *Firebase Hosting Admin* role; `firebase init hosting:github` creates it for you). The same workflow
+also publishes `firestore.rules`, which needs the service account to have the *Firebase Rules Admin* role too.
+To deploy by hand:
+`npm run build && firebase deploy --only hosting,firestore:rules`.
 
 ## Project layout
 
