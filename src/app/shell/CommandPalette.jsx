@@ -57,7 +57,7 @@ function CommandPalette({ books, onRun, onClose }) {
   const optionId = (item) => `${listId}-${item.id}`;
 
   return (
-    <Dialog bare title={t("command.open")} onClose={onClose}>
+    <Dialog bare top title={t("command.open")} onClose={onClose}>
       <div className="pk-palette">
         <div className="pk-palette__search">
           <Search size={18} aria-hidden="true" />

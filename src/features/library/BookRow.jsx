@@ -15,7 +15,7 @@ function BookRow({ book }) {
 
   return (
     <article className="pk-row">
-      <button type="button" className="pk-row__open" onClick={() => openDetails(book)}>
+      <button type="button" className="pk-row__open" onClick={(event) => openDetails(book, event.currentTarget.querySelector(".pk-cover"))}>
         <BookCover book={book} size="sm" />
         <span className="pk-row__text">
           <span className="pk-row__title">{book.title}</span>
