@@ -49,6 +49,21 @@ describe("withCoverTransition", () => {
     expect(to.style.viewTransitionName).toBe(""); // cleaned up when the transition ends
   });
 
+  it("does not leave an unhandled rejection when the browser skips a transition", async () => {
+    const skipped = () => Promise.reject(new DOMException("Transition was skipped", "AbortError"));
+    document.startViewTransition = vi.fn((callback) => {
+      callback();
+      return { ready: skipped(), updateCallbackDone: skipped(), finished: skipped() };
+    });
+    window.matchMedia = () => ({ matches: false });
+    const unhandled = vi.fn();
+    process.on("unhandledRejection", unhandled);
+    withCoverTransition(() => {}, { from: document.createElement("div") });
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    process.off("unhandledRejection", unhandled);
+    expect(unhandled).not.toHaveBeenCalled();
+  });
+
   it("works without a source or destination (e.g. opened from a spine)", () => {
     document.startViewTransition = vi.fn((callback) => {
       callback();

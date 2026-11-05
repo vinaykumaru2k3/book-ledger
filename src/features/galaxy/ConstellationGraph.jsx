@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useBooks } from "../../app/AppContext";
-import { buildGraphData } from "./graph";
+import { buildGraphData, graphSignature } from "./graph";
 import { screenToWorld } from "./graphSimulation";
 import { useForceSimulation } from "./useForceSimulation";
 import GalaxyControls from "./GalaxyControls";
@@ -30,17 +30,23 @@ export default function ConstellationGraph() {
   // re-render (or restart effects) by itself.
   const pointer = useRef(IDLE);
 
-  const graphData = useMemo(() => {
+  const visibleBooks = useMemo(() => {
     const needle = query.trim().toLowerCase();
-    const visible = books.filter(
+    return books.filter(
       (b) =>
         (statusFilter === "all" || b.status === statusFilter) &&
         (!needle || b.title?.toLowerCase().includes(needle) || b.author?.toLowerCase().includes(needle))
     );
-    return buildGraphData(visible);
   }, [books, statusFilter, query]);
 
-  const { heat } = useForceSimulation(graphData, clusterBy, () =>
+  // Rebuild the graph only when something it draws changes. Any library change gives
+  // `books` a new identity (background enrichment, a favourite toggled elsewhere), and
+  // rebuilding would throw every star to a fresh random position.
+  const signature = useMemo(() => graphSignature(visibleBooks), [visibleBooks]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const graphData = useMemo(() => buildGraphData(visibleBooks), [signature]);
+
+  const { heat, wake } = useForceSimulation(graphData, clusterBy, () =>
     pointer.current.mode === "node" ? pointer.current.node : null
   );
 
@@ -101,6 +107,7 @@ export default function ConstellationGraph() {
       p.node.vx = 0;
       p.node.vy = 0;
       heat.current = 0.5;
+      wake();
     } else {
       const dx = (e.clientX - p.lastX) / (world.scale * camera.zoom);
       const dy = (e.clientY - p.lastY) / (world.scale * camera.zoom);
@@ -114,16 +121,20 @@ export default function ConstellationGraph() {
     pointer.current = { ...pointer.current, mode: "idle", node: null };
   };
 
-  const handleClick = () => {
+  // Click and double-click find the star under the pointer from the event itself. They must
+  // not rely on the hovered-star state: a tap on a touch screen (and a fast mouse click) sends
+  // its mouse-move and click back to back, before React has re-rendered with the new hover.
+  const handleClick = (event) => {
     if (pointer.current.moved) {
       pointer.current.moved = false;
       return;
     }
-    setSelectedId(hoveredId);
+    setSelectedId(nodeAt(worldFromEvent(event))?.id ?? null);
   };
 
-  const handleDoubleClick = () => {
-    if (hoveredNode) setCamera({ x: hoveredNode.x, y: hoveredNode.y, zoom: 1.5 });
+  const handleDoubleClick = (event) => {
+    const node = nodeAt(worldFromEvent(event));
+    if (node) setCamera({ x: node.x, y: node.y, zoom: 1.5 });
   };
 
   const connectionsOf = (node) =>

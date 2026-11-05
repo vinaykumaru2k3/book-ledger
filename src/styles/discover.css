@@ -84,9 +84,21 @@
 
 @media (max-width: 640px) {
   .rec-grid {
-    grid-template-columns: 1fr;
+    /* minmax(0, 1fr), not 1fr: a bare 1fr cannot shrink below its content, so a long
+     * title stretched the column wider than the screen and cut the card off. */
+    grid-template-columns: minmax(0, 1fr);
     gap: 12px;
   }
+}
+
+/* Cards may shrink inside their grid cell (long titles wrap instead of widening the card). */
+.rec-grid > *,
+.rec-card .book-main,
+.rec-card .book-heading {
+  min-width: 0;
+}
+.rec-card .book-title {
+  overflow-wrap: anywhere;
 }
 
 /* Specific styling modifications for rec cards */

@@ -12,7 +12,8 @@
  *  - links act as springs (heavier links want to be closer)
  *
  * `alpha` is the "temperature": 1 moves nodes freely, values near 0 settle
- * them. `pinnedId` is a node being dragged, which the simulation must not move.
+ * them. *Every* force is scaled by it, so as it falls to zero the layout comes
+ * to rest instead of drifting forever. `pinnedId` is a node being dragged, which the simulation must not move.
  * Returns the total speed of all nodes, so callers can stop once it is ~0.
  */
 export function stepSimulation(nodes, links, { alpha = 1, clusterBy = "none", pinnedId = null } = {}) {
@@ -47,14 +48,14 @@ export function stepSimulation(nodes, links, { alpha = 1, clusterBy = "none", pi
       node.vy += (dy / dist) * force;
     }
 
-    node.vx -= node.x * centerGravity;
-    node.vy -= node.y * centerGravity;
+    node.vx -= node.x * centerGravity * alpha;
+    node.vy -= node.y * centerGravity * alpha;
 
     if (clusterGravity) {
       const c = centroids.get(clusterKey(node));
       if (c.count > 1) {
-        node.vx += (c.x / c.count - node.x) * clusterGravity;
-        node.vy += (c.y / c.count - node.y) * clusterGravity;
+        node.vx += (c.x / c.count - node.x) * clusterGravity * alpha;
+        node.vy += (c.y / c.count - node.y) * clusterGravity * alpha;
       }
     }
   }

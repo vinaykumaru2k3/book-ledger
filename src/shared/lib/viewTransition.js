@@ -38,6 +38,12 @@ export function withCoverTransition(update, { from, to } = {}) {
     if (target) target.style.viewTransitionName = COVER_TRANSITION_NAME;
   });
 
+  // A skipped or interrupted transition rejects these promises. That is normal (a second
+  // click while one is running skips the first), so swallow it rather than log an error.
+  const ignore = () => {};
+  transition.ready?.catch(ignore);
+  transition.updateCallbackDone?.catch(ignore);
+
   const cleanup = () => {
     if (from) from.style.viewTransitionName = "";
     if (target) target.style.viewTransitionName = "";
