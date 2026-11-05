@@ -1,94 +1,79 @@
-# 📚 Book Ledger
+# 📚 Pustaka — Book Ledger
 
-A premium, minimalistic, and modern book tracking web application designed for bibliophiles. Built with **React**, **Vite**, and **Firebase / Firestore** for secure, real-time cloud data synchronization.
+A private, fast reading tracker. Search for a book, put it on a shelf, track your progress page by page, and
+see your reading life as stats and as a constellation. Your library syncs across devices through your own
+account.
 
-Featuring a beautiful **Obsidian Dark** aesthetic, elegant typography, smooth transitions, and advanced multilingual lookup capabilities powered by the Google Books API.
+Built with **React 19**, **Vite**, **Firebase Auth + Firestore**, and the **Google Books / Open Library** APIs.
 
----
+## Features
 
-## ✨ Features
+- **Smart add**: type a title and get suggestions; transliterated queries work too (search *"Karvalo"* and
+  find *ಕರ್ವಾಲೋ*). Filter by title, author or subject.
+- **Reading status that stays honest**: reaching the last page marks a book finished; progress and dates
+  always match the status.
+- **Custom shelves**, favourites, tags, notes and ratings.
+- **Insights & discovery**: stats, charts, recommendations from your own taste, and top charts.
+- **Knowledge Galaxy**: an interactive force-directed map linking books by shared author, shelf and tags.
+- **Grid and list layouts**, a warm light theme, deep-linkable views (`/reading`, `/galaxy`, …).
+- **Backup**: JSON export and a safe re-importable import (no duplicates, even if you import twice).
+- **Google or email sign-in**; each user can only ever read their own data.
 
-- **Minimalist Obsidian Dark Theme**: Designed with an ultra-clean, slate-and-emerald charcoal aesthetic, focus-centered inputs, and smooth transitions. No distracting animations.
-- **Auto-suggest Autocomplete Lookup**: Simply type in the search bar and watch book suggestions populate instantly.
-- **Multilingual & Phonetic Search**: Supports transliteration queries. For example, search for *"Karvalo"* or *"Chidambara Rahasya"* in English, and retrieve the accurate Kannada script book details (*ಕರ್ವಾಲೋ* or *ಚಿದಂಬರ ರಹಸ್ಯ*).
-- **Advanced Search Filters**: Refine search results by title, author, genre/subject, or general query.
-- **Structured Book Stats**: Track your reading metrics (total library count, active reads, page counts read, average shelf ratings, completion progress charts).
-- **Flexible Layouts**: Effortlessly switch between a detailed Grid view and a compact list-style Row view.
-- **Firebase/Firestore Integration**: Safe, instant storage keeping your shelf synchronized across devices.
-- **JSON Import/Export**: Backup or restore your entire library ledger with clean JSON files.
+## Quick start
 
----
+Requires [Node.js](https://nodejs.org) 18+.
 
-## 🛠️ Project Structure & Architecture
-
-The application was redesigned with a highly modular component structure to ensure maintainability:
-
-```text
-src/
-├── components/
-│   ├── constants.js         # Shared statuses, sort configurations, formatting helpers
-│   ├── Cover.jsx            # Book cover image container & spine fallback cards
-│   ├── Rating.jsx           # Clean interactive & read-only star reviews
-│   ├── MetricCard.jsx       # Dashboard statistics components
-│   ├── ReadingStack.jsx     # Side widgets showing active & completed books
-│   ├── EmptyState.jsx       # Fallback states for filtered shelves
-│   ├── BookCard.jsx         # Book listings with inline page-progress inputs
-│   ├── BookModal.jsx        # Book forms & Google Books autocomplete queries
-│   ├── AuthScreen.jsx       # Google & Email authentication panel
-│   ├── AccountCard.jsx      # Profile widgets with Sign out controls
-│   ├── LoadingScreen.jsx    # Full-page connection loaders
-│   ├── LoadingPanel.jsx     # Inline list spinners
-│   └── Toast.jsx            # Micro-notifications (success/error popups)
-├── firebase.js              # Initialized Firebase/Firestore SDK setup
-├── main.jsx                 # Vite application entry script
-├── App.jsx                  # Main state controller and layout orchestrator
-└── styles.css               # Clean Obsidian slate style system
-```
-
----
-
-## 🚀 Getting Started
-
-### 1. Prerequisites
-Ensure you have [Node.js](https://nodejs.org) (v18 or higher) installed.
-
-### 2. Installation
-Clone the repository and install the dependencies:
 ```bash
 npm install
-```
-
-### 3. Firebase Configuration
-Verify the credentials in `src/firebase.js` match your active Firebase App config. Ensure you have activated **Email/Password** and **Google Sign-In** under Firebase Authentication, and set up **Firestore Database** in test mode or with proper read/write rules:
-```javascript
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /users/{userId}/books/{bookId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-    }
-  }
-}
-```
-
-### 4. Development Server
-Start the local development server:
-```bash
 npm run dev
 ```
 
-### 5. Production Build
-Create an optimized production bundle:
-```bash
-npm run build
+The app works out of the box against the default hosted Firebase project. To use **your own** Firebase
+project (recommended if you deploy it yourself):
+
+1. Create a Firebase project, enable **Authentication** (Google and Email/Password) and **Firestore**.
+2. Copy `.env.example` to `.env.local` and fill in your web app config.
+3. Deploy the security rules in `firestore.rules` (`firebase deploy --only firestore:rules`).
+4. In Google Cloud Console, restrict the browser API key to your domains, and add your domain under
+   Authentication → Settings → Authorized domains.
+
+## Scripts
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Start the dev server |
+| `npm test` | Run the unit tests once (`npm run test:watch` to watch) |
+| `npm run build` | Production build into `dist/` |
+| `npm run preview` | Serve the production build locally |
+
+Deploy to Firebase Hosting with `npm run build` then `firebase deploy`.
+
+## Project layout
+
+```text
+src/
+├── main.jsx          Entry point
+├── app/              Shell: providers, sidebar, routing, page registry (views.js)
+├── features/         One folder per product area: library, shelves, discover, insights, galaxy, auth, landing
+├── shared/ui/        Reusable components: Button, Modal, Pagination, SearchField, Cover, ...
+├── services/         Firebase and book-catalogue (Google Books / Open Library) clients
+├── domain/           Pure rules about books and libraries (no React, no I/O)
+└── styles/           CSS split by area; index.css sets the order
+firestore.rules       Per-user access + document validation
+docs/ARCHITECTURE.md  How it all fits together (start here as a contributor)
 ```
 
----
+Dependencies point downwards only (`app → features → shared / services → domain`), and a test enforces it.
+Read **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** for the layer rules, the data model, the key flows and a
+step-by-step example of adding a new page.
 
-## 📖 Technologies Used
-- **Vite** — High-speed bundler & dev server
-- **React 19** — User interface components
-- **Firebase 12** — Real-time Firestore database & Authentication
-- **Lucide React** — Minimalist vector icons
-- **Google Books API** — Advanced multilingual book index queries
-- **Google Fonts** — Elegant typography (Outfit, Playfair Display)
+## Contributing
+
+1. Put rules in `domain/` (or a feature's `*Model.js`) with no React or Firebase, and cover them with a test next to the file.
+2. Keep Firestore access inside a feature's `use*Controller` hook; components use the context hooks.
+3. Build dialogs on `shared/ui/Modal` and buttons on `shared/ui/Button`; register new pages in `app/views.js`.
+4. Run `npm test && npm run build` before opening a PR.
+
+## Tech
+
+React 19 · Vite 6 · Firebase 12 · Lucide icons · Vitest · Google Books API · Open Library API.

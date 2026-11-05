@@ -1,0 +1,80 @@
+/* Shelf picker and shelves */
+/* Custom Shelves Styles in Modal */
+.shelves-input-container {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.shelves-input-container > span {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.shelves-checklist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 4px 0 8px 0;
+  border-bottom: 1px dashed var(--border-subtle);
+}
+
+.shelf-pill-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background-color: var(--bg-ghost);
+  border: 1px solid var(--border-subtle);
+  border-radius: 99px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  user-select: none;
+}
+
+.shelf-pill-label input[type="checkbox"] {
+  display: none;
+}
+
+.shelf-pill-label:hover {
+  border-color: var(--border-hover);
+  background-color: var(--bg-ghost-hover);
+  color: var(--text-primary);
+}
+
+.shelf-pill-label.active {
+  background-color: rgba(217, 119, 6, 0.08); /* Gold transparent tint */
+  border-color: var(--accent-emerald);
+  color: var(--accent-emerald);
+}
+
+.add-shelf-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.add-shelf-row input {
+  flex: 1;
+  height: 34px;
+  font-size: 0.8rem;
+  padding: 0 12px;
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+}
+
+.add-shelf-row input:focus {
+  outline: none;
+  border-color: var(--accent-emerald);
+}
+
+.add-shelf-row button {
+  height: 34px;
+}

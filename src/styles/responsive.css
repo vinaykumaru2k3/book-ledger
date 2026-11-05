@@ -1,0 +1,121 @@
+/* Cross-cutting responsive overrides */
+/* Responsiveness overrides */
+@media (max-width: 1024px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+  
+  .sidebar {
+    height: auto;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 24px;
+  }
+  
+  .status-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  
+  .nav-item {
+    width: auto;
+    padding: 8px 12px;
+  }
+  
+  .nav-item-badge {
+    margin-left: 4px;
+  }
+  
+  .sidebar-actions {
+    margin-top: 12px;
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .account-card {
+    flex: 1;
+  }
+  
+  .sidebar-actions .button {
+    width: auto;
+  }
+  
+  .split-actions {
+    grid-template-columns: auto auto;
+  }
+  
+  .content-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .auth-panel {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  
+  .auth-art {
+    display: none;
+  }
+  
+  .workspace {
+    padding: 24px;
+  }
+  
+  .toolbar {
+    grid-template-columns: 1fr;
+  }
+  
+  .book-form {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-cover-preview {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .topbar-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .segmented {
+    overflow-x: auto;
+  }
+  
+  .modal {
+    max-height: 100vh;
+    border-radius: 0;
+  }
+  
+  .modal-backdrop {
+    padding: 0;
+  }
+  
+  .lookup-controls {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

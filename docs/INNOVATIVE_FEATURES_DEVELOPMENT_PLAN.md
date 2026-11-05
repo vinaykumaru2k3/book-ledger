@@ -1,4 +1,4 @@
-# 🚀 Development Plan: Innovative Features for Pusthaka Reading Ledger
+# 🚀 Development Plan: Innovative Features for Pustaka Reading Ledger
 
 This document serves as the master implementation blueprint for developing **Feature 2 (3D Interactive Knowledge Galaxy)** and **Feature 4 (Historical Reading Time Machine)**.
 

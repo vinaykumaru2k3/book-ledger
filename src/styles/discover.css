@@ -1,0 +1,369 @@
+/* Recommendations and top charts */
+/* Recommendations Panel Styles */
+.recommendations-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+.rec-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.rec-info-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.rec-info-banner svg {
+  color: var(--accent-emerald);
+  flex-shrink: 0;
+}
+
+.rec-refresh-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rec-loading-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 80px 20px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.rec-loading-panel svg {
+  color: var(--accent-emerald);
+}
+
+.rec-error-panel, .rec-empty-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 80px 20px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+/* Responsive 3-column grid for recommendations */
+.rec-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 1100px) {
+  .rec-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .rec-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* Specific styling modifications for rec cards */
+.rec-card .book-main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.rec-reason-badge {
+  align-self: flex-start;
+  padding: 4px 8px;
+  background-color: rgba(180, 83, 9, 0.06); /* amber tint */
+  border: 1px solid rgba(217, 119, 6, 0.15);
+  border-radius: var(--radius-sm);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--accent-emerald); /* gold/amber */
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 12px;
+  border-color: rgba(180, 83, 9, 0.12);
+}
+
+.inspiring-title {
+  color: var(--text-muted);
+  font-size: 0.62rem;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
+  margin-top: 1px;
+}
+
+.rec-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  width: 100%;
+}
+
+.rec-actions button {
+  flex: 1;
+}
+
+/* === REFINED REC CARD & TOP CHART CARD === */
+.rec-card,
+.top-chart-card {
+  border-radius: 10px !important;
+  border: 1px solid var(--border-subtle) !important;
+  background-color: var(--bg-card) !important;
+  padding: 20px 16px 18px !important;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+  transition:
+    transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.35s ease,
+    border-color 0.3s ease,
+    background-color 0.3s ease;
+  border-left: 4px solid transparent !important;
+}
+.rec-card:hover,
+.top-chart-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-emerald) !important;
+  background-color: var(--bg-card-hover) !important;
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.2),
+    0 4px 12px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(217, 119, 6, 0.12) inset;
+  z-index: 3;
+}
+
+.rec-card:hover,
+.top-chart-card:hover {
+  box-shadow:
+    0 16px 40px rgba(62, 54, 46, 0.1),
+    0 4px 12px rgba(62, 54, 46, 0.06),
+    0 0 0 1px rgba(180, 83, 9, 0.1) inset;
+}
+
+.rec-card .book-main,
+.top-chart-card .book-main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 10px;
+}
+
+/* Rank badge refinement */
+.chart-rank-badge {
+  background: linear-gradient(135deg, var(--accent-emerald), var(--accent-amber)) !important;
+  box-shadow:
+    0 3px 10px rgba(217, 119, 6, 0.35),
+    0 0 0 2px var(--bg-card) !important;
+  border-radius: 8px !important;
+  padding: 4px 10px !important;
+  font-size: 0.6rem !important;
+  top: 10px !important;
+  left: 10px !important;
+}
+.chart-rank-badge .trophy {
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+}
+
+/* Reason badge refinement */
+.rec-reason-badge {
+  align-self: flex-start;
+  padding: 4px 10px;
+  background: linear-gradient(90deg, rgba(180, 83, 9, 0.08), rgba(217, 119, 6, 0.06));
+  border: 1px solid rgba(217, 119, 6, 0.18);
+  border-radius: 8px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--accent-emerald);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 10px;
+  backdrop-filter: blur(4px);
+  border-color: rgba(180, 83, 9, 0.15);
+}
+
+.inspiring-title {
+  color: var(--text-muted);
+  font-size: 0.58rem;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: normal;
+  margin-top: 1px;
+  font-style: italic;
+}
+
+.rec-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+  width: 100%;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border-subtle);
+}
+
+.rec-actions button {
+  flex: 1;
+  height: 34px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.15s ease,
+    box-shadow 0.18s ease;
+}
+
+.rec-actions .button.primary {
+  background: linear-gradient(135deg, var(--accent-emerald), var(--accent-amber));
+  border: none;
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
+}
+.rec-actions .button.primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.4);
+}
+
+.rec-actions .button.ghost {
+  background-color: var(--bg-ghost);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+.rec-actions .button.ghost:hover {
+  background-color: var(--bg-ghost-hover);
+  border-color: var(--accent-emerald);
+  color: var(--accent-emerald);
+}
+
+/* Sidebar Divider */
+.sidebar-divider {
+  height: 1px;
+  background-color: var(--border-subtle);
+  margin: 12px 24px;
+  opacity: 0.5;
+}
+
+/* Top Charts / Discover Tab Styles */
+.top-charts-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.genre-selection-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: linear-gradient(180deg, var(--bg-ghost), transparent);
+  padding: 8px 12px 20px;
+  border-radius: 12px;
+  margin-left: -12px;
+  margin-right: -12px;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.genre-select-tab {
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 8px 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  position: relative;
+  transition:
+    color 0.18s ease,
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.15s ease;
+  border-radius: 99px;
+  margin-bottom: 0;
+}
+
+.genre-select-tab:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-ghost-hover);
+  border-color: var(--border-hover);
+  transform: translateY(-1px);
+}
+
+.genre-select-tab.active {
+  color: #ffffff;
+  background-color: var(--accent-emerald);
+  border-color: var(--accent-emerald);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.28);
+}
+
+.genre-select-tab.active::after {
+  display: none;
+}
+
+.top-chart-card {
+  position: relative;
+}
+
+.chart-rank-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: linear-gradient(135deg, var(--accent-emerald), var(--accent-amber));
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 5;
+  box-shadow:
+    0 3px 10px rgba(217, 119, 6, 0.35),
+    0 0 0 2px var(--bg-card);
+}
+
+/* Success status button styling for TopCharts */
+.button.success {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--accent-emerald);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  cursor: default;
+}
