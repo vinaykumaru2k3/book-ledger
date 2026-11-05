@@ -3,7 +3,11 @@ import Field from "../../../shared/pk/Field";
 import { useLanguage } from "../../../shared/i18n/LanguageContext";
 import { useBooks } from "../../../app/AppContext";
 
-/** Personal notes, saved when you click away. A polite "Saved" confirms it. */
+/**
+ * Personal notes, saved when you click away, and also when the dialog closes
+ * without a click (Escape), so typed notes are never lost. A polite "Saved"
+ * confirms an ordinary save.
+ */
 function NotesEditor({ book }) {
   const { t } = useLanguage();
   const { updateBook } = useBooks();
@@ -11,8 +15,19 @@ function NotesEditor({ book }) {
   const [saved, setSaved] = useState(false);
   const timer = useRef(null);
 
+  // The unmount cleanup needs the latest values, not the ones from the first render.
+  const latest = useRef({});
+  latest.current = { draft, book, updateBook };
+
   useEffect(() => setDraft(book.notes || ""), [book.notes]);
-  useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(
+    () => () => {
+      clearTimeout(timer.current);
+      const { draft: text, book: current, updateBook: save } = latest.current;
+      if (text !== (current.notes || "")) save(current.id, { notes: text });
+    },
+    []
+  );
 
   const save = async () => {
     if (draft === (book.notes || "")) return;

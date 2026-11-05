@@ -19,6 +19,7 @@ vi.mock("../../services/bookApi", () => ({
 }));
 
 const state = { books: [], detailsBook: null };
+let books0 = [];
 const updateBook = vi.fn();
 const quickAdd = vi.fn();
 const closeDetails = vi.fn();
@@ -178,6 +179,41 @@ describe("a book in your library", () => {
   });
 });
 
+describe("input is never lost or misleading", () => {
+  it("saves notes that were typed when the dialog closes without clicking away (Escape)", () => {
+    const view = renderModal();
+    fireEvent.change(screen.getByLabelText("Personal notes"), { target: { value: "Typed, then pressed Escape." } });
+    expect(updateBook).not.toHaveBeenCalled();
+    view.unmount(); // closing the dialog removes it, with no blur event
+    expect(updateBook).toHaveBeenCalledWith("h1", { notes: "Typed, then pressed Escape." });
+  });
+
+  it("does not re-save notes that were not changed", () => {
+    const view = renderModal();
+    view.unmount();
+    expect(updateBook).not.toHaveBeenCalled();
+  });
+
+  it("saves a page number that was typed when the dialog closes", () => {
+    const view = renderModal();
+    fireEvent.change(screen.getByLabelText("Current page"), { target: { value: "210" } });
+    view.unmount();
+    expect(updateBook).toHaveBeenCalledWith("h1", { currentPage: 210 });
+  });
+
+  it("shows the stored value again after saving, never a number that was not stored", async () => {
+    updateBook.mockResolvedValue(undefined); // the store keeps 90, as when the rules adjust the value
+    renderModal();
+    const page = screen.getByLabelText("Current page");
+    fireEvent.change(page, { target: { value: "150" } });
+    expect(page.value).toBe("150"); // while typing, the draft is shown
+    await act(async () => {
+      fireEvent.blur(page);
+    });
+    expect(screen.getByLabelText("Current page").value).toBe("90");
+  });
+});
+
 describe("closing", () => {
   it("closes with the button and with Escape", () => {
     renderModal();
@@ -209,6 +245,24 @@ describe("a book that is not in your library (e.g. from Discover)", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Add to my library" }));
     expect(quickAdd).toHaveBeenCalledWith(expect.objectContaining({ title: "Fresh Find", author: "Someone" }));
+  });
+
+  it("switches to the editing controls once the book has been added (found by its source)", () => {
+    state.detailsBook = normalizeBook({ id: "/works/OL9W", title: "Fresh Find", author: "Someone", sourceKey: "/works/OL9W" });
+    const view = renderModal();
+    expect(screen.getByRole("button", { name: "Add to my library" })).toBeTruthy();
+
+    // The library now holds a copy with its own id but the same source.
+    state.books = [...books0, normalizeBook({ id: "new-1", title: "Fresh Find", author: "Someone", sourceKey: "/works/OL9W", status: "reading", pages: 100, currentPage: 10 })];
+    view.rerender(
+      <LanguageProvider>
+        <BookDetailsModal />
+      </LanguageProvider>
+    );
+    expect(screen.queryByRole("button", { name: "Add to my library" })).toBeNull();
+    expect(screen.getByLabelText("Current page").value).toBe("10");
+    fireEvent.change(screen.getByLabelText("Status"), { target: { value: "done" } });
+    expect(updateBook).toHaveBeenCalledWith("new-1", { status: "done" }); // edits go to the library copy
   });
 
   it("loads the synopsis for Open Library works that have none", async () => {

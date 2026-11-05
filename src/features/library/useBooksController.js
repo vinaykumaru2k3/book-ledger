@@ -18,12 +18,15 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { db } from "../../services/firebase";
-import { normalizeBook, createBookFromForm, parseLedger, findNewBooks } from "../../domain/book";
+import { changedFields, contentKey, createBookFromForm, findNewBooks, normalizeBook, parseLedger } from "../../domain/book";
+import { findDuplicate } from "../../domain/library";
+import { awaitAck } from "../../shared/lib/awaitAck";
 import { buildUpdates, lookupDetails, needsEnrichment } from "../../services/enrichment";
 
 const BATCH_LIMIT = 400; // Firestore allows 500 operations per batch
 const MAX_IMPORT_BOOKS = 5000;
 const ENRICH_DELAY_MS = 800; // gentle on the public APIs
+const OFFLINE_NOTE = "Saved on this device. It will sync when you are back online.";
 
 export function useBooksController(user, notify) {
   const [books, setBooks] = useState([]);
@@ -36,6 +39,7 @@ export function useBooksController(user, notify) {
   const userIdRef = useRef(null);
   const attemptedRef = useRef(new Set()); // book ids already looked up this session
   const enrichingRef = useRef(false);
+  const addingRef = useRef(new Set()); // content keys of quick-adds still in flight
 
   booksRef.current = books;
   userIdRef.current = user?.uid ?? null;
@@ -47,21 +51,43 @@ export function useBooksController(user, notify) {
 
   /* ---------------------------- CRUD ---------------------------- */
 
+  /**
+   * Runs one Firestore write and reports the outcome. Resolves true when the
+   * write is confirmed *or* safely queued while offline (it never hangs), and
+   * false when it was rejected, in which case the error is shown.
+   */
+  async function commit(write, { message, failure, failureToast = "Sync failed." }) {
+    const reportFailure = () => {
+      setSaveError(failure);
+      notify(failureToast, "error");
+    };
+    try {
+      const result = await awaitAck(write, (lateError) => {
+        console.error(lateError);
+        reportFailure();
+      });
+      setSaveError("");
+      if (result === "queued") notify(OFFLINE_NOTE);
+      else if (message) notify(message);
+      return true;
+    } catch (err) {
+      console.error(err);
+      reportFailure();
+      return false;
+    }
+  }
+
+  /** Saves a whole book (a new one, or a full edit). Resolves true on success. */
   async function saveBook(book, message) {
     if (!user) {
       notify("Sign in to save books.", "error");
-      return;
+      return false;
     }
     const nextBook = normalizeBook(book);
-    try {
-      await setDoc(bookDoc(nextBook.id), nextBook, { merge: true });
-      setSaveError("");
-      if (message) notify(message);
-    } catch (err) {
-      console.error(err);
-      setSaveError("Failed to sync records with the database.");
-      notify("Sync failed.", "error");
-    }
+    return commit(setDoc(bookDoc(nextBook.id), nextBook, { merge: true }), {
+      message,
+      failure: "Failed to sync records with the database.",
+    });
   }
 
   /** Writes many books in batches of BATCH_LIMIT. Returns true if all succeeded. */
@@ -90,22 +116,26 @@ export function useBooksController(user, notify) {
   }
 
   async function deleteBook(book) {
-    try {
-      await deleteDoc(bookDoc(book.id));
-      setSaveError("");
-      notify("Book removed from shelf.");
-    } catch (err) {
-      console.error(err);
-      setSaveError("Failed to delete the book from cloud storage.");
-      notify("Failed to delete book.", "error");
-    }
+    return commit(deleteDoc(bookDoc(book.id)), {
+      message: "Book removed from shelf.",
+      failure: "Failed to delete the book from cloud storage.",
+      failureToast: "Failed to delete book.",
+    });
   }
 
+  /**
+   * Changes some fields of a stored book. Only the fields that actually change
+   * are written, so two quick edits to different fields (say pages and notes
+   * saved together when a dialog closes) cannot overwrite each other.
+   */
   async function updateBook(id, updates) {
     const existing = booksRef.current.find((book) => book.id === id);
-    if (!existing) return;
-    // normalizeBook (via reconcileBookStatus) keeps status and progress consistent.
-    await saveBook(normalizeBook({ ...existing, ...updates }, { stamp: true }));
+    if (!existing) return false;
+    // normalizeBook (via reconcileBookStatus) keeps status and progress consistent
+    // and honours an explicit status choice because it knows the previous copy.
+    const next = normalizeBook({ ...existing, ...updates }, { stamp: true, previous: existing });
+    const diff = changedFields(existing, next);
+    return commit(setDoc(bookDoc(id), diff, { merge: true }), { failure: "Failed to sync records with the database." });
   }
 
   /** Applies per-book field changes ({ id, updates }[]) in one batched write. */
@@ -113,23 +143,37 @@ export function useBooksController(user, notify) {
     const next = changes
       .map(({ id, updates }) => {
         const existing = booksRef.current.find((book) => book.id === id);
-        return existing ? normalizeBook({ ...existing, ...updates }, { stamp: true }) : null;
+        return existing ? normalizeBook({ ...existing, ...updates }, { stamp: true, previous: existing }) : null;
       })
       .filter(Boolean);
     return saveManyBooks(next, message);
   }
 
+  /**
+   * Adds a catalogue book to the library. A book already in the library (same
+   * source, or same title and author) is not added again, and neither is one
+   * whose add is still in flight, so a double click cannot create two copies.
+   */
   async function quickAdd(volumeForm) {
-    await saveBook(createBookFromForm(volumeForm), "Added to library.");
+    const incoming = createBookFromForm(volumeForm);
+    const key = contentKey(incoming);
+    if (addingRef.current.has(key) || findDuplicate(booksRef.current, incoming)) {
+      notify("That book is already in your library.");
+      return false;
+    }
+    addingRef.current.add(key);
+    try {
+      return await saveBook(incoming, "Added to library.");
+    } finally {
+      addingRef.current.delete(key);
+    }
   }
 
+  /** Saves the add/edit form. Resolves true when the book was saved. */
   async function submitBook(editingId, form) {
-    if (!form.title.trim()) return;
+    if (!form.title.trim()) return false;
     const existing = editingId ? booksRef.current.find((book) => book.id === editingId) : null;
-    await saveBook(
-      createBookFromForm(form, existing),
-      editingId ? "Book details updated." : "Book added to shelf."
-    );
+    return saveBook(createBookFromForm(form, existing), editingId ? "Book details updated." : "Book added to shelf.");
   }
 
   /* ----------------------- Firestore listener ----------------------- */
@@ -204,7 +248,8 @@ export function useBooksController(user, notify) {
     anchor.href = url;
     anchor.download = `book-ledger-${new Date().toISOString().slice(0, 10)}.json`;
     anchor.click();
-    URL.revokeObjectURL(url);
+    // Revoking at once can cancel the download in some browsers; give it a moment.
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
     notify("Ledger backup exported.");
   }
 

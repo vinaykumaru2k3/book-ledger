@@ -106,3 +106,13 @@ export function buildGraphData(books = []) {
 
   return { nodes, links, nodeMap };
 }
+
+/**
+ * A string that changes exactly when the drawn graph would change: used to avoid
+ * rebuilding (and re-randomising) the layout for unrelated library updates.
+ */
+export function graphSignature(books) {
+  return JSON.stringify(
+    books.map((b) => [b.id, b.title, b.author, b.status, b.rating, b.coverUrl, b.favorite, b.pages, b.currentPage, b.genres, b.tags, b.shelves])
+  );
+}

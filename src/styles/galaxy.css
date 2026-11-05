@@ -314,3 +314,24 @@
   font-size: 0.7rem;
   color: #71717a;
 }
+
+/* Phones: the toolbar and filters wrap instead of pushing the controls off-screen. */
+.galaxy-toolbar {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.galaxy-filters {
+  flex-wrap: wrap;
+}
+@media (max-width: 560px) {
+  .galaxy-search {
+    flex: 1 1 100%;
+  }
+  .galaxy-search input {
+    width: 100%;
+  }
+  .galaxy-controls {
+    flex: 1 1 100%;
+    justify-content: space-between;
+  }
+}

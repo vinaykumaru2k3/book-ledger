@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Edit3, Heart } from "lucide-react";
 import Button from "../../../shared/pk/Button";
 import Field from "../../../shared/pk/Field";
@@ -9,27 +9,65 @@ import { useLanguage } from "../../../shared/i18n/LanguageContext";
 import { useBooks } from "../../../app/AppContext";
 
 const toPage = (value) => Math.max(0, Number.parseInt(value, 10) || 0);
+const storedValue = (book, field) => (field === "pages" ? (book.pages ? String(book.pages) : "") : String(book.currentPage || 0));
 
 /**
  * Inline editing of a library book: status, pages read, rating and favourite.
  * Each change is saved straight away through `updateBook`, which also keeps
  * status and progress consistent (finishing the last page marks it finished).
+ *
+ * The page fields work from a *draft*: while you type, the field shows what you
+ * typed; once saved (on blur / Enter, or when the dialog closes) the draft is
+ * dropped and the field shows the book's real value again. So a field can never
+ * display a number that was not actually stored.
  */
 function BookControls({ book, onEditAll }) {
   const { t } = useLanguage();
   const { updateBook } = useBooks();
-  const [current, setCurrent] = useState(String(book.currentPage || 0));
-  const [total, setTotal] = useState(book.pages ? String(book.pages) : "");
+  const [drafts, setDrafts] = useState({});
 
-  // Follow changes made elsewhere (status promotion, edits in another dialog).
-  useEffect(() => setCurrent(String(book.currentPage || 0)), [book.currentPage]);
-  useEffect(() => setTotal(book.pages ? String(book.pages) : ""), [book.pages]);
+  // Lets the unmount cleanup below see the latest drafts and book.
+  const latest = useRef({});
+  latest.current = { drafts, book, updateBook };
 
-  const commit = (field, raw) => {
-    const next = toPage(raw);
-    if (next !== (book[field] || 0)) updateBook(book.id, { [field]: next });
+  // Closing the dialog (Escape, the backdrop, "Edit all details") must not throw away a number you typed.
+  useEffect(
+    () => () => {
+      const { drafts: pending, book: current, updateBook: save } = latest.current;
+      Object.entries(pending).forEach(([field, raw]) => {
+        const next = toPage(raw);
+        if (next !== (current[field] || 0)) save(current.id, { [field]: next });
+      });
+    },
+    []
+  );
+
+  const shown = (field) => drafts[field] ?? storedValue(book, field);
+  const edit = (field) => (event) => setDrafts((d) => ({ ...d, [field]: event.target.value }));
+  const settle = (field) =>
+    setDrafts((d) => {
+      const { [field]: _done, ...rest } = d;
+      return rest;
+    });
+
+  const commit = async (field) => {
+    if (drafts[field] === undefined) return;
+    const next = toPage(drafts[field]);
+    if (next === (book[field] || 0)) {
+      settle(field);
+      return;
+    }
+    try {
+      await updateBook(book.id, { [field]: next });
+    } finally {
+      settle(field);
+    }
   };
-  const commitOnEnter = (field, raw) => (event) => event.key === "Enter" && (event.preventDefault(), commit(field, raw));
+  const commitOnEnter = (field) => (event) => {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    commit(field);
+  };
   const progress = progressFor(book);
 
   return (
@@ -47,20 +85,20 @@ function BookControls({ book, onEditAll }) {
           type="number"
           min="0"
           inputMode="numeric"
-          value={current}
-          onChange={(event) => setCurrent(event.target.value)}
-          onBlur={() => commit("currentPage", current)}
-          onKeyDown={commitOnEnter("currentPage", current)}
+          value={shown("currentPage")}
+          onChange={edit("currentPage")}
+          onBlur={() => commit("currentPage")}
+          onKeyDown={commitOnEnter("currentPage")}
         />
         <Field
           label={t("details.totalPages")}
           type="number"
           min="0"
           inputMode="numeric"
-          value={total}
-          onChange={(event) => setTotal(event.target.value)}
-          onBlur={() => commit("pages", total)}
-          onKeyDown={commitOnEnter("pages", total)}
+          value={shown("pages")}
+          onChange={edit("pages")}
+          onBlur={() => commit("pages")}
+          onKeyDown={commitOnEnter("pages")}
         />
       </div>
 
