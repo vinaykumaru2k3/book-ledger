@@ -106,7 +106,7 @@ No UI kit, no Tailwind, no router library for now (small route-param support add
 
 Size: S ≈ a few hours, M ≈ a day, L ≈ several days.
 
-### R0: Foundations (M)
+### R0: Foundations (M) — **built, in review**
 - **First, a safe dev environment:** Firebase Auth + Firestore **emulators** with a seeded test user (including sample
   Kannada books), `npm run emulators` / `npm run seed` / `npm run dev:emulated`. Dev-only, excluded from production builds,
   so every later phase can be clicked through signed in without touching real data.

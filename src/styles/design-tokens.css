@@ -1,0 +1,105 @@
+/*
+ * Design tokens for the "Reading Room" redesign.
+ *
+ * Every new component reads these `--pk-*` variables and nothing else, so the
+ * look of the app can be tuned here. The old `--bg-*` / `--text-*` tokens in
+ * tokens.css stay until the last legacy page is migrated (plan.md, phase R10).
+ */
+:root {
+  /* ---- Colour: linen, ink, oxblood, turmeric ------------------------- */
+  --pk-bg: #f6f0e4; /* page */
+  --pk-surface: #fbf7ee; /* cards, panels */
+  --pk-surface-raised: #ffffff; /* menus, dialogs */
+  --pk-surface-sunken: #efe7d6; /* inputs, wells */
+  --pk-ink: #1f1a17; /* primary text */
+  --pk-ink-2: #5b5148; /* secondary text */
+  --pk-ink-3: #7d7266; /* muted text (4.5:1 on --pk-bg) */
+  --pk-line: rgba(31, 26, 23, 0.12);
+  --pk-line-strong: rgba(31, 26, 23, 0.24);
+
+  --pk-accent: #8b1e2d; /* oxblood */
+  --pk-accent-hover: #6f1624;
+  --pk-accent-soft: #f3dde0;
+  --pk-on-accent: #ffffff;
+
+  --pk-gold: #b97a0f; /* turmeric */
+  --pk-gold-soft: #f6e8c6;
+
+  --pk-success: #2f6b4f;
+  --pk-success-soft: #dcebe3;
+  --pk-warning: #9a6a00;
+  --pk-warning-soft: #f7ecc9;
+  --pk-danger: #b3261e;
+  --pk-danger-soft: #f6d9d6;
+
+  --pk-focus: #1d4ed8; /* focus ring: distinct from the accent */
+
+  /* ---- Typography ------------------------------------------------------
+   * Kannada glyphs are not in the Latin fonts, so each stack falls back to a
+   * Noto Kannada face. The browser fetches those subsets only when Kannada
+   * text is actually on the page. */
+  --pk-font-display: "Fraunces", "Noto Serif Kannada", Georgia, "Times New Roman", serif;
+  --pk-font-ui: "Inter", "Noto Sans Kannada", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  --pk-text-xs: 0.75rem;
+  --pk-text-sm: 0.875rem;
+  --pk-text-md: 1rem;
+  --pk-text-lg: 1.125rem;
+  --pk-text-xl: 1.375rem;
+  --pk-text-2xl: 1.75rem;
+  --pk-text-3xl: 2.25rem;
+  --pk-text-4xl: 3rem;
+
+  --pk-leading-tight: 1.2;
+  --pk-leading-body: 1.55;
+
+  /* ---- Space (4px grid), radius, depth ------------------------------- */
+  --pk-space-1: 0.25rem;
+  --pk-space-2: 0.5rem;
+  --pk-space-3: 0.75rem;
+  --pk-space-4: 1rem;
+  --pk-space-5: 1.5rem;
+  --pk-space-6: 2rem;
+  --pk-space-7: 3rem;
+  --pk-space-8: 4rem;
+
+  --pk-radius-sm: 6px;
+  --pk-radius-md: 10px;
+  --pk-radius-lg: 16px;
+  --pk-radius-pill: 999px;
+
+  --pk-shadow-1: 0 1px 2px rgba(60, 40, 20, 0.08), 0 1px 1px rgba(60, 40, 20, 0.04);
+  --pk-shadow-2: 0 4px 14px rgba(60, 40, 20, 0.1), 0 1px 3px rgba(60, 40, 20, 0.06);
+  --pk-shadow-3: 0 18px 44px rgba(60, 40, 20, 0.18), 0 4px 10px rgba(60, 40, 20, 0.08);
+
+  /* ---- Motion: one curve, four speeds ---------------------------------- */
+  --pk-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --pk-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --pk-duration-1: 120ms; /* hover, press */
+  --pk-duration-2: 200ms; /* small reveals */
+  --pk-duration-3: 320ms; /* panels, dialogs */
+  --pk-duration-4: 520ms; /* page-level moves */
+
+  /* ---- Layers ------------------------------------------------------------ */
+  --pk-z-nav: 20;
+  --pk-z-menu: 40;
+  --pk-z-dialog: 60;
+  --pk-z-toast: 80;
+}
+
+/* Kannada letters are taller and carry marks above and below the line, so the
+ * body gets more line height wherever the language is Kannada. */
+:lang(kn) {
+  --pk-leading-body: 1.75;
+  --pk-leading-tight: 1.35;
+}
+
+/* Honour the user's motion preference everywhere the tokens are used. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --pk-duration-1: 0.01ms;
+    --pk-duration-2: 0.01ms;
+    --pk-duration-3: 0.01ms;
+    --pk-duration-4: 0.01ms;
+  }
+}

@@ -1,0 +1,480 @@
+/* Redesign primitives (shared/pk). Reads only --pk-* tokens. Every class is pk-prefixed. */
+
+.pk-spin {
+  animation: pk-spin 0.9s linear infinite;
+}
+@keyframes pk-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* One visible focus ring for every pk control. */
+.pk-btn:focus-visible,
+.pk-icon-btn:focus-visible,
+.pk-tab:focus-visible,
+.pk-lang__btn:focus-visible,
+.pk-field__control:focus-visible,
+.pk-card--interactive:focus-visible {
+  outline: 3px solid var(--pk-focus);
+  outline-offset: 2px;
+}
+
+/* ---- Button ------------------------------------------------------------ */
+.pk-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--pk-space-2);
+  min-height: 44px; /* touch target */
+  padding: 0 var(--pk-space-4);
+  border: 1px solid transparent;
+  border-radius: var(--pk-radius-md);
+  font: 600 var(--pk-text-sm) / 1 var(--pk-font-ui);
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  transition: background-color var(--pk-duration-1) var(--pk-ease), box-shadow var(--pk-duration-1) var(--pk-ease),
+    transform var(--pk-duration-1) var(--pk-ease), border-color var(--pk-duration-1) var(--pk-ease);
+}
+.pk-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.pk-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.pk-btn--sm {
+  min-height: 36px;
+  padding: 0 var(--pk-space-3);
+  font-size: var(--pk-text-xs);
+}
+.pk-btn--lg {
+  min-height: 52px;
+  padding: 0 var(--pk-space-5);
+  font-size: var(--pk-text-md);
+}
+.pk-btn--primary {
+  background: var(--pk-accent);
+  color: var(--pk-on-accent);
+  box-shadow: var(--pk-shadow-1);
+}
+.pk-btn--primary:hover:not(:disabled) {
+  background: var(--pk-accent-hover);
+  box-shadow: var(--pk-shadow-2);
+}
+.pk-btn--secondary {
+  background: var(--pk-surface-raised);
+  color: var(--pk-ink);
+  border-color: var(--pk-line-strong);
+}
+.pk-btn--secondary:hover:not(:disabled) {
+  border-color: var(--pk-ink-2);
+  box-shadow: var(--pk-shadow-1);
+}
+.pk-btn--ghost {
+  background: transparent;
+  color: var(--pk-ink-2);
+}
+.pk-btn--ghost:hover:not(:disabled) {
+  background: var(--pk-surface-sunken);
+  color: var(--pk-ink);
+}
+.pk-btn--danger {
+  background: var(--pk-danger);
+  color: #fff;
+}
+.pk-btn--danger:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
+.pk-icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--pk-radius-md);
+  background: transparent;
+  color: var(--pk-ink-2);
+  cursor: pointer;
+  transition: background-color var(--pk-duration-1) var(--pk-ease);
+}
+.pk-icon-btn:hover {
+  background: var(--pk-surface-sunken);
+  color: var(--pk-ink);
+}
+.pk-icon-btn:focus-visible {
+  outline: 3px solid var(--pk-focus);
+  outline-offset: 2px;
+}
+
+/* ---- Card -------------------------------------------------------------- */
+.pk-card {
+  background: var(--pk-surface);
+  border: 1px solid var(--pk-line);
+  border-radius: var(--pk-radius-lg);
+  box-shadow: var(--pk-shadow-1);
+  color: var(--pk-ink);
+}
+.pk-card--padded {
+  padding: var(--pk-space-5);
+}
+.pk-card--interactive {
+  cursor: pointer;
+  transition: transform var(--pk-duration-2) var(--pk-ease), box-shadow var(--pk-duration-2) var(--pk-ease);
+}
+.pk-card--interactive:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--pk-shadow-2);
+}
+
+/* ---- Badge ------------------------------------------------------------- */
+.pk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pk-space-1);
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--pk-radius-pill);
+  font: 600 var(--pk-text-xs) / 1.2 var(--pk-font-ui);
+  letter-spacing: 0.02em;
+  background: var(--pk-surface-sunken);
+  color: var(--pk-ink-2);
+}
+.pk-badge--accent {
+  background: var(--pk-accent-soft);
+  color: var(--pk-accent);
+}
+.pk-badge--gold {
+  background: var(--pk-gold-soft);
+  color: #7a4f00;
+}
+.pk-badge--success {
+  background: var(--pk-success-soft);
+  color: var(--pk-success);
+}
+.pk-badge--danger {
+  background: var(--pk-danger-soft);
+  color: var(--pk-danger);
+}
+
+/* ---- Skeleton ---------------------------------------------------------- */
+.pk-skeleton {
+  display: block;
+  background: linear-gradient(90deg, var(--pk-surface-sunken) 25%, #f7f1e3 50%, var(--pk-surface-sunken) 75%);
+  background-size: 200% 100%;
+  animation: pk-shimmer 1.4s var(--pk-ease-in-out) infinite;
+  border-radius: var(--pk-radius-sm);
+}
+.pk-skeleton--text {
+  height: 1em;
+  width: 100%;
+}
+.pk-skeleton--block {
+  height: 120px;
+  width: 100%;
+  border-radius: var(--pk-radius-md);
+}
+.pk-skeleton--circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+@keyframes pk-shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pk-skeleton,
+  .pk-spin {
+    animation: none;
+  }
+}
+
+/* ---- Tabs -------------------------------------------------------------- */
+.pk-tabs {
+  display: inline-flex;
+  gap: var(--pk-space-1);
+  padding: var(--pk-space-1);
+  background: var(--pk-surface-sunken);
+  border-radius: var(--pk-radius-pill);
+}
+.pk-tab {
+  min-height: 36px;
+  padding: 0 var(--pk-space-4);
+  border: 0;
+  border-radius: var(--pk-radius-pill);
+  background: transparent;
+  color: var(--pk-ink-2);
+  font: 600 var(--pk-text-sm) / 1 var(--pk-font-ui);
+  cursor: pointer;
+  transition: background-color var(--pk-duration-2) var(--pk-ease), color var(--pk-duration-2) var(--pk-ease);
+}
+.pk-tab:hover {
+  color: var(--pk-ink);
+}
+.pk-tab--active {
+  background: var(--pk-surface-raised);
+  color: var(--pk-accent);
+  box-shadow: var(--pk-shadow-1);
+}
+
+/* ---- Dialog ------------------------------------------------------------ */
+.pk-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--pk-z-dialog);
+  display: grid;
+  place-items: center;
+  padding: var(--pk-space-4);
+  background: rgba(31, 26, 23, 0.5);
+  animation: pk-fade var(--pk-duration-2) var(--pk-ease);
+}
+.pk-dialog {
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 32rem);
+  max-height: min(90vh, 44rem);
+  background: var(--pk-surface-raised);
+  border-radius: var(--pk-radius-lg);
+  box-shadow: var(--pk-shadow-3);
+  color: var(--pk-ink);
+  animation: pk-rise var(--pk-duration-3) var(--pk-ease);
+}
+.pk-dialog:focus {
+  outline: none;
+}
+.pk-dialog--sm {
+  width: min(100%, 24rem);
+}
+.pk-dialog--lg {
+  width: min(100%, 48rem);
+}
+.pk-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pk-space-3);
+  padding: var(--pk-space-4) var(--pk-space-4) var(--pk-space-2) var(--pk-space-5);
+}
+.pk-dialog__title {
+  font: 600 var(--pk-text-xl) / var(--pk-leading-tight) var(--pk-font-display);
+}
+.pk-dialog__body {
+  padding: var(--pk-space-2) var(--pk-space-5) var(--pk-space-5);
+  overflow-y: auto;
+  font: 400 var(--pk-text-md) / var(--pk-leading-body) var(--pk-font-ui);
+  color: var(--pk-ink-2);
+}
+.pk-dialog__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--pk-space-2);
+  padding: var(--pk-space-3) var(--pk-space-5) var(--pk-space-4);
+  border-top: 1px solid var(--pk-line);
+}
+@keyframes pk-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes pk-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+@media (max-width: 600px) {
+  /* Bottom sheet on phones. */
+  .pk-dialog-backdrop {
+    place-items: end center;
+    padding: 0;
+  }
+  .pk-dialog {
+    width: 100%;
+    max-height: 92vh;
+    border-radius: var(--pk-radius-lg) var(--pk-radius-lg) 0 0;
+  }
+}
+
+/* ---- Field ------------------------------------------------------------- */
+.pk-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pk-space-1);
+}
+.pk-field__label {
+  font: 600 var(--pk-text-sm) / var(--pk-leading-tight) var(--pk-font-ui);
+  color: var(--pk-ink);
+}
+.pk-field__control {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.6rem var(--pk-space-3);
+  background: var(--pk-surface-raised);
+  color: var(--pk-ink);
+  border: 1px solid var(--pk-line-strong);
+  border-radius: var(--pk-radius-md);
+  font: 400 var(--pk-text-md) / var(--pk-leading-body) var(--pk-font-ui);
+  transition: border-color var(--pk-duration-1) var(--pk-ease), box-shadow var(--pk-duration-1) var(--pk-ease);
+}
+textarea.pk-field__control {
+  resize: vertical;
+  min-height: 96px;
+}
+.pk-field__control::placeholder {
+  color: var(--pk-ink-3);
+}
+.pk-field__control:hover {
+  border-color: var(--pk-ink-3);
+}
+.pk-field__hint {
+  font: 400 var(--pk-text-xs) / var(--pk-leading-body) var(--pk-font-ui);
+  color: var(--pk-ink-3);
+}
+.pk-field__error {
+  font: 500 var(--pk-text-xs) / var(--pk-leading-body) var(--pk-font-ui);
+  color: var(--pk-danger);
+}
+.pk-field--error .pk-field__control {
+  border-color: var(--pk-danger);
+}
+
+/* ---- Progress ribbon --------------------------------------------------- */
+.pk-ribbon {
+  position: relative;
+  height: 8px;
+  background: var(--pk-surface-sunken);
+  border-radius: var(--pk-radius-pill);
+  overflow: visible;
+}
+.pk-ribbon__fill {
+  position: relative;
+  height: 100%;
+  min-width: 0;
+  background: linear-gradient(90deg, var(--pk-accent-hover), var(--pk-accent));
+  border-radius: var(--pk-radius-pill) 0 0 var(--pk-radius-pill);
+  transition: width var(--pk-duration-4) var(--pk-ease);
+}
+/* Swallow-tail end, like the cut end of a bookmark ribbon. */
+.pk-ribbon__fill::after {
+  content: "";
+  position: absolute;
+  right: -5px;
+  top: 0;
+  width: 10px;
+  height: 100%;
+  background: var(--pk-accent);
+  clip-path: polygon(0 0, 100% 0, 55% 50%, 100% 100%, 0 100%);
+}
+
+/* ---- Book cover -------------------------------------------------------- */
+.pk-cover {
+  --cover-a: #1e293b;
+  --cover-b: #f59e0b;
+  --cover-c: #f8fafc;
+  position: relative;
+  flex: none;
+  aspect-ratio: 2 / 3;
+  border-radius: 3px 8px 8px 3px;
+  overflow: hidden;
+  background: linear-gradient(145deg, var(--cover-a), color-mix(in srgb, var(--cover-a) 70%, var(--cover-b)));
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 4px 6px 14px rgba(60, 40, 20, 0.28), 1px 1px 0 rgba(60, 40, 20, 0.18);
+}
+.pk-cover--sm {
+  width: 56px;
+}
+.pk-cover--md {
+  width: 112px;
+}
+.pk-cover--lg {
+  width: 176px;
+}
+.pk-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.pk-cover__jacket {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--cover-c);
+  border-left: 6px solid var(--cover-b);
+}
+.pk-cover__initials {
+  font: 600 1.6em / 1 var(--pk-font-display);
+  letter-spacing: 0.04em;
+}
+.pk-cover--sm .pk-cover__initials {
+  font-size: 1rem;
+}
+.pk-cover--md .pk-cover__initials {
+  font-size: 1.75rem;
+}
+.pk-cover--lg .pk-cover__initials {
+  font-size: 2.5rem;
+}
+/* Spine crease and light catching the hinge. */
+.pk-cover__spine {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 10%;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.28), rgba(255, 255, 255, 0.16) 55%, transparent);
+  pointer-events: none;
+}
+
+/* ---- Empty state ------------------------------------------------------- */
+.pk-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--pk-space-3);
+  padding: var(--pk-space-7) var(--pk-space-5);
+  text-align: center;
+}
+.pk-empty__icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--pk-accent-soft);
+  color: var(--pk-accent);
+}
+.pk-empty__title {
+  font: 600 var(--pk-text-xl) / var(--pk-leading-tight) var(--pk-font-display);
+  color: var(--pk-ink);
+}
+.pk-empty__body {
+  max-width: 34ch;
+  color: var(--pk-ink-2);
+  line-height: var(--pk-leading-body);
+}
+
+/* ---- Language toggle --------------------------------------------------- */
+.pk-lang {
+  display: inline-flex;
+  padding: 2px;
+  background: var(--pk-surface-sunken);
+  border-radius: var(--pk-radius-pill);
+}
+.pk-lang__btn {
+  min-width: 44px;
+  min-height: 36px;
+  padding: 0 var(--pk-space-3);
+  border: 0;
+  border-radius: var(--pk-radius-pill);
+  background: transparent;
+  color: var(--pk-ink-2);
+  font: 600 var(--pk-text-sm) / 1 var(--pk-font-ui);
+  cursor: pointer;
+  transition: background-color var(--pk-duration-2) var(--pk-ease);
+}
+.pk-lang__btn--active {
+  background: var(--pk-surface-raised);
+  color: var(--pk-accent);
+  box-shadow: var(--pk-shadow-1);
+}
