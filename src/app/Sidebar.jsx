@@ -12,6 +12,8 @@ import {
   Trophy,
 } from "lucide-react";
 import Button from "../shared/ui/Button";
+import LanguageToggle from "../shared/pk/LanguageToggle";
+import { useLanguage } from "../shared/i18n/LanguageContext";
 import AccountCard from "../features/auth/AccountCard";
 import { STATUSES } from "../domain/status";
 import { useBooks, useShelves, useUi } from "./AppContext";
@@ -45,25 +47,26 @@ function Sidebar({ route, stats, onNavigate }) {
   const { exportLedger, importLedger } = useBooks();
   const { uniqueShelves } = useShelves();
   const { openNewBook } = useUi();
+  const { t } = useLanguage();
   const fileInput = useRef(null);
   const nav = { route, onNavigate };
 
   const collections = [
-    { id: "all", label: "All Books", icon: Archive, count: stats.total },
+    { id: "all", label: t("nav.allBooks"), icon: Archive, count: stats.total },
     ...Object.entries(STATUSES).map(([key, status]) => ({
       id: key,
-      label: status.longLabel,
+      label: t(`status.${key}`),
       icon: status.icon,
       count: stats[key],
     })),
-    { id: "favorites", label: "Favorites", icon: Heart, count: stats.favorites },
+    { id: "favorites", label: t("nav.favorites"), icon: Heart, count: stats.favorites },
   ];
 
   const discover = [
-    { id: "recommendations", label: "Recommendations", icon: Sparkles },
-    { id: "topbooks", label: "Top Books", icon: Trophy },
-    { id: "analytics", label: "Insights", icon: BarChart3 },
-    { id: "galaxy", label: "Knowledge Galaxy", icon: Telescope },
+    { id: "recommendations", label: t("nav.recommendations"), icon: Sparkles },
+    { id: "topbooks", label: t("nav.topBooks"), icon: Trophy },
+    { id: "analytics", label: t("nav.insights"), icon: BarChart3 },
+    { id: "galaxy", label: t("nav.galaxy"), icon: Telescope },
   ];
 
   return (
@@ -75,40 +78,41 @@ function Sidebar({ route, stats, onNavigate }) {
         <h1>Pustaka</h1>
       </div>
 
-      <NavSection label="Collection" ariaLabel="Shelf navigation">
+      <NavSection label={t("nav.collection")} ariaLabel="Shelf navigation">
         {collections.map((item) => (
           <NavItem key={item.id} {...item} {...nav} />
         ))}
       </NavSection>
 
-      <NavSection label="Shelves" ariaLabel="Custom Shelves navigation">
+      <NavSection label={t("nav.shelves")} ariaLabel="Custom Shelves navigation">
         {uniqueShelves.length > 0 ? (
-          <NavItem id="shelves" label="All Shelves" icon={FolderOpen} size={15} {...nav} />
+          <NavItem id="shelves" label={t("nav.allShelves")} icon={FolderOpen} size={15} {...nav} />
         ) : (
           <div className="sidebar-help-box">
             <FolderOpen size={13} />
-            <span>Create shelves by editing any book and checking a shelf.</span>
+            <span>{t("nav.shelvesHelp")}</span>
           </div>
         )}
       </NavSection>
 
-      <NavSection label="Discover" ariaLabel="Discover navigation">
+      <NavSection label={t("nav.discover")} ariaLabel="Discover navigation">
         {discover.map((item) => (
           <NavItem key={item.id} {...item} {...nav} />
         ))}
       </NavSection>
 
       <div className="sidebar-actions">
+        <LanguageToggle />
         <AccountCard />
         <Button variant="primary" icon={Plus} iconSize={16} className="full add-book-trigger" onClick={openNewBook}>
-          Add Book
+          {t("action.addBook")}
         </Button>
         <div className="split-actions">
           <Button icon={Download} title="Export Ledger Backup" onClick={exportLedger}>
-            Export
+            {t("action.export")}
           </Button>
           <Button icon={Import} title="Import Ledger Backup" onClick={() => fileInput.current?.click()}>
-            Import
+            {t("action.import")}
           </Button>
         </div>
         <input

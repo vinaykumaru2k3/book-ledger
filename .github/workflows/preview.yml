@@ -1,0 +1,38 @@
+name: PR preview
+
+# Every pull request from this repository gets its own temporary Firebase
+# Hosting URL (commented on the PR, expires after 7 days), so a change can be
+# looked at before it is merged and goes live. The preview build also turns on
+# the Kannada UI switch, which stays hidden in production until the Kannada
+# strings have been reviewed.
+on:
+  pull_request:
+
+jobs:
+  preview:
+    # Forks cannot read repository secrets, so only same-repo PRs get previews.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+        env:
+          VITE_ENABLE_KANNADA_UI: "true"
+
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: book-ledger-2a2e4
+          expires: 7d

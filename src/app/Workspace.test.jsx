@@ -8,6 +8,7 @@ import React from "react";
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { normalizeBook } from "../domain/book";
+import { LanguageProvider } from "../shared/i18n/LanguageContext";
 
 const books = [
   normalizeBook({ id: "1", title: "Dune", author: "Frank Herbert", status: "done", pages: 400, currentPage: 400, rating: 5, favorite: true, tags: ["Sci-Fi"], shelves: ["Classics"], finishedAt: Date.now() }),
@@ -31,7 +32,11 @@ const { default: Workspace } = await import("./Workspace");
 
 function renderAt(path) {
   window.history.replaceState(null, "", path);
-  return render(<Workspace />);
+  return render(
+    <LanguageProvider>
+      <Workspace />
+    </LanguageProvider>
+  );
 }
 
 beforeEach(() => vi.clearAllMocks());
