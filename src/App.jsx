@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { Suspense, lazy, useEffect, useMemo, useRef, useState } from "react";
 import {
   Archive,
   BarChart3,
@@ -42,11 +42,13 @@ import LoadingPanel from "./components/LoadingPanel";
 import Toast from "./components/Toast";
 import DeleteConfirmModal from "./components/DeleteConfirmModal";
 import BookDetailsModal from "./components/BookDetailsModal";
-import Recommendations from "./components/Recommendations";
-import TopCharts from "./components/TopCharts";
-import Analytics from "./components/Analytics";
-import ShelvesDashboard from "./components/ShelvesDashboard";
-import ConstellationGraph from "./components/ConstellationGraph";
+const Recommendations = lazy(() => import("./components/Recommendations"));
+const TopCharts = lazy(() => import("./components/TopCharts"));
+const Analytics = lazy(() => import("./components/Analytics"));
+const ShelvesDashboard = lazy(() => import("./components/ShelvesDashboard"));
+const ConstellationGraph = lazy(() => import("./components/ConstellationGraph"));
+
+// Heavy views are loaded on demand to keep the first load small.
 
 // Constants & context
 import { STATUSES, SORTS, progressFor } from "./components/constants";
@@ -353,6 +355,8 @@ function AppShell() {
                   ? "Popular Charts"
                   : statusFilter === "analytics"
                   ? "Reading Insights"
+                  : statusFilter === "galaxy"
+                  ? "Constellation Graph"
                   : "Library Dashboard"}
               </p>
               <h2 className="dashboard-title">
@@ -362,6 +366,8 @@ function AppShell() {
                   ? "Discover Top Books"
                   : statusFilter === "analytics"
                   ? "Library Analytics"
+                  : statusFilter === "galaxy"
+                  ? "Knowledge Galaxy"
                   : statusFilter === "shelves"
                   ? "Custom Shelves"
                   : statusFilter.startsWith("shelf:")
@@ -394,7 +400,8 @@ function AppShell() {
           {statusFilter !== "recommendations" &&
             statusFilter !== "topbooks" &&
             statusFilter !== "analytics" &&
-            statusFilter !== "shelves" && (
+            statusFilter !== "shelves" &&
+            statusFilter !== "galaxy" && (
               <div className="stats-strip" aria-label="Shelf stats summary">
                 <div className="stat-item">
                   <Library size={15} className="stat-icon teal" />
@@ -429,6 +436,7 @@ function AppShell() {
             )}
         </header>
 
+        <Suspense fallback={<LoadingPanel label="Loading view..." />}>
         {statusFilter === "recommendations" ? (
           <div className="library-panel recommendations-panel-wrapper">
             <Recommendations books={books} quickAdd={modal.quickAdd} onViewDetails={openDetails} />
@@ -447,7 +455,7 @@ function AppShell() {
           </div>
         ) : statusFilter === "galaxy" ? (
           <div className="library-panel recommendations-panel-wrapper" style={{ padding: 0, overflow: 'hidden' }}>
-            <ConstellationGraph books={books} onViewDetails={openDetails} />
+            <ConstellationGraph />
           </div>
         ) : (
           <section className="content-layout">
@@ -589,6 +597,7 @@ function AppShell() {
             </aside>
           </section>
         )}
+        </Suspense>
       </main>
 
       {modal.open && <BookModal />}

@@ -58,7 +58,7 @@ export function AppProvider({ children }) {
   };
 
   const booksApi = useBooksController(authController.user, notify);
-  const shelvesApi = useShelvesController(booksApi.books, booksApi.updateBook);
+  const shelvesApi = useShelvesController(booksApi.books, booksApi.updateManyBooks, notify);
 
   // Wrapped sign-out that surfaces a toast
   const signOut = async () => {

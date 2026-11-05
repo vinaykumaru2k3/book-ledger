@@ -1,221 +1,161 @@
-import React, { useRef, useEffect, useState, useCallback } from "react";
+import React, { useRef, useEffect, useMemo, useState } from "react";
 import { Search, X, Star, BookOpen, CircleDot } from "lucide-react";
 import { useBooks } from "../context/AppContext";
 import { buildGraphData } from "../utils/graph";
+import { stepSimulation, screenToWorld } from "../utils/graphSimulation";
 import { STATUSES } from "./constants";
+
+const REST_ENERGY = 0.05; // below this total speed the layout is considered settled
+const MIN_HEAT = 0.05;
+const CLICK_SLOP_PX = 4; // pointer travel that turns a click into a drag
 
 export default function ConstellationGraph() {
   const { books } = useBooks();
   const svgRef = useRef(null);
-  
-  // State
-  const [graphData, setGraphData] = useState({ nodes: [], links: [] });
+
   const [camera, setCamera] = useState({ x: 0, y: 0, zoom: 1 });
-  const [hoveredNode, setHoveredNode] = useState(null);
-  const [selectedNode, setSelectedNode] = useState(null);
+  const [hoveredId, setHoveredId] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [clusterBy, setClusterBy] = useState("none");
-  
-  // Drag state
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragNode, setDragNode] = useState(null);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [, setFrame] = useState(0); // bumped every animation frame to re-render moved nodes
 
-  // Build graph from books
-  useEffect(() => {
-    let filteredBooks = books;
-    if (statusFilter !== "all") {
-      filteredBooks = books.filter((b) => b.status === statusFilter);
-    }
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      filteredBooks = filteredBooks.filter(
-        (b) =>
-          b.title?.toLowerCase().includes(q) ||
-          b.author?.toLowerCase().includes(q)
-      );
-    }
-    const data = buildGraphData(filteredBooks);
-    setGraphData(data);
+  // Pointer interaction lives in a ref: it changes on every mouse move and
+  // must not re-run effects or re-render by itself.
+  const pointer = useRef({ mode: "idle", node: null, startX: 0, startY: 0, lastX: 0, lastY: 0, moved: false });
+  const heat = useRef(1); // simulation temperature; reheated whenever something changes
+
+  const graphData = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    const visible = books.filter(
+      (b) =>
+        (statusFilter === "all" || b.status === statusFilter) &&
+        (!query || b.title?.toLowerCase().includes(query) || b.author?.toLowerCase().includes(query))
+    );
+    return buildGraphData(visible);
   }, [books, statusFilter, searchQuery]);
 
-  // Physics simulation
+  const nodeById = graphData.nodeMap || new Map();
+  const hoveredNode = hoveredId ? nodeById.get(hoveredId) : null;
+  const selectedNode = selectedId ? nodeById.get(selectedId) : null;
+
+  // Animation loop: runs while the layout is still moving, then sleeps.
+  // A slow poll wakes it again after a drag has reheated the simulation.
   useEffect(() => {
-    if (!graphData.nodes.length) return;
+    heat.current = 1;
+    if (!graphData.nodes.length) return undefined;
+    let raf = null;
 
-    const simulate = () => {
-      const { nodes, links } = graphData;
-      const alpha = 0.5;
-      const damping = 0.9;
-      const centerGravity = 0.005;
-      const clusterGravity = clusterBy !== "none" ? 0.015 : 0;
-
-      // Repulsion between all nodes
-      for (let i = 0; i < nodes.length; i++) {
-        const node = nodes[i];
-        for (let j = 0; j < nodes.length; j++) {
-          if (i === j) continue;
-          const other = nodes[j];
-          const dx = node.x - other.x;
-          const dy = node.y - other.y;
-          const distSq = Math.max(dx * dx + dy * dy, 100);
-          const force = (800 / distSq) * alpha;
-          node.vx += (dx / Math.sqrt(distSq)) * force;
-          node.vy += (dy / Math.sqrt(distSq)) * force;
-        }
-
-        // Center gravity
-        node.vx -= node.x * centerGravity;
-        node.vy -= node.y * centerGravity;
-
-        // Cluster gravity
-        if (clusterBy !== "none") {
-          const clusterKey = clusterBy === "status" ? node.status : node.author;
-          const clusterNodes = nodes.filter((n) =>
-            clusterBy === "status" ? n.status === clusterKey : n.author === clusterKey
-          );
-          if (clusterNodes.length > 1) {
-            let cx = 0, cy = 0;
-            clusterNodes.forEach((n) => {
-              cx += n.x;
-              cy += n.y;
-            });
-            cx /= clusterNodes.length;
-            cy /= clusterNodes.length;
-            node.vx += (cx - node.x) * clusterGravity;
-            node.vy += (cy - node.y) * clusterGravity;
-          }
-        }
-      }
-
-      // Spring forces along links
-      links.forEach((link) => {
-        const { source, target, weight } = link;
-        const dx = target.x - source.x;
-        const dy = target.y - source.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 1) return;
-        const desiredDist = Math.max(120 - weight * 10, 60);
-        const force = (dist - desiredDist) * 0.05;
-        const fx = (dx / dist) * force;
-        const fy = (dy / dist) * force;
-        source.vx += fx;
-        source.vy += fy;
-        target.vx -= fx;
-        target.vy -= fy;
+    const tick = () => {
+      const dragged = pointer.current.mode === "node" ? pointer.current.node : null;
+      const energy = stepSimulation(graphData.nodes, graphData.links, {
+        alpha: heat.current,
+        clusterBy,
+        pinnedId: dragged?.id,
       });
-
-      // Update positions
-      nodes.forEach((node) => {
-        if (node === dragNode) return;
-        node.vx *= damping;
-        node.vy *= damping;
-        node.x += node.vx;
-        node.y += node.vy;
-      });
+      heat.current = Math.max(heat.current * 0.985, MIN_HEAT);
+      setFrame((f) => f + 1);
+      raf = energy > REST_ENERGY || dragged ? requestAnimationFrame(tick) : null;
     };
 
-    const interval = setInterval(simulate, 20);
-    return () => clearInterval(interval);
-  }, [graphData, clusterBy, dragNode]);
+    raf = requestAnimationFrame(tick);
+    const wake = window.setInterval(() => {
+      if (raf === null && heat.current > MIN_HEAT) raf = requestAnimationFrame(tick);
+    }, 250);
 
-  // Coordinate transforms
-  const toWorld = useCallback((sx, sy, width, height) => {
-    return {
-      x: (sx - width / 2) / camera.zoom + camera.x,
-      y: (sy - height / 2) / camera.zoom + camera.y,
+    return () => {
+      if (raf !== null) cancelAnimationFrame(raf);
+      window.clearInterval(wake);
     };
-  }, [camera]);
+  }, [graphData, clusterBy]);
 
-  // Mouse handlers
-  const handleMouseDown = (e) => {
+  // React attaches wheel listeners as passive, so preventDefault (which stops
+  // the page scrolling while zooming) only works on a native listener.
+  useEffect(() => {
     const svg = svgRef.current;
-    if (!svg) return;
-    const rect = svg.getBoundingClientRect();
-    const sx = e.clientX - rect.left;
-    const sy = e.clientY - rect.top;
-    const world = toWorld(sx, sy, rect.width, rect.height);
+    if (!svg) return undefined;
+    const onWheel = (e) => {
+      e.preventDefault();
+      const factor = e.deltaY > 0 ? 0.9 : 1.1;
+      setCamera((prev) => ({ ...prev, zoom: Math.max(0.3, Math.min(3, prev.zoom * factor)) }));
+    };
+    svg.addEventListener("wheel", onWheel, { passive: false });
+    return () => svg.removeEventListener("wheel", onWheel);
+  }, []);
 
-    const clickedNode = graphData.nodes.find((node) => {
-      const dx = node.x - world.x;
-      const dy = node.y - world.y;
-      return Math.sqrt(dx * dx + dy * dy) < node.radius + 5;
-    });
+  const worldFromEvent = (e) => {
+    const rect = svgRef.current.getBoundingClientRect();
+    return screenToWorld(e.clientX - rect.left, e.clientY - rect.top, rect, camera);
+  };
 
-    if (clickedNode) {
-      setDragNode(clickedNode);
-    } else {
-      setIsDragging(true);
-    }
-    setDragStart({ x: e.clientX, y: e.clientY });
+  const nodeAt = (world) =>
+    graphData.nodes.find((n) => Math.hypot(n.x - world.x, n.y - world.y) < n.radius + 5) || null;
+
+  const handleMouseDown = (e) => {
+    if (!svgRef.current) return;
+    const hit = nodeAt(worldFromEvent(e));
+    pointer.current = {
+      mode: hit ? "node" : "pan",
+      node: hit,
+      startX: e.clientX,
+      startY: e.clientY,
+      lastX: e.clientX,
+      lastY: e.clientY,
+      moved: false,
+    };
   };
 
   const handleMouseMove = (e) => {
-    const svg = svgRef.current;
-    if (!svg) return;
-    const rect = svg.getBoundingClientRect();
-    const sx = e.clientX - rect.left;
-    const sy = e.clientY - rect.top;
+    if (!svgRef.current) return;
+    const p = pointer.current;
+    const world = worldFromEvent(e);
 
-    if (dragNode) {
-      const world = toWorld(sx, sy, rect.width, rect.height);
-      dragNode.x = world.x;
-      dragNode.y = world.y;
-      dragNode.vx = 0;
-      dragNode.vy = 0;
-    } else if (isDragging) {
-      const dx = e.clientX - dragStart.x;
-      const dy = e.clientY - dragStart.y;
-      setCamera((prev) => ({
-        ...prev,
-        x: prev.x - dx / prev.zoom,
-        y: prev.y - dy / prev.zoom,
-      }));
-      setDragStart({ x: e.clientX, y: e.clientY });
+    if (p.mode === "idle") {
+      setHoveredId(nodeAt(world)?.id ?? null);
+      return;
+    }
+    if (Math.hypot(e.clientX - p.startX, e.clientY - p.startY) > CLICK_SLOP_PX) p.moved = true;
+
+    if (p.mode === "node") {
+      p.node.x = world.x;
+      p.node.y = world.y;
+      p.node.vx = 0;
+      p.node.vy = 0;
+      heat.current = 0.5;
     } else {
-      const world = toWorld(sx, sy, rect.width, rect.height);
-      const hovered = graphData.nodes.find((node) => {
-        const dx = node.x - world.x;
-        const dy = node.y - world.y;
-        return Math.sqrt(dx * dx + dy * dy) < node.radius + 5;
-      });
-      setHoveredNode(hovered || null);
+      const dx = (e.clientX - p.lastX) / (world.scale * camera.zoom);
+      const dy = (e.clientY - p.lastY) / (world.scale * camera.zoom);
+      setCamera((prev) => ({ ...prev, x: prev.x - dx, y: prev.y - dy }));
+      p.lastX = e.clientX;
+      p.lastY = e.clientY;
     }
   };
 
   const handleMouseUp = () => {
-    setDragNode(null);
-    setIsDragging(false);
+    pointer.current = { ...pointer.current, mode: "idle", node: null };
   };
 
-  const handleClick = (e) => {
-    setSelectedNode(hoveredNode || dragNode);
+  const handleClick = () => {
+    if (pointer.current.moved) {
+      pointer.current.moved = false;
+      return;
+    }
+    setSelectedId(hoveredId);
   };
 
-  const handleDoubleClick = (e) => {
-    if (!hoveredNode) return;
-    setCamera({ x: hoveredNode.x, y: hoveredNode.y, zoom: 1.5 });
+  const handleDoubleClick = () => {
+    if (hoveredNode) setCamera({ x: hoveredNode.x, y: hoveredNode.y, zoom: 1.5 });
   };
 
-  const handleWheel = (e) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    setCamera((prev) => ({
-      ...prev,
-      zoom: Math.max(0.3, Math.min(3, prev.zoom * delta)),
-    }));
-  };
-
-  // Get connected books
   const getConnectedBooks = (node) => {
     if (!node) return [];
     return graphData.links
       .filter((l) => l.source.id === node.id || l.target.id === node.id)
-      .map((l) => {
-        const other = l.source.id === node.id ? l.target : l.source;
-        return { book: other.originalBook, reasons: l.reasons };
-      });
+      .map((l) => ({
+        book: (l.source.id === node.id ? l.target : l.source).originalBook,
+        reasons: l.reasons,
+      }));
   };
 
   const svgWidth = 800;
@@ -289,7 +229,6 @@ export default function ConstellationGraph() {
         onMouseLeave={handleMouseUp}
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
-        onWheel={handleWheel}
         style={{ width: '100%', height: '100%', display: 'block' }}
       >
         <rect width={svgWidth} height={svgHeight} fill="#0d0d0f" />
@@ -369,9 +308,9 @@ export default function ConstellationGraph() {
 
       {/* Modal */}
       {selectedNode && (
-        <div className="galaxy-modal-backdrop" onClick={() => setSelectedNode(null)}>
+        <div className="galaxy-modal-backdrop" onClick={() => setSelectedId(null)}>
           <div className="galaxy-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="galaxy-modal-close" onClick={() => setSelectedNode(null)}>
+            <button className="galaxy-modal-close" onClick={() => setSelectedId(null)}>
               <X size={16} />
             </button>
 
@@ -425,7 +364,7 @@ export default function ConstellationGraph() {
                         onClick={() => {
                           const node = graphData.nodes.find((n) => n.id === book.id);
                           if (node) {
-                            setSelectedNode(node);
+                            setSelectedId(node.id);
                             setCamera({ x: node.x, y: node.y, zoom: 1.2 });
                           }
                         }}

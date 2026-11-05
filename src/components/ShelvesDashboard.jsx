@@ -18,12 +18,8 @@ function ShelvesDashboard() {
       return;
     }
 
-    if (uniqueShelves.includes(newName) && newName !== oldName) {
-      alert("A shelf board with this name already exists!");
-      return;
-    }
-
-    await renameShelf(oldName, newName);
+    const renamed = await renameShelf(oldName, newName);
+    if (!renamed) return;
 
     // Update active shelf name if active
     if (activeShelf === oldName) {

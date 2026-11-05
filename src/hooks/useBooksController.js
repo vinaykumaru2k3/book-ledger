@@ -1,3 +1,11 @@
+/**
+ * Owns the signed-in user's library: the live Firestore subscription, CRUD,
+ * JSON import/export and background metadata enrichment.
+ *
+ * Writes rely on Firestore's local cache for optimistic UI: a pending write
+ * shows up in the next snapshot immediately, and if the server rejects it the
+ * SDK emits another snapshot without it, so the UI rolls back on its own.
+ */
 import { useEffect, useRef, useState } from "react";
 import {
   collection,
@@ -10,181 +18,41 @@ import {
   writeBatch,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { uid, clamp, toNumber, normalizeBook, loadBooks, createBookFromForm } from "../utils/book";
+import { normalizeBook, createBookFromForm, parseLedger, findNewBooks } from "../utils/book";
+import { buildUpdates, lookupDetails, needsEnrichment } from "../services/enrichment";
 
-/* ------------------------------------------------------------------ *
- * Module-level enrichment caches (survive renders / persist per tab) *
- * ------------------------------------------------------------------ */
-const detailsCache = new Map(); // key -> { tags, pages }
-const inflight = new Map(); // key -> Promise (dedupe concurrent fetches)
-let cacheLoaded = false;
-
-function loadCacheFromStorage() {
-  if (cacheLoaded) return;
-  cacheLoaded = true;
-  try {
-    const raw = sessionStorage.getItem("pusthaka-enrich-cache");
-    if (raw) {
-      const obj = JSON.parse(raw);
-      Object.entries(obj).forEach(([k, v]) => detailsCache.set(k, v));
-    }
-  } catch {
-    /* ignore */
-  }
-}
-
-function persistCache() {
-  try {
-    const obj = Object.fromEntries(detailsCache.entries());
-    sessionStorage.setItem("pusthaka-enrich-cache", JSON.stringify(obj));
-  } catch {
-    /* ignore */
-  }
-}
-
-function enrichKey(book) {
-  return book.sourceKey || book.isbn || `${book.title || ""}|${book.author || ""}`.toLowerCase();
-}
-
-function cleanTags(categories) {
-  const flat = (categories || [])
-    .map((cat) => (typeof cat === "string" ? cat.split("/").map((s) => s.trim()) : []))
-    .flat()
-    .map((cat) => cat.trim())
-    .filter((cat) => cat.length > 1 && cat.length < 25);
-  const unique = [...new Set(flat)].slice(0, 3);
-  return unique.length > 0 ? unique : ["General"];
-}
-
-function buildUpdates(book, data) {
-  const updates = {};
-  if ((!book.tags || book.tags.length === 0) && data.tags && data.tags.length) {
-    updates.tags = data.tags;
-  }
-  if (!book.pages && data.pages) {
-    updates.pages = data.pages;
-  }
-  return updates;
-}
-
-// Does the cache already hold the data this book is missing?
-function cacheCovers(book) {
-  const cached = detailsCache.get(enrichKey(book));
-  if (!cached) return false;
-  const missingTags = !book.tags || book.tags.length === 0;
-  const missingPages = !book.pages;
-  if (missingTags && (!cached.tags || cached.tags.length === 0)) return false;
-  if (missingPages && !cached.pages) return false;
-  return true;
-}
-
-function needsEnrichment(book) {
-  return (
-    ((!book.tags || book.tags.length === 0) || !book.pages) &&
-    (book.sourceKey || book.isbn || book.title)
-  );
-}
-
-async function fetchEnrichData(book) {
-  let categories = [];
-  let fetchedPages = 0;
-
-  try {
-    // 1. Google Books by sourceKey
-    if (book.sourceKey && !book.sourceKey.startsWith("/works/")) {
-      const res = await fetch(`https://www.googleapis.com/books/v1/volumes/${book.sourceKey}`);
-      if (res.ok) {
-        const data = await res.json();
-        categories = data.volumeInfo?.categories || [];
-        fetchedPages = data.volumeInfo?.pageCount || 0;
-      }
-    }
-
-    // 2. Google Books search fallback
-    if (!categories.length || !fetchedPages) {
-      const queryStr = book.isbn
-        ? `isbn:${book.isbn}`
-        : `${book.title}${book.author ? ` ${book.author}` : ""}`;
-      const res = await fetch(
-        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(queryStr)}&maxResults=1`
-      );
-      if (res.ok) {
-        const data = await res.json();
-        if (data.items?.[0]) {
-          const info = data.items[0].volumeInfo;
-          if (!categories.length) categories = info?.categories || [];
-          if (!fetchedPages) fetchedPages = info?.pageCount || 0;
-        }
-      }
-    }
-
-    // 3. Open Library fallback
-    if (!categories.length || !fetchedPages) {
-      const fieldsParam =
-        "&fields=key,title,author_name,number_of_pages_median,first_publish_year,subject,cover_i,isbn";
-      const queryParams = book.isbn
-        ? `isbn=${book.isbn}`
-        : `q=${encodeURIComponent(book.title + (book.author ? ` ${book.author}` : ""))}`;
-      const res = await fetch(`https://openlibrary.org/search.json?limit=1&${queryParams}${fieldsParam}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data.docs?.[0]) {
-          const doc = data.docs[0];
-          if (!categories.length) categories = doc.subject ? doc.subject.slice(0, 3) : [];
-          if (!fetchedPages) fetchedPages = doc.number_of_pages_median || doc.number_of_pages || 0;
-        }
-      }
-    }
-  } catch (err) {
-    console.error(`[Enrich] fetch error for "${book.title}":`, err);
-    return null;
-  }
-
-  return { tags: cleanTags(categories), pages: fetchedPages };
-}
+const BATCH_LIMIT = 400; // Firestore allows 500 operations per batch
+const MAX_IMPORT_BOOKS = 5000;
+const ENRICH_DELAY_MS = 800; // gentle on the public APIs
 
 export function useBooksController(user, notify) {
   const [books, setBooks] = useState([]);
   const [booksLoading, setBooksLoading] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [enrichTick, setEnrichTick] = useState(0);
 
-  // Refs let the enrichment engine read the latest values without
-  // re-subscribing the Firestore listener on every change.
+  // Refs let async work read the latest values without re-subscribing.
   const booksRef = useRef([]);
-  const booksLoadingRef = useRef(false);
-  const enrichedRef = useRef(new Set());
-  const debounceRef = useRef(null);
+  const userIdRef = useRef(null);
+  const attemptedRef = useRef(new Set()); // book ids already looked up this session
+  const enrichingRef = useRef(false);
 
-  useEffect(() => {
-    booksRef.current = books;
-  }, [books]);
-  useEffect(() => {
-    booksLoadingRef.current = booksLoading;
-  }, [booksLoading]);
-  useEffect(() => {
-    loadCacheFromStorage();
-  }, []);
+  booksRef.current = books;
+  userIdRef.current = user?.uid ?? null;
 
-  /* ---------------------------- CRUD ---------------------------- */
   function bookDoc(bookId) {
-    if (!user) throw new Error("Anonymous session error");
+    if (!user) throw new Error("Not signed in");
     return doc(db, "users", user.uid, "books", bookId);
   }
+
+  /* ---------------------------- CRUD ---------------------------- */
 
   async function saveBook(book, message) {
     if (!user) {
       notify("Sign in to save books.", "error");
       return;
     }
-
     const nextBook = normalizeBook(book);
-    setBooks((current) => {
-      const exists = current.some((item) => item.id === nextBook.id);
-      return exists
-        ? current.map((item) => (item.id === nextBook.id ? nextBook : item))
-        : [nextBook, ...current];
-    });
-
     try {
       await setDoc(bookDoc(nextBook.id), nextBook, { merge: true });
       setSaveError("");
@@ -196,34 +64,32 @@ export function useBooksController(user, notify) {
     }
   }
 
+  /** Writes many books in batches of BATCH_LIMIT. Returns true if all succeeded. */
   async function saveManyBooks(nextBooks, message) {
-    if (!user || !nextBooks.length) return;
-
-    const batch = writeBatch(db);
-    const normalized = nextBooks.map(normalizeBook);
-    normalized.forEach((book) => {
-      batch.set(bookDoc(book.id), book, { merge: true });
-    });
-
-    setBooks((current) => {
-      const byId = new Map(current.map((book) => [book.id, book]));
-      normalized.forEach((book) => byId.set(book.id, book));
-      return [...byId.values()].sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
-    });
+    if (!user || !nextBooks.length) return true;
+    const normalized = nextBooks.map((book) => normalizeBook(book));
 
     try {
-      await batch.commit();
+      for (let i = 0; i < normalized.length; i += BATCH_LIMIT) {
+        const batch = writeBatch(db);
+        normalized.slice(i, i + BATCH_LIMIT).forEach((book) => {
+          batch.set(bookDoc(book.id), book, { merge: true });
+        });
+        // eslint-disable-next-line no-await-in-loop
+        await batch.commit();
+      }
       setSaveError("");
       if (message) notify(message);
+      return true;
     } catch (err) {
       console.error(err);
-      setSaveError("Batch import failed to sync to database.");
-      notify("Import sync failed.", "error");
+      setSaveError("Batch update failed to sync to database.");
+      notify("Sync failed.", "error");
+      return false;
     }
   }
 
   async function deleteBook(book) {
-    setBooks((current) => current.filter((item) => item.id !== book.id));
     try {
       await deleteDoc(bookDoc(book.id));
       setSaveError("");
@@ -236,21 +102,25 @@ export function useBooksController(user, notify) {
   }
 
   async function updateBook(id, updates) {
-    // Read from the ref so enrichment (which may use a slightly stale
-    // closure) still resolves the latest book.
     const existing = booksRef.current.find((book) => book.id === id);
     if (!existing) return;
+    // normalizeBook (via reconcileBookStatus) keeps status and progress consistent.
+    await saveBook(normalizeBook({ ...existing, ...updates }, { stamp: true }));
+  }
 
-    // We no longer need manual status promotion logic here.
-    // We just merge the updates and let the central reconcileBookStatus (inside normalizeBook) handle it.
-    const merged = { ...existing, ...updates, updatedAt: Date.now() };
-
-    await saveBook(normalizeBook(merged));
+  /** Applies per-book field changes ({ id, updates }[]) in one batched write. */
+  async function updateManyBooks(changes, message) {
+    const next = changes
+      .map(({ id, updates }) => {
+        const existing = booksRef.current.find((book) => book.id === id);
+        return existing ? normalizeBook({ ...existing, ...updates }, { stamp: true }) : null;
+      })
+      .filter(Boolean);
+    return saveManyBooks(next, message);
   }
 
   async function quickAdd(volumeForm) {
-    const incoming = createBookFromForm(volumeForm);
-    await saveBook(incoming, "Added to library.");
+    await saveBook(createBookFromForm(volumeForm), "Added to library.");
   }
 
   async function submitBook(editingId, form) {
@@ -262,96 +132,18 @@ export function useBooksController(user, notify) {
     );
   }
 
-  /* ----------------------- Enrichment engine ----------------------- */
-  async function enrichBook(book) {
-    const key = enrichKey(book);
-
-    // Already in cache -> apply directly, no network.
-    const cached = detailsCache.get(key);
-    if (cached) {
-      const updates = buildUpdates(book, cached);
-      if (Object.keys(updates).length > 0) {
-        try {
-          await updateBook(book.id, updates);
-        } catch {
-          /* ignore */
-        }
-      }
-      enrichedRef.current.add(book.id);
-      return;
-    }
-
-    // Dedupe concurrent requests for the same book.
-    if (inflight.has(key)) {
-      await inflight.get(key);
-      return;
-    }
-
-    const promise = (async () => {
-      const data = await fetchEnrichData(book);
-      if (data) {
-        detailsCache.set(key, data);
-        persistCache();
-      }
-      return data;
-    })();
-    inflight.set(key, promise);
-
-    try {
-      const data = await promise;
-      if (data) {
-        const updates = buildUpdates(book, data);
-        if (Object.keys(updates).length > 0) {
-          await updateBook(book.id, updates);
-        }
-      }
-      // Mark enriched only after a successful pass so failures retry.
-      enrichedRef.current.add(book.id);
-    } catch (err) {
-      console.error(`[Enrich] failed for "${book.title}":`, err);
-    } finally {
-      inflight.delete(key);
-    }
-  }
-
-  async function runEnrichmentBatch() {
-    if (booksLoadingRef.current) {
-      scheduleEnrichment();
-      return;
-    }
-    const list = booksRef.current;
-    const book = list.find(
-      (b) =>
-        !enrichedRef.current.has(b.id) &&
-        needsEnrichment(b) &&
-        !inflight.has(enrichKey(b)) &&
-        !cacheCovers(b)
-    );
-    if (!book) return;
-    await enrichBook(book);
-    // Chain to the next book after a short gap (gentle on the API).
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(runEnrichmentBatch, 600);
-  }
-
-  function scheduleEnrichment() {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(runEnrichmentBatch, 1200);
-  }
-
   /* ----------------------- Firestore listener ----------------------- */
   useEffect(() => {
+    attemptedRef.current = new Set();
     if (!user) {
       setBooks([]);
       setBooksLoading(false);
       setSaveError("");
-      enrichedRef.current = new Set();
       return undefined;
     }
 
     setBooksLoading(true);
-    const booksCollection = collection(db, "users", user.uid, "books");
-    const booksQuery = query(booksCollection, orderBy("addedAt", "desc"));
+    const booksQuery = query(collection(db, "users", user.uid, "books"), orderBy("addedAt", "desc"));
 
     return onSnapshot(
       booksQuery,
@@ -359,8 +151,6 @@ export function useBooksController(user, notify) {
         setBooks(snapshot.docs.map((item) => normalizeBook({ id: item.id, ...item.data() })));
         setBooksLoading(false);
         setSaveError("");
-        // Debounced trigger: only scan after books settle.
-        scheduleEnrichment();
       },
       (error) => {
         console.error("Firestore subscription error:", error);
@@ -368,43 +158,48 @@ export function useBooksController(user, notify) {
         setSaveError(`Failed to fetch Cloud records: ${error.message} (${error.code})`);
       }
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
+  /* ----------------------- Enrichment queue ----------------------- */
+  // Looks up one book at a time. Each book is attempted once per session, so a
+  // failing lookup can never loop; `enrichTick` re-runs this effect when an
+  // attempt finishes without changing `books`.
+  useEffect(() => {
+    if (!user || booksLoading || enrichingRef.current) return undefined;
+    const next = books.find((b) => !attemptedRef.current.has(b.id) && needsEnrichment(b));
+    if (!next) return undefined;
+
+    const timer = setTimeout(async () => {
+      const startedFor = userIdRef.current;
+      enrichingRef.current = true;
+      attemptedRef.current.add(next.id);
+      try {
+        const data = await lookupDetails(next);
+        const latest = booksRef.current.find((b) => b.id === next.id);
+        if (data && latest && userIdRef.current === startedFor) {
+          const updates = buildUpdates(latest, data);
+          if (Object.keys(updates).length) await updateBook(latest.id, updates);
+        }
+      } catch (err) {
+        console.error(`[Enrich] failed for "${next.title}":`, err);
+      } finally {
+        enrichingRef.current = false;
+        setEnrichTick((tick) => tick + 1);
+      }
+    }, ENRICH_DELAY_MS);
+
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, books, booksLoading, enrichTick]);
+
   /* ----------------------- Import / export ----------------------- */
-  async function migrateLocalBooks() {
-    const localBooks = loadBooks();
-    if (!localBooks.length) {
-      return;
-    }
-
-    const seen = new Set(books.map((book) => book.sourceKey || book.id));
-    const additions = localBooks.filter((book) => {
-      const key = book.sourceKey || book.id;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
-
-    await saveManyBooks(
-      additions,
-      additions.length ? "Local library merged to Cloud shelf." : "No new books to import."
-    );
-    localStorage.removeItem("personal-book-ledger:v1");
-  }
-
   function exportLedger() {
     const payload = JSON.stringify(
-      {
-        version: 1,
-        exportedAt: new Date().toISOString(),
-        books,
-      },
+      { version: 1, exportedAt: new Date().toISOString(), books },
       null,
       2
     );
-    const blob = new Blob([payload], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
+    const url = URL.createObjectURL(new Blob([payload], { type: "application/json" }));
     const anchor = document.createElement("a");
     anchor.href = url;
     anchor.download = `book-ledger-${new Date().toISOString().slice(0, 10)}.json`;
@@ -418,28 +213,24 @@ export function useBooksController(user, notify) {
     event.target.value = "";
     if (!file) return;
 
+    let incoming;
     try {
-      const text = await file.text();
-      const parsed = JSON.parse(text);
-      const incoming = Array.isArray(parsed) ? parsed : parsed.books;
-      if (!Array.isArray(incoming)) throw new Error("Invalid format");
-      const normalized = incoming.map(normalizeBook);
-
-      const seen = new Set(books.map((book) => book.sourceKey || book.id));
-      const additions = normalized.filter((book) => {
-        const key = book.sourceKey || book.id;
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
-
-      await saveManyBooks(
-        additions,
-        additions.length ? "Ledger import complete." : "No new books to import."
-      );
+      incoming = parseLedger(await file.text());
     } catch {
-      notify("Failed to parse import backup file.", "error");
+      notify("That file is not a valid ledger backup.", "error");
+      return;
     }
+    if (incoming.length > MAX_IMPORT_BOOKS) {
+      notify(`Backup has too many books (max ${MAX_IMPORT_BOOKS}).`, "error");
+      return;
+    }
+
+    const additions = findNewBooks(books, incoming);
+    if (!additions.length) {
+      notify("No new books to import.");
+      return;
+    }
+    await saveManyBooks(additions, `Imported ${additions.length} book${additions.length === 1 ? "" : "s"}.`);
   }
 
   return {
@@ -450,10 +241,10 @@ export function useBooksController(user, notify) {
     saveManyBooks,
     deleteBook,
     updateBook,
+    updateManyBooks,
     quickAdd,
     submitBook,
     exportLedger,
     importLedger,
-    migrateLocalBooks,
   };
 }

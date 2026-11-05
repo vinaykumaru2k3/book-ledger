@@ -1,16 +1,29 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // User profile document rules
+
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // Shape check for a book being written. Keeps junk and oversized
+    // documents out even if a client is modified.
+    function isValidBook(book) {
+      return book.title is string && book.title.size() > 0 && book.title.size() <= 500
+        && book.status in ['want', 'reading', 'done']
+        && book.rating is number && book.rating >= 0 && book.rating <= 5
+        && (!('notes' in book) || (book.notes is string && book.notes.size() <= 20000))
+        && (!('description' in book) || (book.description is string && book.description.size() <= 20000));
+    }
+
+    // Everything a user owns lives under users/{uid}. Nobody else can touch it.
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-      
-      // Nested subcollection representing user's library books
+      allow read, write: if isOwner(userId);
+
       match /books/{bookId} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidBook(request.resource.data);
       }
     }
-    
   }
 }
