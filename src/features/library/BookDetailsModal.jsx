@@ -1,175 +1,153 @@
-import React from "react";
-import { X, Calendar, Bookmark, Layers, Heart, BookOpen, Tag, Loader2 } from "lucide-react";
-import Modal from "../../shared/ui/Modal";
-import Cover from "../../shared/ui/Cover";
-import Rating from "../../shared/ui/Rating";
-import { STATUSES, progressFor } from "../../domain/status";
-import { useApp, useUi } from "../../app/AppContext";
+import React, { useEffect, useId, useRef, useState } from "react";
+import { Loader2, Plus, X } from "lucide-react";
+import BookCover from "../../shared/pk/BookCover";
+import Button from "../../shared/pk/Button";
+import Dialog from "../../shared/pk/Dialog";
+import RatingStars from "../../shared/pk/RatingStars";
+import { formFromBook } from "../../domain/book";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
+import { useApp, useBooks, useModal, useUi } from "../../app/AppContext";
+import StatusChip from "./StatusChip";
+import BookControls from "./details/BookControls";
+import FinishedBurst from "./details/FinishedBurst";
+import NotesEditor from "./details/NotesEditor";
+import { useCoverTint } from "./details/useCoverTint";
 import { useBookDescription } from "./useBookDescription";
 
-function ChipSection({ label, icon: Icon, items, rowClass, chipClass, sectionClass }) {
+function ChipList({ label, items }) {
   if (!items?.length) return null;
   return (
-    <div className={sectionClass}>
-      <span className="details-section-label">
-        {Icon && <Icon size={13} />}
-        {label}
-      </span>
-      <div className={rowClass}>
+    <div className="pk-details__chips">
+      <span className="pk-details__label">{label}</span>
+      <ul>
         {items.map((item) => (
-          <span key={item} className={chipClass}>
-            {item}
-          </span>
+          <li key={item}>{item}</li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 }
 
-function TextSection({ title, children }) {
-  return (
-    <div className="details-description-section">
-      <h3 className="details-section-label">{title}</h3>
-      <div className="details-description-text">{children}</div>
-    </div>
-  );
-}
+/** Watches a book's status and reports the moment it becomes "done". */
+function useJustFinished(status) {
+  const previous = useRef(status);
+  const [just, setJust] = useState(false);
 
-function BookDetailsModal() {
-  const { detailsBook: book } = useApp();
-  const { closeDetails } = useUi();
-  if (!book) return null;
-  return <BookDetails book={book} onClose={closeDetails} />;
+  useEffect(() => {
+    let timer;
+    if (previous.current !== "done" && status === "done") {
+      setJust(true);
+      timer = setTimeout(() => setJust(false), 2600);
+    }
+    previous.current = status;
+    return () => clearTimeout(timer);
+  }, [status]);
+
+  return just;
 }
 
 function BookDetails({ book, onClose }) {
-  const { description, loading } = useBookDescription(book);
-  const progress = progressFor(book);
-  const status = STATUSES[book.status];
-  const StatusIcon = status?.icon;
-  const statusColor = status?.color || "#10b981";
+  const { t } = useLanguage();
+  const { books } = useBooks();
+  const { quickAdd } = useModal();
+  const { openEditBook } = useUi();
+
+  // Always show the library's current copy so edits appear immediately.
+  const live = books.find((item) => item.id === book.id) || book;
+  const inLibrary = books.some((item) => item.id === book.id);
+  const tint = useCoverTint(live);
+  const { description, loading } = useBookDescription(live);
+  const finished = useJustFinished(live.status);
+  const titleId = useId();
 
   return (
-    <Modal onClose={onClose} className="details-modal">
-      <div className="details-modal-header">
-        <div className="details-header-title">
-          <Layers size={16} />
-          <span>Book Profile</span>
-        </div>
-        <button className="icon-button close-btn" onClick={onClose} aria-label="Close" title="Close details" type="button">
-          <X size={19} />
+    <Dialog bare size="lg" className="pk-dialog--details" title={live.title} labelledBy={titleId} closeLabel={t("details.close")} onClose={onClose}>
+      <article className="pk-details" style={{ "--tint": tint }}>
+        <button type="button" className="pk-icon-btn pk-details__close" onClick={onClose} aria-label={t("details.close")}>
+          <X size={20} aria-hidden="true" />
         </button>
-      </div>
 
-      <div className="details-modal-body">
-        <div className="details-cover-column">
-          <div className="details-cover-wrap">
-            <Cover book={book} />
-            {book.favorite && (
-              <div className="cover-favorite-badge" title="Favorite Book">
-                <Heart size={12} fill="currentColor" />
-              </div>
-            )}
+        <header className="pk-details__hero">
+          <div className="pk-details__cover">
+            <BookCover book={live} size="lg" />
           </div>
-
-          <div className="details-status-badge" style={{ "--status-color": statusColor }}>
-            {StatusIcon && <StatusIcon size={12} />}
-            <span>{status?.longLabel}</span>
-          </div>
-
-          {book.pages ? (
-            <div className="details-progress-card">
-              <div className="details-progress-header">
-                <strong>{progress}% Read</strong>
-                <span>
-                  {book.currentPage} / {book.pages} pages
-                </span>
-              </div>
-              <div className="progress-track">
-                <span style={{ width: `${progress}%`, backgroundColor: statusColor }} />
-              </div>
+          <div className="pk-details__head">
+            <div className="pk-details__badges">
+              <StatusChip status={live.status} />
+              {finished && <FinishedBurst />}
             </div>
-          ) : null}
-        </div>
-
-        <div className="details-info-column">
-          <div className="details-title-heading">
-            <h1 className="details-title">{book.title}</h1>
-            <p className="details-author">by {book.author || "Unknown Author"}</p>
-          </div>
-
-          <div className="details-meta-grid">
-            {book.publishedYear && (
-              <div className="details-meta-item">
-                <Calendar size={14} />
-                <span>
-                  Published: <strong>{book.publishedYear}</strong>
-                </span>
-              </div>
+            <h2 id={titleId} className="pk-details__title">
+              {live.title}
+            </h2>
+            <p className="pk-details__author">{live.author || t("book.unknownAuthor")}</p>
+            <p className="pk-details__meta">
+              {[
+                live.publishedYear && t("details.published", { year: live.publishedYear }),
+                live.pages ? t("book.pages", { count: live.pages }) : null,
+                live.isbn && t("details.isbn", { isbn: live.isbn }),
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+            {!inLibrary && (
+              <RatingStars readOnly value={live.rating} label={t("details.rating")} starLabel={(n) => String(n)} />
             )}
-            {book.isbn && (
-              <div className="details-meta-item">
-                <Bookmark size={14} />
-                <span>
-                  ISBN: <strong>{book.isbn}</strong>
-                </span>
-              </div>
-            )}
-            {book.pages ? (
-              <div className="details-meta-item">
-                <BookOpen size={14} />
-                <span>
-                  Length: <strong>{book.pages} pages</strong>
-                </span>
-              </div>
-            ) : null}
           </div>
+        </header>
 
-          <div className="details-rating-section">
-            <span className="details-section-label">Your Review:</span>
-            <Rating value={book.rating} readonly />
-          </div>
+        <div className="pk-details__body">
+          {inLibrary ? (
+            <BookControls
+              book={live}
+              onEditAll={() => {
+                onClose();
+                openEditBook(live);
+              }}
+            />
+          ) : (
+            <div className="pk-details__add">
+              <p>{t("details.notInLibrary")}</p>
+              <Button
+                variant="primary"
+                icon={Plus}
+                onClick={async () => {
+                  await quickAdd(formFromBook(live));
+                }}
+              >
+                {t("details.addToLibrary")}
+              </Button>
+            </div>
+          )}
 
-          <ChipSection
-            label="Genres:"
-            icon={Tag}
-            items={book.genres}
-            sectionClass="details-genres-section"
-            rowClass="genre-row"
-            chipClass="genre-chip"
-          />
-          <ChipSection
-            label="Tags:"
-            items={book.tags}
-            sectionClass="details-tags-section"
-            rowClass="tag-row"
-            chipClass="tag-badge"
-          />
+          <ChipList label={t("details.genres")} items={live.genres} />
+          <ChipList label={t("details.tags")} items={live.tags} />
 
-          <TextSection title="About This Book">
+          <section className="pk-details__section" aria-label={t("details.about")}>
+            <h3 className="pk-details__label">{t("details.about")}</h3>
             {loading ? (
-              <div className="desc-loading-inline">
-                <Loader2 size={16} className="spin" style={{ marginRight: 6 }} />
-                <span>Fetching synopsis from Open Library...</span>
-              </div>
+              <p className="pk-details__loading">
+                <Loader2 size={16} className="pk-spin" aria-hidden="true" /> {t("details.loadingDescription")}
+              </p>
             ) : description ? (
-              <p>{description}</p>
+              <p className="pk-details__text">{description}</p>
             ) : (
-              <p className="empty-desc">No description available for this book.</p>
+              <p className="pk-details__muted">{t("details.noDescription")}</p>
             )}
-          </TextSection>
+          </section>
 
-          <TextSection title="Personal Notes">
-            {book.notes ? (
-              <p>{book.notes}</p>
-            ) : (
-              <p className="empty-desc">No personal notes or review logged for this book yet.</p>
-            )}
-          </TextSection>
+          {inLibrary && <NotesEditor book={live} />}
         </div>
-      </div>
-    </Modal>
+      </article>
+    </Dialog>
   );
+}
+
+/** The details dialog for the book chosen with `openDetails` (nothing when none is open). */
+function BookDetailsModal() {
+  const { detailsBook } = useApp();
+  const { closeDetails } = useUi();
+  if (!detailsBook) return null;
+  return <BookDetails book={detailsBook} onClose={closeDetails} />;
 }
 
 export default BookDetailsModal;

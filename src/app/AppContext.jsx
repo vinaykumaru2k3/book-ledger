@@ -3,6 +3,7 @@ import { useAuthController } from "../features/auth/useAuthController";
 import { useBooksController } from "../features/library/useBooksController";
 import { useShelvesController } from "../features/shelves/useShelvesController";
 import { formFromBook } from "../domain/book";
+import { withCoverTransition } from "../shared/lib/viewTransition";
 
 const AppContext = createContext(null);
 
@@ -123,7 +124,14 @@ export function AppProvider({ children }) {
     setForm(null);
   };
 
-  const openDetails = (book) => setDetailsBook(book);
+  // Opening and closing animate the cover between the list and the dialog where the browser can.
+  const openDetails = (book, sourceEl) => withCoverTransition(() => setDetailsBook(book), { from: sourceEl });
+  const closeDetails = () => {
+    const id = detailsBook?.id;
+    withCoverTransition(() => setDetailsBook(null), {
+      to: () => (id ? document.querySelector(`[data-cover-id="${CSS.escape(String(id))}"]`) : null),
+    });
+  };
 
   const submitForm = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
@@ -146,7 +154,7 @@ export function AppProvider({ children }) {
     openNewBook,
     openEditBook,
     openDetails,
-    closeDetails: () => setDetailsBook(null),
+    closeDetails,
     openDeleteConfirm: (book) => setDeleteConfirmBook(book),
     closeDeleteConfirm: () => setDeleteConfirmBook(null),
     closeModal,

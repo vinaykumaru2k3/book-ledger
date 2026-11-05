@@ -16,7 +16,7 @@ function BookTile({ book }) {
 
   return (
     <article className="pk-tile">
-      <button type="button" className="pk-tile__open" onClick={() => openDetails(book)}>
+      <button type="button" className="pk-tile__open" onClick={(event) => openDetails(book, event.currentTarget.querySelector(".pk-cover"))}>
         <span className="pk-tile__cover">
           <BookCover book={book} size="fluid" />
           {book.favorite && (

@@ -129,7 +129,7 @@ Size: S ≈ a few hours, M ≈ a day, L ≈ several days.
 - Titles/authors shown in Kannada script when the book has Kannada metadata.
 - **Done when:** 500 books scroll smoothly; works one-handed on a phone.
 
-### R3: Book details (M)
+### R3: Book details (M) — **built, in review**
 - Cover-to-details shared-element transition (View Transitions API, fade fallback), cover-tinted page, inline progress/status/notes/rating, "finished a book" moment.
 
 ### R4: Add / edit a book (M)
@@ -140,7 +140,7 @@ Size: S ≈ a few hours, M ≈ a day, L ≈ several days.
 - Bilingual editorial landing (with a taste of the Explorer on it), simpler sign-in.
 - **Password reset and email verification** (currently missing).
 
-### R6: Shelves (S) — **built, in review** (done early: the old page had no styles) · R7: Discover (M) · R8: Insights + Year in review (M)
+### R6: Shelves (S) — **done** (done early: the old page had no styles) · R7: Discover (M) · R8: Insights + Year in review (M)
 > **Note (found during R2):** the Shelves dashboard page has had *no styles at all* since commit `212bd9a` (before this
 > redesign), so it currently renders as an unstyled list. R6 is small, so it is a good candidate to do right after R2.
 

@@ -15,6 +15,7 @@ function BookCover({ book, size = "md", className = "" }) {
     <div
       className={["pk-cover", `pk-cover--${size}`, className].filter(Boolean).join(" ")}
       style={getCoverStyle(`${title}${book?.author || ""}`)}
+      data-cover-id={book?.id}
     >
       {showImage ? (
         <img src={book.coverUrl} alt={title ? `Cover of ${title}` : "Book cover"} loading="lazy" onError={() => setFailed(true)} />
