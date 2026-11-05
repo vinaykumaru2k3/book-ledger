@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { filterAndSortBooks, paginate } from "../../domain/library";
 
-export const BOOKS_PER_PAGE = 8;
+/** How many books fit comfortably on a page in each layout. */
+export const PAGE_SIZES = { grid: 12, list: 10, shelf: 36 };
 
 /**
  * View state for the library list: search text, sort order, layout and page.
@@ -14,15 +15,16 @@ export function useLibraryView(books, view) {
   const [page, setPage] = useState(1);
 
   // Back to the first page whenever the result set changes shape.
-  useEffect(() => setPage(1), [query, sortBy, view]);
+  useEffect(() => setPage(1), [query, sortBy, view, layout]);
 
   const visible = useMemo(() => filterAndSortBooks(books, { view, query, sortBy }), [books, view, query, sortBy]);
-  const pageData = useMemo(() => paginate(visible, page, BOOKS_PER_PAGE), [visible, page]);
+  const pageSize = PAGE_SIZES[layout] || PAGE_SIZES.grid;
+  const pageData = useMemo(() => paginate(visible, page, pageSize), [visible, page, pageSize]);
 
   const resetFilters = () => {
     setQuery("");
     setSortBy("recent");
   };
 
-  return { query, setQuery, sortBy, setSortBy, layout, setLayout, setPage, visible, pageData, resetFilters };
+  return { query, setQuery, sortBy, setSortBy, layout, setLayout, setPage, visible, pageData, pageSize, resetFilters };
 }

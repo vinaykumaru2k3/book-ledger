@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Trash2, FolderOpen, X, Layers, Edit2, Check, ArrowLeft } from "lucide-react";
 import Cover from "../../shared/ui/Cover";
-import BookCard from "../library/BookCard";
+import BookTile from "../library/BookTile";
 import ConfirmDialog from "../../shared/ui/ConfirmDialog";
 import { useShelves } from "../../app/AppContext";
 
@@ -136,9 +136,9 @@ function ShelvesDashboard() {
           </div>
         ) : (
           <div className="book-grid-layout">
-            <div className="book-grid">
+            <div className="pk-tiles">
               {list.map((book) => (
-                <BookCard key={book.id} book={book} layout="grid" />
+                <BookTile key={book.id} book={book} />
               ))}
             </div>
           </div>

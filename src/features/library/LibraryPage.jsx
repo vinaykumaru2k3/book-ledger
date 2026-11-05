@@ -1,26 +1,22 @@
 import React from "react";
-import { Grid3X3, List } from "lucide-react";
-import SearchField from "../../shared/ui/SearchField";
-import SelectField from "../../shared/ui/SelectField";
-import Pagination from "../../shared/ui/Pagination";
-import LoadingPanel from "../../shared/ui/LoadingPanel";
-import { SORT_OPTIONS } from "../../domain/library";
+import { Library, Plus, RotateCcw, SearchX } from "lucide-react";
+import Button from "../../shared/pk/Button";
+import EmptyState from "../../shared/pk/EmptyState";
+import Pagination from "../../shared/pk/Pagination";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 import { useBooks, useUi } from "../../app/AppContext";
-import BookCard from "./BookCard";
-import EmptyState from "./EmptyState";
+import BookList from "./BookList";
 import LibrarySidePanel from "./LibrarySidePanel";
-import { BOOKS_PER_PAGE, useLibraryView } from "./useLibraryView";
-
-const LAYOUTS = [
-  { value: "grid", label: "Grid", icon: Grid3X3, size: 15 },
-  { value: "list", label: "List", icon: List, size: 16 },
-];
+import LibrarySkeleton from "./LibrarySkeleton";
+import LibraryToolbar from "./LibraryToolbar";
+import { useLibraryView } from "./useLibraryView";
 
 /**
- * The main library screen: toolbar (search / sort / layout), the paged list of
- * books for the current view, and the progress side panel.
+ * The main library screen: toolbar, the paged books for the current view in
+ * the chosen layout, and the progress side panel.
  */
 function LibraryPage({ view, stats, onClearView }) {
+  const { t } = useLanguage();
   const { books, booksLoading } = useBooks();
   const { openNewBook } = useUi();
   const lib = useLibraryView(books, view);
@@ -31,66 +27,51 @@ function LibraryPage({ view, stats, onClearView }) {
     lib.resetFilters();
   };
 
+  const hasBooks = books.length > 0;
+
   return (
-    <section className="content-layout">
-      <div className="library-panel">
-        <div className="toolbar">
-          <SearchField
-            value={lib.query}
-            onChange={lib.setQuery}
-            label="Filter library"
-            placeholder="Filter by title, author, tags, notes..."
-          />
-
-          <SelectField
-            className="library-sort-select"
-            label="Sort books"
-            value={lib.sortBy}
-            onChange={lib.setSortBy}
-            options={SORT_OPTIONS}
-          />
-
-          <div className="view-toggle" aria-label="Toggle Layout Grid/List">
-            {LAYOUTS.map(({ value, label, icon: Icon, size }) => (
-              <button
-                key={value}
-                className={lib.layout === value ? "active" : ""}
-                onClick={() => lib.setLayout(value)}
-                aria-label={`${label} View`}
-                title={`${label} Layout`}
-                type="button"
-              >
-                <Icon size={size} />
-              </button>
-            ))}
-          </div>
-        </div>
+    <div className="pk-lib">
+      <section className="pk-lib__main" aria-label={t("nav.library")}>
+        <LibraryToolbar lib={lib} />
 
         {booksLoading ? (
-          <LoadingPanel label="Connecting with Database ledger..." />
+          <LibrarySkeleton />
         ) : lib.visible.length ? (
           <>
-            <div className={lib.layout === "grid" ? "book-grid" : "book-list"}>
-              {pageData.items.map((book) => (
-                <BookCard key={book.id} book={book} layout={lib.layout} />
-              ))}
-            </div>
+            <BookList books={pageData.items} layout={lib.layout} />
             <Pagination
               page={pageData.page}
               pageCount={pageData.pageCount}
               start={pageData.start}
-              pageSize={BOOKS_PER_PAGE}
+              pageSize={lib.pageSize}
               total={pageData.total}
               onChange={lib.setPage}
             />
           </>
         ) : (
-          <EmptyState hasBooks={books.length > 0} onAdd={openNewBook} onReset={clearFilters} />
+          <EmptyState
+            icon={hasBooks ? SearchX : Library}
+            title={hasBooks ? t("empty.noMatchTitle") : t("empty.emptyTitle")}
+            action={
+              <div className="pk-empty__actions">
+                <Button variant="primary" icon={Plus} onClick={openNewBook}>
+                  {t("action.addBook")}
+                </Button>
+                {hasBooks && (
+                  <Button icon={RotateCcw} onClick={clearFilters}>
+                    {t("empty.reset")}
+                  </Button>
+                )}
+              </div>
+            }
+          >
+            {hasBooks ? t("empty.noMatchBody") : t("empty.emptyBody")}
+          </EmptyState>
         )}
-      </div>
+      </section>
 
       <LibrarySidePanel books={books} stats={stats} />
-    </section>
+    </div>
   );
 }
 
