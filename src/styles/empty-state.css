@@ -1,0 +1,59 @@
+/* Empty states */
+/* Empty States */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 24px;
+  text-align: center;
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-lg);
+}
+
+.empty-covers {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.empty-covers span {
+  width: 48px;
+  height: 72px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.06);
+  margin-left: -12px;
+  box-shadow: var(--shadow-sm);
+  background: linear-gradient(135deg, var(--cover-a), var(--cover-b));
+}
+
+.empty-covers span:first-child {
+  margin-left: 0;
+}
+
+.empty-covers span:nth-child(2n) {
+  transform: rotate(-6deg) translateY(-2px);
+}
+
+.empty-covers span:nth-child(3n) {
+  transform: rotate(6deg) translateY(-4px);
+}
+
+.empty-state h3 {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.empty-state p {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  max-width: 320px;
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+.empty-actions {
+  display: flex;
+  gap: 10px;
+}

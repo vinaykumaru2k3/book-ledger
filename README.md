@@ -15,7 +15,7 @@ Built with **React 19**, **Vite**, **Firebase Auth + Firestore**, and the **Goog
 - **Custom shelves**, favourites, tags, notes and ratings.
 - **Insights & discovery**: stats, charts, recommendations from your own taste, and top charts.
 - **Knowledge Galaxy**: an interactive force-directed map linking books by shared author, shelf and tags.
-- **Grid and list layouts**, light and dark themes, deep-linkable views (`/reading`, `/galaxy`, …).
+- **Grid and list layouts**, a warm light theme, deep-linkable views (`/reading`, `/galaxy`, …).
 - **Backup**: JSON export and a safe re-importable import (no duplicates, even if you import twice).
 - **Google or email sign-in**; each user can only ever read their own data.
 
@@ -52,27 +52,27 @@ Deploy to Firebase Hosting with `npm run build` then `firebase deploy`.
 
 ```text
 src/
-├── App.jsx                  App shell: sidebar, filters, view switching (heavy views load lazily)
-├── main.jsx                 Entry point (wraps the app in an error boundary)
-├── firebase.js              Firebase init; config comes from VITE_FIREBASE_* env vars
-├── context/AppContext.jsx   Creates the controllers once; exposes useAuth/useBooks/useShelves/useUi/…
-├── hooks/                   State + I/O: auth, books (Firestore), shelves, URL routing
-├── services/enrichment.js   Fills missing tags/pages from Google Books → Open Library
-├── utils/                   Pure logic: book rules, import/dedupe, graph building and physics
-├── components/              UI components
-└── *.css                    Styles
-firestore.rules              Per-user access + document validation
-docs/ARCHITECTURE.md         How it all fits together (start here as a contributor)
+├── main.jsx          Entry point
+├── app/              Shell: providers, sidebar, routing, page registry (views.js)
+├── features/         One folder per product area: library, shelves, discover, insights, galaxy, auth, landing
+├── shared/ui/        Reusable components: Button, Modal, Pagination, SearchField, Cover, ...
+├── services/         Firebase and book-catalogue (Google Books / Open Library) clients
+├── domain/           Pure rules about books and libraries (no React, no I/O)
+└── styles/           CSS split by area; index.css sets the order
+firestore.rules       Per-user access + document validation
+docs/ARCHITECTURE.md  How it all fits together (start here as a contributor)
 ```
 
-Read **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** for the data model, the layering rule, and the key
-flows (saving, status rules, enrichment, import, routing, galaxy).
+Dependencies point downwards only (`app → features → shared / services → domain`), and a test enforces it.
+Read **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** for the layer rules, the data model, the key flows and a
+step-by-step example of adding a new page.
 
 ## Contributing
 
-1. Put rules in `utils/` or `services/` (no React/Firebase there) and cover them with a test next to the file.
-2. Keep Firestore access inside `hooks/`; components should use the context hooks.
-3. Run `npm test && npm run build` before opening a PR.
+1. Put rules in `domain/` (or a feature's `*Model.js`) with no React or Firebase, and cover them with a test next to the file.
+2. Keep Firestore access inside a feature's `use*Controller` hook; components use the context hooks.
+3. Build dialogs on `shared/ui/Modal` and buttons on `shared/ui/Button`; register new pages in `app/views.js`.
+4. Run `npm test && npm run build` before opening a PR.
 
 ## Tech
 
