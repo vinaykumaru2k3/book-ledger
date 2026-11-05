@@ -1,20 +1,25 @@
 import React, { useMemo } from "react";
-import { Sparkles, X } from "lucide-react";
-import Modal from "../../../shared/ui/Modal";
-import Button from "../../../shared/ui/Button";
+import { Sparkles } from "lucide-react";
+import Button from "../../../shared/pk/Button";
+import Dialog from "../../../shared/pk/Dialog";
 import { findDuplicate, shelvesOf } from "../../../domain/library";
 import { mergeLookupIntoForm } from "../../../domain/book";
 import { buildFormFromVolume } from "../../../services/bookApi";
+import { useLanguage } from "../../../shared/i18n/LanguageContext";
 import { useBooks, useModal } from "../../../app/AppContext";
 import BookLookup from "./BookLookup";
 import BookFormFields from "./BookFormFields";
 import DuplicateWarning from "./DuplicateWarning";
 
+const FORM_ID = "book-form";
+
 /**
  * Add / edit dialog. This component only wires things together:
  * lookup (search the catalogues) → fields (edit) → save (via the modal context).
+ * A click outside never closes it, so half-typed input is not lost by accident.
  */
 function BookFormModal() {
+  const { t } = useLanguage();
   const { books } = useBooks();
   const { editing, form, onFormChange, onSubmit, onClose, quickAdd } = useModal();
 
@@ -34,33 +39,30 @@ function BookFormModal() {
   const quickAddVolume = async (volume) => quickAdd(await buildFormFromVolume(volume));
 
   return (
-    <Modal onClose={onClose} onBackdropClick={() => {}} labelledBy="book-modal-title">
-      <div className="modal-header">
-        <div>
-          <p className="section-kicker">{editing ? "Update Ledger" : "New Addition"}</p>
-          <h2 id="book-modal-title">{editing ? "Modify Book Details" : "Add to Library"}</h2>
-        </div>
-        <button className="icon-button close-btn" onClick={onClose} aria-label="Close" title="Close" type="button">
-          <X size={19} />
-        </button>
-      </div>
-
+    <Dialog
+      size="lg"
+      title={editing ? t("form.editTitle") : t("form.addTitle")}
+      closeLabel={t("action.close")}
+      closeOnBackdrop={false}
+      onClose={onClose}
+      footer={
+        <>
+          <Button variant="ghost" onClick={onClose}>
+            {t("action.cancel")}
+          </Button>
+          <Button variant="primary" type="submit" form={FORM_ID} icon={Sparkles}>
+            {editing ? t("form.saveChanges") : t("form.save")}
+          </Button>
+        </>
+      }
+    >
       {!editing && <BookLookup books={books} onFill={fillFromVolume} onQuickAdd={quickAddVolume} />}
       {duplicate && <DuplicateWarning book={duplicate} />}
 
-      <form className="book-form" onSubmit={onSubmit}>
-        <BookFormFields form={form} patch={patch} shelfOptions={shelfOptions} />
-
-        <div className="modal-footer">
-          <Button className="on-light" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button variant="primary" type="submit" icon={Sparkles} iconSize={16}>
-            {editing ? "Save Changes" : "Save Book"}
-          </Button>
-        </div>
+      <form id={FORM_ID} className="pk-form" onSubmit={onSubmit}>
+        <BookFormFields form={form} patch={patch} shelfOptions={shelfOptions} editing={editing} focusTitle={editing} />
       </form>
-    </Modal>
+    </Dialog>
   );
 }
 

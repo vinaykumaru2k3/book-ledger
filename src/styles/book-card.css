@@ -193,14 +193,6 @@
   color: var(--accent-amber);
 }
 
-.rating.readonly .star-icon {
-  color: var(--text-muted);
-}
-
-.rating.readonly .star-icon.filled {
-  color: var(--accent-amber);
-}
-
 .tag-row {
   display: flex;
   flex-wrap: wrap;

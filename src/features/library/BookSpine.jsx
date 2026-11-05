@@ -1,5 +1,5 @@
 import React from "react";
-import { getCoverStyle } from "../../shared/ui/Cover";
+import { getCoverStyle } from "../../shared/lib/cover";
 
 // A spine's size follows the book: thicker for more pages, within sensible limits.
 export const spineHeight = (pages) => 150 + (Math.min(Math.max(pages || 0, 0), 700) / 700) * 56;

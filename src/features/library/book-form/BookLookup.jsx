@@ -1,155 +1,119 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Import, Loader2, Plus } from "lucide-react";
-import Cover from "../../../shared/ui/Cover";
-import Button from "../../../shared/ui/Button";
-import SearchField from "../../../shared/ui/SearchField";
-import SelectField from "../../../shared/ui/SelectField";
+import BookCover from "../../../shared/pk/BookCover";
+import Button from "../../../shared/pk/Button";
+import SearchBox from "../../../shared/pk/SearchBox";
+import SelectBox from "../../../shared/pk/SelectBox";
 import { findDuplicate } from "../../../domain/library";
+import { useLanguage } from "../../../shared/i18n/LanguageContext";
 import { useBookSearch } from "./useBookSearch";
 
-const SEARCH_TYPES = [
-  { value: "all", label: "General Search" },
-  { value: "title", label: "By Title" },
-  { value: "author", label: "By Author" },
-  { value: "genre", label: "By Genre/Subject" },
-];
+const TYPES = ["all", "title", "author", "genre"];
 
 function ResultRow({ volume, alreadyAdded, onFill, onQuickAdd }) {
+  const { t } = useLanguage();
   const info = volume.volumeInfo || {};
   const authors = info.authors?.join(", ") || "";
-  const description = info.description ? info.description.replace(/<[^>]*>/g, "").slice(0, 100) : "";
-  const thumbnail = info.imageLinks?.smallThumbnail || info.imageLinks?.thumbnail || "";
-  const preview = {
-    title: info.title || "Untitled",
-    author: authors || "Unknown Author",
-    coverUrl: thumbnail.replace(/^http:\/\//, "https://"),
-  };
+  const snippet = info.description ? info.description.replace(/<[^>]*>/g, "").slice(0, 110) : "";
+  const thumbnail = (info.imageLinks?.smallThumbnail || info.imageLinks?.thumbnail || "").replace(/^http:\/\//, "https://");
+  const preview = { title: info.title || "Untitled", author: authors, coverUrl: thumbnail };
 
   return (
-    <div className="dropdown-result-row">
-      <Cover book={preview} className="tiny" />
-      <div className="result-details">
+    <li className="pk-result">
+      <BookCover book={preview} size="sm" />
+      <div className="pk-result__text">
         <strong>{info.title}</strong>
         <span>
-          {authors || "Unknown Author"}
+          {authors || t("book.unknownAuthor")}
           {info.publishedDate ? ` • ${info.publishedDate.split("-")[0]}` : ""}
-          {info.pageCount ? ` • ${info.pageCount}p` : ""}
+          {info.pageCount ? ` • ${t("book.pages", { count: info.pageCount })}` : ""}
         </span>
-        {description && <span className="result-desc">{description}…</span>}
+        {snippet && <span className="pk-result__snippet">{snippet}…</span>}
         {info.categories?.length > 0 && (
-          <div className="result-genres">
+          <span className="pk-result__chips">
             {info.categories.slice(0, 3).map((category) => (
-              <span key={category} className="genre-chip">
-                {category}
-              </span>
+              <span key={category}>{category}</span>
             ))}
-          </div>
+          </span>
         )}
       </div>
-      <div className="result-actions">
-        <Button compact icon={Import} iconSize={14} className="use-result-btn" onClick={() => onFill(volume)}>
-          Fill Form
+      <div className="pk-result__actions">
+        <Button size="sm" icon={Import} onClick={() => onFill(volume)}>
+          {t("lookup.fill")}
         </Button>
-        <Button
-          compact
-          variant="primary"
-          icon={Plus}
-          iconSize={14}
-          className="quick-add-btn"
-          disabled={alreadyAdded}
-          onClick={() => onQuickAdd(volume)}
-        >
-          {alreadyAdded ? "Added" : "Quick Add"}
+        <Button size="sm" variant="primary" icon={Plus} disabled={alreadyAdded} onClick={() => onQuickAdd(volume)}>
+          {alreadyAdded ? t("lookup.added") : t("lookup.quickAdd")}
         </Button>
       </div>
-    </div>
+    </li>
   );
 }
 
 /**
- * Search box with a results dropdown. Picking "Fill Form" or "Quick Add" is
- * delegated to the parent, which knows what to do with the chosen volume.
+ * Search the book catalogues (Google Books, then Open Library) and either fill
+ * the form from a result or add it straight away. Results sit inline above the
+ * form; after "Fill form" they fold away so the form is in view.
  */
 function BookLookup({ books, onFill, onQuickAdd }) {
+  const { t } = useLanguage();
   const [query, setQuery] = useState("");
   const [type, setType] = useState("all");
-  const [open, setOpen] = useState(false);
-  const containerRef = useRef(null);
-  const { results, searching, error } = useBookSearch(query, type);
+  const [folded, setFolded] = useState(false);
+  const { results, searching, problem } = useBookSearch(query, type);
 
-  // Open the dropdown whenever a search finishes with something to show.
-  useEffect(() => {
-    if (!searching && (results.length > 0 || error)) setOpen(true);
-    if (!query.trim()) setOpen(false);
-  }, [results, error, searching, query]);
+  // A new search or a new query brings the results back.
+  useEffect(() => setFolded(false), [query, type]);
 
-  // Close when clicking anywhere outside the search box.
-  useEffect(() => {
-    const onPointerDown = (event) => {
-      if (containerRef.current && !containerRef.current.contains(event.target)) setOpen(false);
-    };
-    document.addEventListener("mousedown", onPointerDown);
-    return () => document.removeEventListener("mousedown", onPointerDown);
-  }, []);
+  const status = searching
+    ? t("lookup.searching")
+    : problem
+      ? t(`lookup.${problem}`)
+      : results.length && !folded
+        ? t("lookup.count", { count: results.length })
+        : "";
 
-  const choose = (action) => async (volume) => {
-    await action(volume);
-    setOpen(false);
+  const fill = async (volume) => {
+    await onFill(volume);
+    setFolded(true);
   };
 
   return (
-    <div className="lookup-section">
-      <div className="lookup-controls">
-        <div className="search-field-container" ref={containerRef}>
-          <SearchField
-            value={query}
-            onChange={setQuery}
-            label="Search for a book"
-            placeholder="Search title, author, transliterated names..."
-            onFocus={() => (results.length > 0 || error) && setOpen(true)}
-          >
-            {searching && <Loader2 className="spin search-spinner" size={18} />}
-          </SearchField>
-
-          {open && (results.length > 0 || error) && (
-            <div className="search-dropdown-menu">
-              {error ? (
-                <div className="dropdown-message error">{error}</div>
-              ) : (
-                results.map((volume) => {
-                  const info = volume.volumeInfo || {};
-                  const alreadyAdded = Boolean(
-                    findDuplicate(books, {
-                      sourceKey: volume.id,
-                      title: info.title,
-                      author: info.authors?.join(", "),
-                    })
-                  );
-                  return (
-                    <ResultRow
-                      key={volume.id}
-                      volume={volume}
-                      alreadyAdded={alreadyAdded}
-                      onFill={choose(onFill)}
-                      onQuickAdd={choose(onQuickAdd)}
-                    />
-                  );
-                })
-              )}
-            </div>
-          )}
-        </div>
-
-        <SelectField
-          className="search-type-select"
-          label="Search by"
+    <section className="pk-lookup" aria-label={t("lookup.region")}>
+      <div className="pk-lookup__bar">
+        <SearchBox
+          className="pk-lookup__search"
+          value={query}
+          onChange={setQuery}
+          label={t("lookup.label")}
+          placeholder={t("lookup.placeholder")}
+          clearLabel={t("action.close")}
+          data-autofocus
+        />
+        <SelectBox
           value={type}
           onChange={setType}
-          options={SEARCH_TYPES}
-          chevron={false}
+          label={t("lookup.typeLabel")}
+          options={TYPES.map((value) => ({ value, label: t(`lookup.type.${value}`) }))}
         />
       </div>
-    </div>
+
+      <p className="pk-lookup__status" role="status" aria-live="polite">
+        {searching && <Loader2 size={14} className="pk-spin" aria-hidden="true" />}
+        {status || (!query.trim() ? t("lookup.hint") : "")}
+      </p>
+
+      {results.length > 0 && !folded && (
+        <ul className="pk-lookup__results">
+          {results.map((volume) => {
+            const info = volume.volumeInfo || {};
+            const alreadyAdded = Boolean(
+              findDuplicate(books, { sourceKey: volume.id, title: info.title, author: info.authors?.join(", ") })
+            );
+            return <ResultRow key={volume.id} volume={volume} alreadyAdded={alreadyAdded} onFill={fill} onQuickAdd={onQuickAdd} />;
+          })}
+        </ul>
+      )}
+    </section>
   );
 }
 

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { getCoverStyle, getInitials } from "../ui/Cover";
+import { getCoverStyle, getInitials } from "../lib/cover";
 
 /**
  * A book cover with physical depth: spine highlight, page edge and shadow.

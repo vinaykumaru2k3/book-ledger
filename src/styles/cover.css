@@ -51,16 +51,3 @@
   border-radius: 99px;
   opacity: 0.6;
 }
-
-.cover.tiny {
-  width: 32px;
-  border-radius: 3px;
-}
-
-.cover.tiny .cover-initials {
-  font-size: 0.65rem;
-}
-
-.cover.tiny .cover-fallback {
-  padding: 4px;
-}

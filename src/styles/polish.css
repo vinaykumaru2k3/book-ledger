@@ -5,15 +5,6 @@
 
 /* Vintage-Modern Serif Headers */
 
-.section-kicker {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 0.85rem;
-  color: var(--accent-emerald) !important;
-  letter-spacing: 0.05em;
-  text-transform: capitalize;
-}
-
 /* Hardcover Library Book Spine style Cards */
 .book-card {
   border-left: 4px solid var(--accent-emerald) !important; /* Elegant gold/leather spine marker */

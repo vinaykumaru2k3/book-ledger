@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { FastAverageColor } from "fast-average-color";
-import { getCoverStyle } from "../../../shared/ui/Cover";
+import { getCoverStyle } from "../../../shared/lib/cover";
 
 /**
  * A colour taken from the book's cover, used to wash the details page.

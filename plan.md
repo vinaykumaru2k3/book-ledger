@@ -129,10 +129,10 @@ Size: S ≈ a few hours, M ≈ a day, L ≈ several days.
 - Titles/authors shown in Kannada script when the book has Kannada metadata.
 - **Done when:** 500 books scroll smoothly; works one-handed on a phone.
 
-### R3: Book details (M) — **built, in review**
+### R3: Book details (M) — **done**
 - Cover-to-details shared-element transition (View Transitions API, fade fallback), cover-tinted page, inline progress/status/notes/rating, "finished a book" moment.
 
-### R4: Add / edit a book (M)
+### R4: Add / edit a book (M) — **built, in review**
 - Command-style lookup, calmer sectioned form, better duplicate warning and shelf picker.
 - Kannada-aware: lookups accept Kannada script and transliteration (reuses the Explorer's transliteration table from K2 when ready).
 
