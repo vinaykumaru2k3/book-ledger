@@ -270,12 +270,6 @@
 }
 
 /* Sidebar Divider */
-.sidebar-divider {
-  height: 1px;
-  background-color: var(--border-subtle);
-  margin: 12px 24px;
-  opacity: 0.5;
-}
 
 /* Top Charts / Discover Tab Styles */
 .top-charts-container {

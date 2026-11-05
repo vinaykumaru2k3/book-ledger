@@ -1,53 +1,42 @@
 /**
- * Registry of the app's views. To add a page: create the feature component,
- * add it here, and add its route name to `PAGE_ROUTES` in `usePathRoute.js`.
+ * Registry of the app's pages. To add a page: create the feature component,
+ * add it here, and add its nav entry in `nav.js`.
  *
- * Routes that are *not* listed here ("all", a status, "favorites",
- * "shelf:<name>") show the library list.
+ * Headings come from the translation dictionary under `view.<id>.kicker` and
+ * `view.<id>.title`. Routes that are *not* listed here ("all", a status,
+ * "favorites", "shelf:<name>") show the library list.
  */
 import { lazy } from "react";
+import { KANNADA_UI_ENABLED } from "../shared/i18n/config";
 import { shelfFromRoute } from "../domain/library";
 
 // Heavy pages load on demand so the first screen stays small.
 export const PAGES = {
-  recommendations: {
-    kicker: "Personalized Discovery",
-    title: "Book Recommendations",
-    Component: lazy(() => import("../features/discover/Recommendations")),
-  },
-  topbooks: {
-    kicker: "Popular Charts",
-    title: "Discover Top Books",
-    Component: lazy(() => import("../features/discover/TopCharts")),
-  },
-  analytics: {
-    kicker: "Reading Insights",
-    title: "Library Analytics",
-    Component: lazy(() => import("../features/insights/Analytics")),
-  },
-  shelves: {
-    kicker: "Library Dashboard",
-    title: "Custom Shelves",
-    Component: lazy(() => import("../features/shelves/ShelvesDashboard")),
-  },
+  recommendations: { Component: lazy(() => import("../features/discover/Recommendations")) },
+  topbooks: { Component: lazy(() => import("../features/discover/TopCharts")) },
+  analytics: { Component: lazy(() => import("../features/insights/Analytics")) },
+  shelves: { Component: lazy(() => import("../features/shelves/ShelvesDashboard")) },
   galaxy: {
-    kicker: "Constellation Graph",
-    title: "Knowledge Galaxy",
     Component: lazy(() => import("../features/galaxy/ConstellationGraph")),
     fullBleed: true, // draws edge to edge, without the panel padding
   },
+  // The Kannada Explorer is public (no sign-in) and hidden until the Kannada UI is reviewed.
+  ...(KANNADA_UI_ENABLED
+    ? { kannada: { Component: lazy(() => import("../features/kannada/KannadaExplorerPage")), public: true, bare: true } }
+    : {}),
 };
 
-/** Heading text and page component (if any) for a route. */
-export function describeRoute(route) {
-  const page = PAGES[route] || null;
-  if (page) return { page, kicker: page.kicker, title: page.title, isLibrary: false };
+/** What to show for a view: the page component (if any) and its heading keys. */
+export function describeRoute(view) {
+  const page = PAGES[view] || null;
+  if (page) return { page, kickerKey: `view.${view}.kicker`, titleKey: `view.${view}.title`, isLibrary: false };
 
-  const shelf = shelfFromRoute(route);
+  const shelf = shelfFromRoute(view);
   return {
     page: null,
-    kicker: "Library Dashboard",
-    title: shelf !== null ? `Shelf: ${shelf}` : "My Library",
+    kickerKey: shelf !== null ? "view.shelf.kicker" : "view.all.kicker",
+    titleKey: shelf !== null ? "view.shelf.title" : "view.all.title",
+    titleVars: shelf !== null ? { name: shelf } : undefined,
     isLibrary: true,
   };
 }

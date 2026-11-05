@@ -45,10 +45,14 @@ those hooks and never create their own Firestore subscriptions.
   else works with three shapes it returns: a search **volume**, a book **form**, and a Discover **item**.
 - `enrichment.js` – fills missing tags/pages for saved books, with caching.
 
-### `shared/ui/` – reusable components
-`Button`, `Modal`, `ConfirmDialog`, `Pagination`, `SearchField`, `SelectField`, `Field`, `Cover`, `Rating`,
-`Toast`, `LoadingPanel`, `LoadingScreen`, `ErrorBoundary`. They take props and know nothing about books beyond `Cover`.
-New dialogs should be built on `Modal`; new buttons should use `Button`.
+### `shared/` – reusable building blocks
+- `shared/pk/` – **the new design system** (redesign, see `plan.md`): `Button`, `Card`, `Badge`, `Skeleton`, `Tabs`,
+  `Dialog` (focus trap, scroll lock), `Menu`, `Field`, `ProgressRibbon`, `BookCover`, `EmptyState`, `LanguageToggle`.
+  They read only `--pk-*` tokens (`styles/design-tokens.css`). **Build new screens from these.** Browse them at `/dev/ui`.
+- `shared/i18n/` – English / Kannada text: `en.js` (source of truth), `kn.js` (draft, hidden in production until
+  reviewed), `translate()` (pure), `useLanguage()` → `{ t, lang, setLang }`.
+- `shared/ui/` – the older components (`Button`, `Modal`, `Pagination`, `Cover`, …) still used by pages that have
+  not been redesigned yet. They are removed page by page as the redesign proceeds (plan.md, phase R10).
 
 ### `features/` – one folder per product area
 | Feature | Contents |
@@ -58,23 +62,33 @@ New dialogs should be built on `Modal`; new buttons should use `Button`.
 | `discover` | `Recommendations`, `TopCharts`, shared `DiscoverCard`; pure `recommendationsModel.js` and `topChartFilters.js` |
 | `insights` | `Analytics` composed of cards in `AnalyticsCards.jsx`; pure `analyticsModel.js` |
 | `galaxy` | `ConstellationGraph`, `GalaxyControls`, `NodeInspector`, `useForceSimulation`; pure `graph.js`, `graphSimulation.js` |
-| `auth` | `AuthScreen` = `AuthArt` + `AuthCard`, `AccountCard`, `useAuthController` |
+| `auth` | `AuthScreen` = `AuthArt` + `AuthCard`, `useAuthController` |
 | `landing` | `LandingPage` |
+| `kannada` | `KannadaExplorerPage` (placeholder for the Kannada Explorer, plan.md track K; public, hidden until the Kannada UI is enabled) |
 
 **Pattern inside a feature:** a pure `*Model.js` (testable logic) → a `use*` hook (state/effects) → components (markup).
 
 ### `app/` – the shell
-- `App.jsx` – chooses between loading, landing, sign-in and the workspace.
-- `Workspace.jsx` – signed-in layout: `Sidebar` + `PageHeader` + the page for the current route + global dialogs.
-- `views.js` – **registry of pages** (title, lazy component). Add a page here.
-- `usePathRoute.js` – keeps the view in the URL (`/reading`, `/shelf%3AName`, `/galaxy`); unknown paths redirect to `/`.
+- `App.jsx` – the gate: loading → public page → landing → sign-in → workspace. Owns the route (`usePathRoute`).
+- `Workspace.jsx` – signed-in layout: `NavRail` (desktop) / `TabBar` (phone) + `PageHeader` + the page for the
+  route + command palette + global dialogs. Pages fade in on every navigation.
+- `shell/` – `NavRail`, `TabBar` (+ "More" sheet), `AccountMenu`, `CommandPalette`, `PublicShell`, `NavLink`
+  (a real `<a href>` so middle-click and "open in new tab" work), `useCommandHotkey` (`/` and Ctrl/Cmd+K).
+- `views.js` – **registry of pages** (lazy component, `public`/`bare`/`fullBleed` flags). Headings come from the
+  dictionary under `view.<id>.kicker|title`.
+- `nav.js` – **the destinations list** that feeds the rail, tab bar, More sheet and palette (one place to add a link).
+- `commands.js` – palette logic (pure): `buildCommands`, `searchCommands`, `groupResults`.
+- `routes.js` – URL ↔ view mapping (pure): `parseLocation`, `buildPath`. Legacy single-segment URLs
+  (`/reading`, `/shelf%3AName`) keep working; nested views such as `/kannada/author/:id` expose `params`.
+- `usePathRoute.js` – the hook: `[view, navigate, location]`; unknown paths redirect to `/`.
+- Public pages (`public: true` in `views.js`) open without signing in, inside `PublicShell`.
 
 ## Adding a feature (example: a "Time Machine" page)
 1. Create `features/timeline/` with `timelineModel.js` (+ test), `useTimeline.js`, `TimelinePage.jsx`.
-2. Register it in `app/views.js` (`PAGES.timeline = { kicker, title, Component: lazy(...) }`).
-3. Add a nav entry in `app/Sidebar.jsx`.
-4. Use `shared/ui` for buttons/dialogs and `services/bookApi.js` for any catalogue calls.
-That is the whole change; `usePathRoute` picks the route up from `PAGES` automatically.
+2. Register it in `app/views.js` (`PAGES.timeline = { Component: lazy(...) }`) and add `view.timeline.kicker|title` to `en.js` and `kn.js`.
+3. Add a destination in `app/nav.js` (icon, `labelKey`, optional `shortKey`).
+4. Build the UI from `shared/pk`, and use `services/bookApi.js` for any catalogue calls.
+That is the whole change: routing, the rail, the tab bar and the command palette pick it up automatically.
 
 ## Data model
 One Firestore document per book at `users/{uid}/books/{bookId}`:
@@ -112,7 +126,7 @@ One Firestore document per book at `users/{uid}/books/{bookId}`:
 ## Testing
 `npm test` (Vitest) covers:
 - **Rules:** `domain/*`, discover/insights/galaxy models, `services/enrichment`, route validation.
-- **Rendering:** `app/Workspace.test.jsx` renders the signed-in app against a fake context (routing, filters, layouts, lazy pages, galaxy) and `BookFormModal.test.jsx` the add/edit dialog.
+- **Rendering:** `app/Workspace.test.jsx` renders the signed-in app against a fake context (shell, routing, palette, account menu, filters, layouts, lazy pages, galaxy) and `BookFormModal.test.jsx` the add/edit dialog.
 - **Architecture:** `architecture.test.js` fails if a file imports across a forbidden layer boundary.
 
 Not covered: real Firestore/Auth behaviour and the live catalogue APIs.
