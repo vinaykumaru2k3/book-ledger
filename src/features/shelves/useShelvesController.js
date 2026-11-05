@@ -6,19 +6,19 @@
  */
 import { useMemo } from "react";
 
-const BOARD_PRESETS = [
-  { class: "shelf-board-sepia", color: "#d97706" },
-  { class: "shelf-board-cosmic", color: "#6366f1" },
-  { class: "shelf-board-botanical", color: "#10b981" },
-  { class: "shelf-board-crimson", color: "#ef4444" },
-  { class: "shelf-board-amber", color: "#f59e0b" },
-  { class: "shelf-board-teal", color: "#14b8a6" },
+const SHELF_COLORS = [
+  "#d97706",
+  "#6366f1",
+  "#10b981",
+  "#ef4444",
+  "#f59e0b",
+  "#14b8a6",
 ];
 
-/** Stable look for a shelf, derived from its name. */
+/** Stable look for a shelf (an accent colour), derived from its name. */
 export function getPreset(shelfName) {
   const codeSum = shelfName.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return BOARD_PRESETS[codeSum % BOARD_PRESETS.length];
+  return { color: SHELF_COLORS[codeSum % SHELF_COLORS.length] };
 }
 
 export function useShelvesController(books, updateManyBooks, notify) {

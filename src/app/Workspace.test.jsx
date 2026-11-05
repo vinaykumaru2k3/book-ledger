@@ -24,7 +24,7 @@ const exportLedger = vi.fn();
 vi.mock("./AppContext", () => ({
   useAuth: () => ({ user: { uid: "u", displayName: "Test Reader", email: "t@example.com" }, signOut }),
   useBooks: () => ({ books, booksLoading: false, exportLedger, importLedger: vi.fn(), updateBook: vi.fn(), deleteBook: vi.fn() }),
-  useShelves: () => ({ uniqueShelves: ["Classics"], shelfBooks: { Classics: [books[0]] }, getPreset: () => ({ class: "x", color: "#000" }), renameShelf: vi.fn(), deleteShelf: vi.fn() }),
+  useShelves: () => ({ uniqueShelves: ["Classics"], shelfBooks: { Classics: [books[0]] }, getPreset: () => ({ color: "#000" }), renameShelf: vi.fn(), deleteShelf: vi.fn() }),
   useUi: () => ui,
   useModal: () => ({ open: false, quickAdd: vi.fn() }),
   useToast: () => ({ toast: "", toastType: "success" }),
@@ -78,6 +78,17 @@ describe("library", () => {
     expect(screen.getByRole("heading", { level: 1, name: "Shelf: Classics" })).toBeTruthy();
     expect(within(document.querySelector(".pk-tiles")).queryByText("Emma")).toBeNull();
     expect(screen.queryByRole("tablist")).toBeNull();
+    // A shelf page offers a way back and a rename/delete menu.
+    expect(screen.getByRole("link", { name: "All shelves" }).getAttribute("href")).toBe("/shelves");
+    expect(screen.getByRole("button", { name: "Shelf options" })).toBeTruthy();
+  });
+
+  it("opens a shelf from the shelves page without a reload", async () => {
+    renderAt("/shelves");
+    const card = await screen.findByRole("link", { name: /Open shelf Classics/ });
+    fireEvent.click(card);
+    expect(window.location.pathname).toBe("/shelf%3AClassics");
+    expect(screen.getByRole("heading", { level: 1, name: "Shelf: Classics" })).toBeTruthy();
   });
 
   it("searches the library and offers a reset when nothing matches", () => {

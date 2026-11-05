@@ -130,5 +130,21 @@ export default {
   "side.noActive": "No active books.",
   "side.noFinished": "No books completed yet.",
 
+
+  "shelves.intro": "Collections you have made. Open one to see its books.",
+  "shelves.emptyTitle": "No shelves yet",
+  "shelves.emptyBody": "Use the shelf button on any book to start a collection, like Summer Reads or Classics.",
+  "shelves.openShelf": "Open shelf {name}",
+  "shelves.back": "All shelves",
+  "shelf.count": "{count} books",
+  "shelf.countOne": "1 book",
+  "shelf.options": "Shelf options",
+  "shelf.rename": "Rename shelf",
+  "shelf.delete": "Delete shelf",
+  "shelf.nameLabel": "Shelf name",
+  "shelf.deleteTitle": "Delete this shelf?",
+  "shelf.deleteBody": "Delete the shelf {name}? Its books stay in your library; they are just removed from this shelf.",
+  "shelf.confirmDelete": "Delete",
+
   "count.books": "{count} books",
 };

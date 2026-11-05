@@ -124,7 +124,7 @@ Size: S ≈ a few hours, M ≈ a day, L ≈ several days.
 - **Public routes + nested routes:** the shell works signed out for public pages; route params (`/kannada/author/:id`).
 - **Done when:** any route reachable by mouse, touch and keyboard; signed-out visitors can open public pages; no layout shift.
 
-### R2: Library (L) — **built, in review**
+### R2: Library (L) — **done**
 - Shelf view (spine-out), refined grid and list, new `BookCard` with ribbon progress, redesigned toolbar and filters, skeletons, empty states.
 - Titles/authors shown in Kannada script when the book has Kannada metadata.
 - **Done when:** 500 books scroll smoothly; works one-handed on a phone.
@@ -140,7 +140,7 @@ Size: S ≈ a few hours, M ≈ a day, L ≈ several days.
 - Bilingual editorial landing (with a taste of the Explorer on it), simpler sign-in.
 - **Password reset and email verification** (currently missing).
 
-### R6: Shelves (S) · R7: Discover (M) · R8: Insights + Year in review (M)
+### R6: Shelves (S) — **built, in review** (done early: the old page had no styles) · R7: Discover (M) · R8: Insights + Year in review (M)
 > **Note (found during R2):** the Shelves dashboard page has had *no styles at all* since commit `212bd9a` (before this
 > redesign), so it currently renders as an unstyled list. R6 is small, so it is a good candidate to do right after R2.
 

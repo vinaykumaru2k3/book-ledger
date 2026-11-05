@@ -7,7 +7,8 @@ import BookDetailsModal from "../features/library/BookDetailsModal";
 import DeleteConfirmModal from "../features/library/DeleteConfirmModal";
 import LibraryPage from "../features/library/LibraryPage";
 import LibraryTabs from "../features/library/LibraryTabs";
-import { computeLibraryStats, shelfFromRoute } from "../domain/library";
+import ShelfActions from "../features/shelves/ShelfActions";
+import { computeLibraryStats, shelfFromRoute, shelfRoute } from "../domain/library";
 import { useApp, useBooks, useModal, useToast, useUi } from "./AppContext";
 import PageHeader from "./PageHeader";
 import { buildPath } from "./routes";
@@ -33,6 +34,7 @@ function Workspace({ view, navigate, location }) {
 
   const stats = useMemo(() => computeLibraryStats(books), [books]);
   const { page, kickerKey, titleKey, titleVars, isLibrary } = describeRoute(view);
+  const shelfName = shelfFromRoute(view);
   const anyDialogOpen = modal.open || Boolean(detailsBook) || Boolean(deleteConfirmBook);
 
   const openPalette = useCallback(() => setPaletteOpen(true), []);
@@ -60,22 +62,29 @@ function Workspace({ view, navigate, location }) {
           showStats={isLibrary}
           onOpenCommand={openPalette}
           onAdd={openNewBook}
+          onNavigate={navigate}
+          back={shelfName !== null ? { view: "shelves", label: t("shelves.back") } : undefined}
+          extra={
+            shelfName !== null && (
+              <ShelfActions name={shelfName} onRenamed={(next) => navigate(shelfRoute(next))} onDeleted={() => navigate("shelves")} />
+            )
+          }
         />
 
-        {isLibrary && shelfFromRoute(view) === null && <LibraryTabs view={view} stats={stats} onChange={navigate} />}
+        {isLibrary && shelfName === null && <LibraryTabs view={view} stats={stats} onChange={navigate} />}
 
         {/* Keyed by view so the entrance animation replays on every navigation. */}
         <main id="main" className="pk-page" key={view} tabIndex={-1}>
           <Suspense fallback={<LoadingPanel label="Loading view..." />}>
             {page ? (
               page.bare ? (
-                <page.Component params={location.params} path={buildPath(view, location.params)} />
+                <page.Component params={location.params} path={buildPath(view, location.params)} navigate={navigate} />
               ) : (
                 <div
                   className="library-panel recommendations-panel-wrapper"
                   style={page.fullBleed ? { padding: 0, overflow: "hidden" } : undefined}
                 >
-                  <page.Component />
+                  <page.Component navigate={navigate} />
                 </div>
               )
             ) : (

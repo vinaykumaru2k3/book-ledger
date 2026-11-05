@@ -58,7 +58,7 @@ those hooks and never create their own Firestore subscriptions.
 | Feature | Contents |
 |---|---|
 | `library` | `LibraryPage` (toolbar → books → pagination, plus `LibrarySidePanel`) · `BookList` picks the layout: `BookTile` (grid), `BookRow` (list) or `ShelfView` (books standing spine-out) · `BookActions` + `ShelfPopover` · `StatusChip` · `StatsStrip` · `LibraryTabs` · `LibrarySkeleton` · `BookDetailsModal` · `DeleteConfirmModal` · `book-form/` (the add/edit dialog: `BookLookup`, `BookFormFields`, `ShelfPicker`, `DuplicateWarning`, `useBookSearch`) · `useBooksController` (Firestore) · `useLibraryView` (search, sort, layout, page size per layout) |
-| `shelves` | `ShelvesDashboard`, `useShelvesController` (rename/delete shelves in one batched write) |
+| `shelves` | `ShelvesDashboard` (each shelf is a link card: a miniature wooden shelf) · `ShelfActions` (rename / delete menu shown in the header of a shelf page) · `useShelvesController` (rename/delete in one batched write). A shelf's own page *is* the library view filtered to it (`/shelf%3A<name>`), so it gets the toolbar, layouts and paging for free |
 | `discover` | `Recommendations`, `TopCharts`, shared `DiscoverCard`; pure `recommendationsModel.js` and `topChartFilters.js` |
 | `insights` | `Analytics` composed of cards in `AnalyticsCards.jsx`; pure `analyticsModel.js` |
 | `galaxy` | `ConstellationGraph`, `GalaxyControls`, `NodeInspector`, `useForceSimulation`; pure `graph.js`, `graphSimulation.js` |

@@ -134,5 +134,21 @@ export default {
   "side.noActive": "ಯಾವ ಪುಸ್ತಕವೂ ಓದುತ್ತಿಲ್ಲ.",
   "side.noFinished": "ಇನ್ನೂ ಯಾವ ಪುಸ್ತಕವೂ ಮುಗಿದಿಲ್ಲ.",
 
+
+  "shelves.intro": "ನೀವು ರಚಿಸಿದ ಸಂಗ್ರಹಗಳು. ಅದರ ಪುಸ್ತಕಗಳನ್ನು ನೋಡಲು ಒಂದನ್ನು ತೆರೆಯಿರಿ.",
+  "shelves.emptyTitle": "ಇನ್ನೂ ಕಪಾಟುಗಳಿಲ್ಲ",
+  "shelves.emptyBody": "ಯಾವುದೇ ಪುಸ್ತಕದ ಕಪಾಟು ಬಟನ್ ಬಳಸಿ ಸಂಗ್ರಹವನ್ನು ಪ್ರಾರಂಭಿಸಿ, ಉದಾಹರಣೆಗೆ ಬೇಸಿಗೆ ಓದು ಅಥವಾ ಶ್ರೇಷ್ಠ ಕೃತಿಗಳು.",
+  "shelves.openShelf": "{name} ಕಪಾಟು ತೆರೆಯಿರಿ",
+  "shelves.back": "ಎಲ್ಲಾ ಕಪಾಟುಗಳು",
+  "shelf.count": "{count} ಪುಸ್ತಕಗಳು",
+  "shelf.countOne": "1 ಪುಸ್ತಕ",
+  "shelf.options": "ಕಪಾಟಿನ ಆಯ್ಕೆಗಳು",
+  "shelf.rename": "ಕಪಾಟಿನ ಹೆಸರು ಬದಲಿಸಿ",
+  "shelf.delete": "ಕಪಾಟು ಅಳಿಸಿ",
+  "shelf.nameLabel": "ಕಪಾಟಿನ ಹೆಸರು",
+  "shelf.deleteTitle": "ಈ ಕಪಾಟನ್ನು ಅಳಿಸಬೇಕೇ?",
+  "shelf.deleteBody": "{name} ಕಪಾಟನ್ನು ಅಳಿಸಬೇಕೇ? ಅದರ ಪುಸ್ತಕಗಳು ನಿಮ್ಮ ಗ್ರಂಥಾಲಯದಲ್ಲೇ ಉಳಿಯುತ್ತವೆ; ಈ ಕಪಾಟಿನಿಂದ ಮಾತ್ರ ತೆಗೆಯಲಾಗುತ್ತದೆ.",
+  "shelf.confirmDelete": "ಅಳಿಸಿ",
+
   "count.books": "{count} ಪುಸ್ತಕಗಳು",
 };
