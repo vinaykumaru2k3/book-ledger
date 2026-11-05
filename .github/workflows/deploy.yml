@@ -1,0 +1,36 @@
+name: Deploy to Firebase Hosting
+
+# Every push to the default branch (i.e. every merged PR) is tested, built and
+# deployed to the live site. Direct pushes to that branch deploy too.
+on:
+  push:
+    branches: [codex/book-ledger-app]
+
+# Never run two deploys at once; a newer merge replaces a queued older one.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: book-ledger-2a2e4
+          channelId: live

@@ -46,7 +46,16 @@ project (recommended if you deploy it yourself):
 | `npm run build` | Production build into `dist/` |
 | `npm run preview` | Serve the production build locally |
 
-Deploy to Firebase Hosting with `npm run build` then `firebase deploy`.
+### Deployment
+
+Merging to `codex/book-ledger-app` deploys automatically (`.github/workflows/deploy.yml`): the workflow
+installs, runs the tests, builds and publishes to Firebase Hosting. Pull requests run the same tests and build
+(`.github/workflows/ci.yml`) without deploying.
+
+One-time setup: add a repository secret named `FIREBASE_SERVICE_ACCOUNT` (a Firebase service-account JSON key
+with the *Firebase Hosting Admin* role; `firebase init hosting:github` creates it for you).
+Deploy `firestore.rules` separately with `firebase deploy --only firestore:rules`. To deploy by hand:
+`npm run build && firebase deploy --only hosting`.
 
 ## Project layout
 
