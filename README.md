@@ -46,6 +46,19 @@ project (recommended if you deploy it yourself):
 | `npm run build` | Production build into `dist/` |
 | `npm run preview` | Serve the production build locally |
 
+### Develop without touching real data
+
+The Firebase emulators run Auth and Firestore on your machine (needs Java 11+), with the same `firestore.rules`:
+
+```bash
+npm run emulators      # terminal 1: start Auth + Firestore emulators
+npm run seed           # terminal 2: create a test user and sample books (incl. Kannada)
+npm run dev:emulated   # terminal 3: the app, wired to the emulators
+```
+
+Sign in with the test user printed in `scripts/seed-emulator.mjs`. This mode is dev-only and is removed from
+production builds, so it can never reach the live project.
+
 ### Deployment
 
 Merging to `codex/book-ledger-app` deploys automatically (`.github/workflows/deploy.yml`): the workflow

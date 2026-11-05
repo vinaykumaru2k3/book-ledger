@@ -9,8 +9,8 @@
  */
 import { getAnalytics, isSupported } from "firebase/analytics";
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { connectAuthEmulator, getAuth, GoogleAuthProvider } from "firebase/auth";
+import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 
 const env = import.meta.env;
 
@@ -33,6 +33,18 @@ googleProvider.setCustomParameters({
   prompt: "select_account",
 });
 
-export const analyticsReady = isSupported()
-  .then((supported) => (supported ? getAnalytics(app) : null))
-  .catch(() => null);
+// Local development only: `npm run dev:emulated` talks to the Firebase emulators
+// on this machine, never to the real project. `import.meta.env.DEV` is false in
+// production builds, so this whole branch is removed from the shipped bundle.
+const useEmulators = import.meta.env.DEV && import.meta.env.VITE_USE_EMULATORS === "true";
+if (useEmulators) {
+  connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+  connectFirestoreEmulator(db, "127.0.0.1", 8080);
+  console.info("[Pustaka] Using local Firebase emulators (no real data is touched).");
+}
+
+export const analyticsReady = useEmulators
+  ? Promise.resolve(null)
+  : isSupported()
+      .then((supported) => (supported ? getAnalytics(app) : null))
+      .catch(() => null);
