@@ -1,13 +1,18 @@
 import React from "react";
-import { Tags } from "lucide-react";
-import Cover from "../../../shared/ui/Cover";
-import Rating from "../../../shared/ui/Rating";
-import Field from "../../../shared/ui/Field";
+import BookCover from "../../../shared/pk/BookCover";
+import Field from "../../../shared/pk/Field";
+import RatingStars from "../../../shared/pk/RatingStars";
 import { STATUSES } from "../../../domain/status";
+import { useLanguage } from "../../../shared/i18n/LanguageContext";
 import ShelfPicker from "./ShelfPicker";
 
-/** The editable fields of a book. Controlled: all state lives in `form`. */
-function BookFormFields({ form, patch, shelfOptions }) {
+/**
+ * The editable fields of a book, essentials first. Rarely-needed details sit
+ * under a "More details" disclosure, open by default when editing.
+ * Controlled: all state lives in `form`.
+ */
+function BookFormFields({ form, patch, shelfOptions, editing, focusTitle }) {
+  const { t } = useLanguage();
   const text = (name) => ({
     value: form[name] ?? "",
     onChange: (event) => patch({ [name]: event.target.value }),
@@ -15,72 +20,53 @@ function BookFormFields({ form, patch, shelfOptions }) {
 
   return (
     <>
-      <div className="form-cover-preview">
-        <Cover book={{ title: form.title || "Preview", author: form.author || "", coverUrl: form.coverUrl || "" }} />
+      <div className="pk-form__basics">
+        <div className="pk-form__cover">
+          <BookCover book={{ title: form.title || "?", author: form.author || "", coverUrl: form.coverUrl || "" }} size="md" />
+        </div>
+
+        <div className="pk-form__fields">
+          <Field label={`${t("form.title")} *`} required {...text("title")} placeholder={t("form.titlePlaceholder")} data-autofocus={focusTitle || undefined} />
+          <Field label={t("form.author")} {...text("author")} placeholder={t("form.authorPlaceholder")} />
+
+          <div className="pk-form__row">
+            <Field label={t("form.status")} as="select" {...text("status")}>
+              {Object.keys(STATUSES).map((key) => (
+                <option key={key} value={key}>
+                  {t(`status.${key}`)}
+                </option>
+              ))}
+            </Field>
+            <Field label={t("form.currentPage")} type="number" min="0" inputMode="numeric" {...text("currentPage")} />
+            <Field label={t("form.totalPages")} type="number" min="0" inputMode="numeric" {...text("pages")} />
+          </div>
+        </div>
       </div>
 
-      <div className="form-grid">
-        <Field label="Title" wide>
-          <input required {...text("title")} placeholder="e.g. Karvalo" />
-        </Field>
-
-        <Field label="Author">
-          <input {...text("author")} placeholder="e.g. K. P. Poornachandra Tejaswi" />
-        </Field>
-
-        <Field label="Published Year">
-          <input inputMode="numeric" {...text("publishedYear")} placeholder="e.g. 1980" />
-        </Field>
-
-        <Field label="Total Pages">
-          <input min="0" type="number" {...text("pages")} placeholder="e.g. 350" />
-        </Field>
-
-        <Field label="Current Page">
-          <input min="0" type="number" {...text("currentPage")} placeholder="e.g. 45" />
-        </Field>
-
-        <Field label="Status">
-          <select {...text("status")}>
-            {Object.entries(STATUSES).map(([key, status]) => (
-              <option key={key} value={key}>
-                {status.longLabel}
-              </option>
-            ))}
-          </select>
-        </Field>
-
-        <Field label="Rating">
-          <div className="rating-input">
-            <Rating value={form.rating} onChange={(rating) => patch({ rating })} />
+      <details className="pk-more" open={editing}>
+        <summary>{t("form.moreDetails")}</summary>
+        <div className="pk-form__more">
+          <div className="pk-form__row">
+            <Field label={t("form.year")} inputMode="numeric" {...text("publishedYear")} placeholder="1980" />
+            <div className="pk-form__rating">
+              <span className="pk-field__label">{t("form.rating")}</span>
+              <RatingStars
+                value={form.rating}
+                label={t("form.rating")}
+                starLabel={(n) => (n === 1 ? t("details.star") : t("details.stars", { n }))}
+                clearLabel={t("details.clearRating")}
+                onChange={(rating) => patch({ rating })}
+              />
+            </div>
           </div>
-        </Field>
 
-        <Field label="Tags / Genres" wide>
-          <div className="field-with-icon">
-            <Tags size={17} />
-            <input {...text("tags")} placeholder="e.g. Fiction, Kannada Literature, Mystery" />
-          </div>
-        </Field>
-
-        <ShelfPicker
-          available={shelfOptions}
-          selected={form.shelves || []}
-          onChange={(shelves) => patch({ shelves })}
-        />
-
-        <Field label="Book Description (Synopsis)" wide>
-          <textarea {...text("description")} rows={4} placeholder="Synopsis of the book from API search..." />
-        </Field>
-
-        <Field label="Notes & Thoughts" wide>
-          <textarea {...text("notes")} rows={3} placeholder="Write your review, quotes or key thoughts here..." />
-        </Field>
-
-        <Field label="Cover Image URL" wide>
-          <input {...text("coverUrl")} placeholder="https://example.com/cover.jpg" />
-        </Field>
-      </div>
+          <Field label={t("form.tags")} {...text("tags")} placeholder={t("form.tagsPlaceholder")} />
+          <ShelfPicker available={shelfOptions} selected={form.shelves || []} onChange={(shelves) => patch({ shelves })} />
+          <Field label={t("form.description")} as="textarea" rows={4} {...text("description")} placeholder={t("form.descriptionPlaceholder")} />
+          <Field label={t("form.notes")} as="textarea" rows={3} {...text("notes")} placeholder={t("form.notesPlaceholder")} />
+          <Field label={t("form.cover")} {...text("coverUrl")} placeholder="https://example.com/cover.jpg" />
+        </div>
+      </details>
     </>
   );
 }

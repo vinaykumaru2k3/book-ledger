@@ -51,14 +51,14 @@ those hooks and never create their own Firestore subscriptions.
   They read only `--pk-*` tokens (`styles/design-tokens.css`). **Build new screens from these.** Browse them at `/dev/ui`.
 - `shared/i18n/` – English / Kannada text: `en.js` (source of truth), `kn.js` (draft, hidden in production until
   reviewed), `translate()` (pure), `useLanguage()` → `{ t, lang, setLang }`.
-- `shared/lib/` – small helpers: `viewTransition.js` (the cover-to-dialog shared-element animation, with a plain fallback).
-- `shared/ui/` – the older components (`Button`, `Modal`, `Pagination`, `Cover`, …) still used by pages that have
-  not been redesigned yet. They are removed page by page as the redesign proceeds (plan.md, phase R10).
+- `shared/lib/` – small helpers: `viewTransition.js` (the cover-to-dialog shared-element animation, with a plain fallback) and `cover.js` (generated cover colours and initials).
+- `shared/ui/` – the few older components still used by pages that have not been redesigned yet (`Button`, `Cover`,
+  `LoadingPanel`, `LoadingScreen`, `Toast`, `ErrorBoundary`). They are removed page by page as the redesign proceeds (plan.md, phase R10).
 
 ### `features/` – one folder per product area
 | Feature | Contents |
 |---|---|
-| `library` | `LibraryPage` (toolbar → books → pagination, plus `LibrarySidePanel`) · `BookList` picks the layout: `BookTile` (grid), `BookRow` (list) or `ShelfView` (books standing spine-out) · `BookActions` + `ShelfPopover` · `StatusChip` · `StatsStrip` · `LibraryTabs` · `LibrarySkeleton` · `BookDetailsModal` + `details/` (`BookControls`, `NotesEditor`, `FinishedBurst`, `useCoverTint`) · `DeleteConfirmModal` · `book-form/` (the add/edit dialog: `BookLookup`, `BookFormFields`, `ShelfPicker`, `DuplicateWarning`, `useBookSearch`) · `useBooksController` (Firestore) · `useLibraryView` (search, sort, layout, page size per layout) |
+| `library` | `LibraryPage` (toolbar → books → pagination, plus `LibrarySidePanel`) · `BookList` picks the layout: `BookTile` (grid), `BookRow` (list) or `ShelfView` (books standing spine-out) · `BookActions` + `ShelfPopover` · `StatusChip` · `StatsStrip` · `LibraryTabs` · `LibrarySkeleton` · `BookDetailsModal` + `details/` (`BookControls`, `NotesEditor`, `FinishedBurst`, `useCoverTint`) · `DeleteConfirmModal` · `book-form/` (the add/edit dialog: `BookLookup` with inline results, `BookFormFields` with a "More details" disclosure, `ShelfPicker`, `DuplicateWarning`, `useBookSearch`) · `useBooksController` (Firestore) · `useLibraryView` (search, sort, layout, page size per layout) |
 | `shelves` | `ShelvesDashboard` (each shelf is a link card: a miniature wooden shelf) · `ShelfActions` (rename / delete menu shown in the header of a shelf page) · `useShelvesController` (rename/delete in one batched write). A shelf's own page *is* the library view filtered to it (`/shelf%3A<name>`), so it gets the toolbar, layouts and paging for free |
 | `discover` | `Recommendations`, `TopCharts`, shared `DiscoverCard`; pure `recommendationsModel.js` and `topChartFilters.js` |
 | `insights` | `Analytics` composed of cards in `AnalyticsCards.jsx`; pure `analyticsModel.js` |
