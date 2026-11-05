@@ -4,7 +4,7 @@ import { getCoverStyle, getInitials } from "../ui/Cover";
 /**
  * A book cover with physical depth: spine highlight, page edge and shadow.
  * Falls back to a coloured jacket with initials when there is no image (or it
- * fails to load). size: "sm" | "md" | "lg".
+ * fails to load). size: "sm" | "md" | "lg", or "fluid" to fill its container (2:3).
  */
 function BookCover({ book, size = "md", className = "" }) {
   const [failed, setFailed] = useState(false);

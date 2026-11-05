@@ -64,19 +64,19 @@ describe("library", () => {
 
   it("filters by status from the URL and from the tabs", () => {
     renderAt("/reading");
-    const grid = document.querySelector(".book-grid");
+    const grid = document.querySelector(".pk-tiles");
     expect(within(grid).getByText("Emma")).toBeTruthy();
     expect(within(grid).queryByText("Dune")).toBeNull();
 
     fireEvent.click(screen.getByRole("tab", { name: /Finished/ }));
     expect(window.location.pathname).toBe("/done");
-    expect(within(document.querySelector(".book-grid")).getByText("Dune")).toBeTruthy();
+    expect(within(document.querySelector(".pk-tiles")).getByText("Dune")).toBeTruthy();
   });
 
   it("filters by shelf, titles the page after it, and hides the status tabs", () => {
     renderAt("/" + encodeURIComponent("shelf:Classics"));
     expect(screen.getByRole("heading", { level: 1, name: "Shelf: Classics" })).toBeTruthy();
-    expect(within(document.querySelector(".book-grid")).queryByText("Emma")).toBeNull();
+    expect(within(document.querySelector(".pk-tiles")).queryByText("Emma")).toBeNull();
     expect(screen.queryByRole("tablist")).toBeNull();
   });
 
@@ -91,7 +91,7 @@ describe("library", () => {
   it("switches between grid and list layouts", () => {
     renderAt("/");
     fireEvent.click(screen.getByLabelText("List View"));
-    expect(document.querySelector(".book-list")).toBeTruthy();
+    expect(document.querySelector(".pk-rows")).toBeTruthy();
   });
 
   it("opens the add-book dialog and book details through the ui actions", () => {

@@ -70,5 +70,65 @@ export default {
   "language.label": "Language",
   "language.switchTo": "Switch language to {language}",
 
+
+  "library.search.label": "Filter library",
+  "library.search.placeholder": "Filter by title, author, tags, notes...",
+  "library.sort.label": "Sort books",
+  "library.loading": "Loading your library…",
+
+  "sort.recent": "Recently added",
+  "sort.title": "Title",
+  "sort.author": "Author",
+  "sort.progress": "Progress",
+  "sort.rating": "Rating",
+  "sort.finished": "Recently finished",
+
+  "layout.label": "Layout",
+  "layout.grid": "Grid View",
+  "layout.list": "List View",
+  "layout.shelf": "Shelf View",
+
+  "book.unknownAuthor": "Unknown Author",
+  "book.noPages": "No page count",
+  "book.pages": "{count} pages",
+  "book.progress": "{current} / {total} pages",
+  "book.open": "Open {title}",
+  "book.favorite": "Toggle favorite",
+  "book.favoriteBadge": "Favorite",
+  "book.shelve": "Add to shelf",
+  "book.edit": "Edit book details",
+  "book.remove": "Remove book",
+
+  "shelf.popoverTitle": "Add to Collections",
+  "shelf.none": "No collections created yet.",
+  "shelf.newPlaceholder": "New shelf...",
+  "shelf.create": "Create and add to shelf",
+
+  "empty.noMatchTitle": "No books match this view",
+  "empty.noMatchBody": "Try clearing your filters or searching for another term.",
+  "empty.emptyTitle": "Your shelf is empty",
+  "empty.emptyBody": "Add your first book to start tracking your reading journey.",
+  "empty.reset": "Reset filters",
+
+  "page.label": "Pagination",
+  "page.showing": "Showing {from}–{to} of {total} books",
+  "page.prev": "Previous page",
+  "page.next": "Next page",
+  "page.go": "Page {n}",
+
+  "stats.label": "Shelf stats summary",
+  "stats.total": "Total Books",
+  "stats.finished": "Finished",
+  "stats.reading": "Reading",
+  "stats.completedYear": "Completed {year}",
+  "stats.avgRating": "Avg Rating",
+
+  "side.progress": "Reading Progress",
+  "side.done": "{pct}% done",
+  "side.readingNow": "Reading Now",
+  "side.recentlyFinished": "Recently Finished",
+  "side.noActive": "No active books.",
+  "side.noFinished": "No books completed yet.",
+
   "count.books": "{count} books",
 };

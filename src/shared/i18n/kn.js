@@ -74,5 +74,65 @@ export default {
   "language.label": "ಭಾಷೆ",
   "language.switchTo": "ಭಾಷೆಯನ್ನು {language} ಗೆ ಬದಲಿಸಿ",
 
+
+  "library.search.label": "ಗ್ರಂಥಾಲಯ ಹುಡುಕಿ",
+  "library.search.placeholder": "ಶೀರ್ಷಿಕೆ, ಲೇಖಕ, ಟ್ಯಾಗ್, ಟಿಪ್ಪಣಿಗಳಿಂದ ಹುಡುಕಿ...",
+  "library.sort.label": "ವಿಂಗಡಿಸಿ",
+  "library.loading": "ನಿಮ್ಮ ಗ್ರಂಥಾಲಯ ಲೋಡ್ ಆಗುತ್ತಿದೆ…",
+
+  "sort.recent": "ಇತ್ತೀಚೆಗೆ ಸೇರಿಸಿದ್ದು",
+  "sort.title": "ಶೀರ್ಷಿಕೆ",
+  "sort.author": "ಲೇಖಕ",
+  "sort.progress": "ಪ್ರಗತಿ",
+  "sort.rating": "ರೇಟಿಂಗ್",
+  "sort.finished": "ಇತ್ತೀಚೆಗೆ ಮುಗಿಸಿದ್ದು",
+
+  "layout.label": "ವಿನ್ಯಾಸ",
+  "layout.grid": "ಗ್ರಿಡ್ ನೋಟ",
+  "layout.list": "ಪಟ್ಟಿ ನೋಟ",
+  "layout.shelf": "ಕಪಾಟು ನೋಟ",
+
+  "book.unknownAuthor": "ಲೇಖಕರು ತಿಳಿದಿಲ್ಲ",
+  "book.noPages": "ಪುಟಗಳ ಸಂಖ್ಯೆ ಇಲ್ಲ",
+  "book.pages": "{count} ಪುಟಗಳು",
+  "book.progress": "{current} / {total} ಪುಟಗಳು",
+  "book.open": "{title} ತೆರೆಯಿರಿ",
+  "book.favorite": "ಮೆಚ್ಚಿನದೆಂದು ಗುರುತಿಸಿ",
+  "book.favoriteBadge": "ಮೆಚ್ಚಿನದು",
+  "book.shelve": "ಕಪಾಟಿಗೆ ಸೇರಿಸಿ",
+  "book.edit": "ವಿವರ ತಿದ್ದಿ",
+  "book.remove": "ಪುಸ್ತಕ ತೆಗೆಯಿರಿ",
+
+  "shelf.popoverTitle": "ಸಂಗ್ರಹಗಳಿಗೆ ಸೇರಿಸಿ",
+  "shelf.none": "ಇನ್ನೂ ಯಾವುದೇ ಸಂಗ್ರಹ ರಚಿಸಿಲ್ಲ.",
+  "shelf.newPlaceholder": "ಹೊಸ ಕಪಾಟು...",
+  "shelf.create": "ರಚಿಸಿ ಕಪಾಟಿಗೆ ಸೇರಿಸಿ",
+
+  "empty.noMatchTitle": "ಈ ನೋಟಕ್ಕೆ ಯಾವುದೇ ಪುಸ್ತಕ ಹೊಂದಿಕೆಯಾಗಲಿಲ್ಲ",
+  "empty.noMatchBody": "ಫಿಲ್ಟರ್ ತೆಗೆದು ಅಥವಾ ಬೇರೆ ಪದ ಹುಡುಕಿ ನೋಡಿ.",
+  "empty.emptyTitle": "ನಿಮ್ಮ ಕಪಾಟು ಖಾಲಿ ಇದೆ",
+  "empty.emptyBody": "ನಿಮ್ಮ ಓದಿನ ಪಯಣ ದಾಖಲಿಸಲು ಮೊದಲ ಪುಸ್ತಕ ಸೇರಿಸಿ.",
+  "empty.reset": "ಫಿಲ್ಟರ್ ಮರುಹೊಂದಿಸಿ",
+
+  "page.label": "ಪುಟ ಸಂಖ್ಯೆ",
+  "page.showing": "{total} ಪುಸ್ತಕಗಳಲ್ಲಿ {from}–{to} ತೋರಿಸಲಾಗುತ್ತಿದೆ",
+  "page.prev": "ಹಿಂದಿನ ಪುಟ",
+  "page.next": "ಮುಂದಿನ ಪುಟ",
+  "page.go": "ಪುಟ {n}",
+
+  "stats.label": "ಸಂಗ್ರಹದ ಅಂಕಿಅಂಶ",
+  "stats.total": "ಒಟ್ಟು ಪುಸ್ತಕಗಳು",
+  "stats.finished": "ಮುಗಿಸಿದವು",
+  "stats.reading": "ಓದುತ್ತಿರುವವು",
+  "stats.completedYear": "{year} ರಲ್ಲಿ ಮುಗಿಸಿದವು",
+  "stats.avgRating": "ಸರಾಸರಿ ರೇಟಿಂಗ್",
+
+  "side.progress": "ಓದಿನ ಪ್ರಗತಿ",
+  "side.done": "{pct}% ಮುಗಿದಿದೆ",
+  "side.readingNow": "ಈಗ ಓದುತ್ತಿರುವುದು",
+  "side.recentlyFinished": "ಇತ್ತೀಚೆಗೆ ಮುಗಿಸಿದ್ದು",
+  "side.noActive": "ಯಾವ ಪುಸ್ತಕವೂ ಓದುತ್ತಿಲ್ಲ.",
+  "side.noFinished": "ಇನ್ನೂ ಯಾವ ಪುಸ್ತಕವೂ ಮುಗಿದಿಲ್ಲ.",
+
   "count.books": "{count} ಪುಸ್ತಕಗಳು",
 };

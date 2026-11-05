@@ -560,22 +560,6 @@
   }
 }
 
-/* The stats strip is a single row; on narrow screens it scrolls inside the header
- * instead of stretching the whole page. */
-.pk-header .stats-strip {
-  max-width: 100%;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.pk-header .stats-strip::-webkit-scrollbar {
-  display: none;
-}
-.pk-header .stat-item {
-  flex: none;
-}
 .pk-shell__body {
   overflow-x: clip;
-}
-.pk-header .stats-strip {
-  margin-top: var(--pk-space-4);
 }

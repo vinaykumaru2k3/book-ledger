@@ -15,70 +15,6 @@
 }
 
 /* Stats strip — inline horizontal row of numbers */
-.stats-strip {
-  display: flex;
-  align-items: center;
-  gap: 0;
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 24px 0 0;
-}
-
-.stat-item:first-child {
-  padding-left: 0;
-}
-
-.stat-item .stat-icon {
-  flex-shrink: 0;
-  opacity: 0.85;
-}
-
-.stat-icon.teal  { color: var(--accent-emerald); }
-.stat-icon.gold  { color: var(--accent-amber); }
-.stat-icon.plum  { color: var(--accent-plum); }
-.stat-icon.coral { color: var(--accent-coral); }
-
-.stat-item strong {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  font-family: var(--font-sans);
-}
-
-.stat-item span {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  font-weight: 400;
-}
-
-.stat-divider {
-  width: 1px;
-  height: 20px;
-  background-color: var(--border-subtle);
-  flex-shrink: 0;
-  margin-right: 24px;
-}
-
-.sync-pill {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  background-color: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border-subtle);
-  border-radius: 99px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.sync-icon {
-  color: var(--accent-emerald);
-}
 
 .icon-button {
   display: flex;
@@ -105,106 +41,9 @@
   color: #f87171;
 }
 
-
-
-.notice {
-  margin-bottom: 20px;
-  padding: 12px 18px;
-  font-size: 0.85rem;
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.error-notice {
-  background-color: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.15);
-  color: #f87171;
-}
-
-.success-notice {
-  background-color: rgba(16, 185, 129, 0.08);
-  border: 1px solid rgba(16, 185, 129, 0.15);
-  color: var(--accent-emerald);
-}
-
 /* Metrics Dashboard Grid */
-.metrics-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 28px;
-}
-
-.metric-card {
-  background-color: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 22px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  position: relative;
-  overflow: hidden;
-  transition: var(--transition-smooth);
-  box-shadow: var(--shadow-sm);
-}
-
-.metric-card:hover {
-  transform: translateY(-2px);
-  background-color: var(--bg-card-hover);
-  border-color: var(--border-hover);
-  box-shadow: var(--shadow-md);
-}
-
-.metric-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-sm);
-  background-color: var(--bg-segmented);
-  border: 1px solid var(--border-subtle);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-secondary);
-  margin-bottom: 2px;
-  transition: var(--transition-smooth);
-}
-
-.metric-card:hover .metric-icon {
-  transform: scale(1.06);
-}
-
-.metric-card.teal .metric-icon { color: var(--accent-emerald); }
-.metric-card.gold .metric-icon { color: var(--accent-amber); }
-.metric-card.plum .metric-icon { color: var(--accent-plum); }
-.metric-card.coral .metric-icon { color: var(--accent-coral); }
-
-.metric-card span {
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-}
-
-.metric-card strong {
-  font-family: var(--font-serif);
-  font-size: 1.9rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  line-height: 1;
-}
 
 /* Content Columns Layout */
-.content-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 300px;
-  gap: 24px;
-  align-items: start;
-}
 
 .library-panel {
   background-color: var(--bg-surface);
@@ -265,31 +104,4 @@
   right: 14px;
   pointer-events: none;
   color: var(--text-secondary);
-}
-
-.view-toggle {
-  display: flex;
-  background-color: var(--bg-input);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 3px;
-}
-
-.view-toggle button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  color: var(--text-secondary);
-  border-radius: var(--radius-sm);
-  transition: var(--transition-smooth);
-  border: 1px solid transparent;
-}
-
-.view-toggle button.active {
-  background-color: var(--bg-surface-elevated);
-  color: var(--text-primary);
-  border: 1px solid transparent;
-  box-shadow: var(--shadow-sm);
 }

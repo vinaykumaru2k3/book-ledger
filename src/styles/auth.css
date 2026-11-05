@@ -122,16 +122,6 @@
   justify-content: center;
 }
 
-.auth-edition {
-  font-size: 0.68rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--accent-gold-landing);
-  z-index: 2;
-  margin-top: -12px;
-}
-
 .auth-book-title {
   font-family: var(--font-serif);
   font-size: clamp(1.85rem, 4vw, 2.85rem);

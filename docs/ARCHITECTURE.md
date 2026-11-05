@@ -47,7 +47,7 @@ those hooks and never create their own Firestore subscriptions.
 
 ### `shared/` – reusable building blocks
 - `shared/pk/` – **the new design system** (redesign, see `plan.md`): `Button`, `Card`, `Badge`, `Skeleton`, `Tabs`,
-  `Dialog` (focus trap, scroll lock), `Menu`, `Field`, `ProgressRibbon`, `BookCover`, `EmptyState`, `LanguageToggle`.
+  `Dialog` (focus trap, scroll lock), `Menu`, `Field`, `SearchBox`, `SelectBox`, `Segmented`, `Pagination`, `ProgressRibbon`, `BookCover`, `EmptyState`, `LanguageToggle`.
   They read only `--pk-*` tokens (`styles/design-tokens.css`). **Build new screens from these.** Browse them at `/dev/ui`.
 - `shared/i18n/` – English / Kannada text: `en.js` (source of truth), `kn.js` (draft, hidden in production until
   reviewed), `translate()` (pure), `useLanguage()` → `{ t, lang, setLang }`.
@@ -57,7 +57,7 @@ those hooks and never create their own Firestore subscriptions.
 ### `features/` – one folder per product area
 | Feature | Contents |
 |---|---|
-| `library` | `LibraryPage` (toolbar, list, paging) · `BookCard` + `BookActions` + `ShelfPopover` + `StatusChip` · `BookDetailsModal` · `DeleteConfirmModal` · `book-form/` (the add/edit dialog, split into `BookLookup`, `BookFormFields`, `ShelfPicker`, `DuplicateWarning`, `useBookSearch`) · `useBooksController` (Firestore) · `useLibraryView` |
+| `library` | `LibraryPage` (toolbar → books → pagination, plus `LibrarySidePanel`) · `BookList` picks the layout: `BookTile` (grid), `BookRow` (list) or `ShelfView` (books standing spine-out) · `BookActions` + `ShelfPopover` · `StatusChip` · `StatsStrip` · `LibraryTabs` · `LibrarySkeleton` · `BookDetailsModal` · `DeleteConfirmModal` · `book-form/` (the add/edit dialog: `BookLookup`, `BookFormFields`, `ShelfPicker`, `DuplicateWarning`, `useBookSearch`) · `useBooksController` (Firestore) · `useLibraryView` (search, sort, layout, page size per layout) |
 | `shelves` | `ShelvesDashboard`, `useShelvesController` (rename/delete shelves in one batched write) |
 | `discover` | `Recommendations`, `TopCharts`, shared `DiscoverCard`; pure `recommendationsModel.js` and `topChartFilters.js` |
 | `insights` | `Analytics` composed of cards in `AnalyticsCards.jsx`; pure `analyticsModel.js` |

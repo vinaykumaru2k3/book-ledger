@@ -1,40 +1,41 @@
 import React, { useMemo } from "react";
-import { BarChart3 } from "lucide-react";
 import { STATUSES } from "../../domain/status";
 import { currentlyReading, recentlyFinished } from "../../domain/library";
+import Card from "../../shared/pk/Card";
+import ProgressRibbon from "../../shared/pk/ProgressRibbon";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 import ReadingStack from "./ReadingStack";
 
 /** Right-hand column of the library: completion bars plus reading lists. */
 function LibrarySidePanel({ books, stats }) {
+  const { t } = useLanguage();
   const reading = useMemo(() => currentlyReading(books), [books]);
   const finished = useMemo(() => recentlyFinished(books), [books]);
 
   return (
-    <aside className="insights-panel">
-      <div className="insight-block">
-        <div className="panel-heading">
-          <BarChart3 size={15} />
-          <h3>Reading Progress</h3>
-          <span className="panel-badge">{stats.completionRate}% done</span>
+    <aside className="pk-side" aria-label={t("side.progress")}>
+      <Card className="pk-side__card">
+        <div className="pk-side__head">
+          <h2 className="pk-side__title">{t("side.progress")}</h2>
+          <span className="pk-side__badge">{t("side.done", { pct: stats.completionRate })}</span>
         </div>
-        <div className="completion-meter">
-          <span style={{ width: `${stats.completionRate}%` }} />
-        </div>
-        <div className="status-bars">
-          {Object.entries(STATUSES).map(([key, status]) => (
-            <div className="status-bar-row" key={key}>
-              <span className="status-bar-label">{status.longLabel}</span>
-              <div className="status-bar-track">
-                <i style={{ width: `${stats.total ? (stats[key] / stats.total) * 100 : 0}%`, background: status.color }} />
-              </div>
-              <strong>{stats[key]}</strong>
-            </div>
-          ))}
-        </div>
-      </div>
+        <ProgressRibbon value={stats.completionRate} label={t("side.progress")} />
 
-      <ReadingStack title="Reading Now" books={reading} empty="No active books." />
-      <ReadingStack title="Recently Finished" books={finished} empty="No books completed yet." />
+        <ul className="pk-statusbars">
+          {Object.keys(STATUSES).map((key) => (
+            <li key={key} className="pk-statusbar">
+              <span className="pk-statusbar__label">{t(`status.${key}`)}</span>
+              <span className="pk-statusbar__track" aria-hidden="true">
+                <i className={`pk-statusbar__fill pk-statusbar__fill--${key}`} style={{ width: `${stats.total ? (stats[key] / stats.total) * 100 : 0}%` }} />
+              </span>
+              <strong>{stats[key]}</strong>
+            </li>
+          ))}
+        </ul>
+      </Card>
+
+      <ReadingStack title={t("side.readingNow")} books={reading} empty={t("side.noActive")} />
+      <ReadingStack title={t("side.recentlyFinished")} books={finished} empty={t("side.noFinished")} />
     </aside>
   );
 }

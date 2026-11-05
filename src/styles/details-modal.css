@@ -52,32 +52,6 @@
   color: var(--accent-emerald);
 }
 
-.notes-preview-container {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.read-more-link {
-  border: none;
-  background: transparent;
-  padding: 0;
-  margin: 0;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: var(--accent-emerald);
-  cursor: pointer;
-  transition: var(--transition-smooth);
-}
-
-.read-more-link:hover {
-  text-decoration: underline;
-  opacity: 0.9;
-}
-
 /* Book Details Modal styling */
 .details-modal {
   width: min(780px, 95vw) !important;

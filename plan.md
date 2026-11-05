@@ -119,12 +119,12 @@ Size: S ≈ a few hours, M ≈ a day, L ≈ several days.
 - CI: Firebase preview channels per PR; wire `npm run validate:data` into CI (used from K0).
 - **Done when:** primitives pass contrast at 3 widths, Kannada and Latin both render with the right fonts, old app unchanged.
 
-### R1: App shell (M) — **built, in review**
+### R1: App shell (M) — **done**
 - Slim rail / bottom tab bar, account menu, **language toggle (ಕ / EN)**, command bar (`/`, ⌘K).
 - **Public routes + nested routes:** the shell works signed out for public pages; route params (`/kannada/author/:id`).
 - **Done when:** any route reachable by mouse, touch and keyboard; signed-out visitors can open public pages; no layout shift.
 
-### R2: Library (L)
+### R2: Library (L) — **built, in review**
 - Shelf view (spine-out), refined grid and list, new `BookCard` with ribbon progress, redesigned toolbar and filters, skeletons, empty states.
 - Titles/authors shown in Kannada script when the book has Kannada metadata.
 - **Done when:** 500 books scroll smoothly; works one-handed on a phone.
@@ -141,6 +141,9 @@ Size: S ≈ a few hours, M ≈ a day, L ≈ several days.
 - **Password reset and email verification** (currently missing).
 
 ### R6: Shelves (S) · R7: Discover (M) · R8: Insights + Year in review (M)
+> **Note (found during R2):** the Shelves dashboard page has had *no styles at all* since commit `212bd9a` (before this
+> redesign), so it currently renders as an unstyled list. R6 is small, so it is a good candidate to do right after R2.
+
 - Rebuilt in the new style, as in the previous draft. Year in review includes a cover mosaic and, for Kannada readers, a "Kannada reads" highlight.
 
 ### R9: Knowledge Galaxy 2.0 (L), the flagship visual

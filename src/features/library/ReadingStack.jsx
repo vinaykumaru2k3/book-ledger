@@ -1,39 +1,42 @@
 import React from "react";
-import Cover from "../../shared/ui/Cover";
+import Card from "../../shared/pk/Card";
+import BookCover from "../../shared/pk/BookCover";
+import ProgressRibbon from "../../shared/pk/ProgressRibbon";
 import { progressFor } from "../../domain/status";
+import { useUi } from "../../app/AppContext";
 
-/** A short titled list of books with progress bars (e.g. "Reading Now"). */
+/** A short titled list of books with progress (e.g. "Reading Now"). */
 function ReadingStack({ title, books, empty }) {
+  const { openDetails } = useUi();
+
   return (
-    <div className="insight-block compact">
-      <div className="panel-heading">
-        <h3>{title}</h3>
-      </div>
+    <Card className="pk-side__card">
+      <h2 className="pk-side__title">{title}</h2>
       {books.length ? (
-        <div className="stack-list">
+        <ul className="pk-stack">
           {books.map((book) => {
             const pct = progressFor(book);
             return (
-              <div className="stack-item" key={book.id}>
-                <Cover book={book} className="tiny" />
-                <div className="stack-info">
-                  <strong>{book.title}</strong>
-                  {book.author && <span className="stack-author">{book.author}</span>}
-                  <div className="stack-progress-row">
-                    <div className="stack-progress-track">
-                      <div className="stack-progress-fill" style={{ width: `${pct}%` }} />
-                    </div>
-                    <span className="stack-pct">{pct}%</span>
-                  </div>
-                </div>
-              </div>
+              <li key={book.id}>
+                <button type="button" className="pk-stack__item" onClick={() => openDetails(book)}>
+                  <BookCover book={book} size="sm" />
+                  <span className="pk-stack__text">
+                    <strong>{book.title}</strong>
+                    {book.author && <span>{book.author}</span>}
+                    <span className="pk-stack__progress">
+                      <ProgressRibbon value={pct} label={book.title} />
+                      <span>{pct}%</span>
+                    </span>
+                  </span>
+                </button>
+              </li>
             );
           })}
-        </div>
+        </ul>
       ) : (
-        <p className="muted">{empty}</p>
+        <p className="pk-side__empty">{empty}</p>
       )}
-    </div>
+    </Card>
   );
 }
 

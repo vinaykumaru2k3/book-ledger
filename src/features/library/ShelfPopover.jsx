@@ -1,13 +1,14 @@
 import React, { useState } from "react";
 import { Check, Plus } from "lucide-react";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 
 /** Quick "add to collections" menu opened from a book card. */
 function ShelfPopover({ shelves, selected, onToggle, onCreate, onClose }) {
+  const { t } = useLanguage();
   const [draft, setDraft] = useState("");
 
   const submit = (event) => {
     event.preventDefault();
-    event.stopPropagation();
     const name = draft.trim();
     if (!name) return;
     onCreate(name);
@@ -16,19 +17,18 @@ function ShelfPopover({ shelves, selected, onToggle, onCreate, onClose }) {
 
   return (
     <>
+      <div className="pk-popover-backdrop" onClick={onClose} />
       <div
-        className="popover-backdrop"
-        onClick={(event) => {
-          event.stopPropagation();
-          onClose();
-        }}
-      />
-      <div className="card-shelf-popover" onClick={(event) => event.stopPropagation()}>
-        <div className="popover-title">Add to Collections</div>
+        className="pk-popover"
+        role="dialog"
+        aria-label={t("shelf.popoverTitle")}
+        onKeyDown={(event) => event.key === "Escape" && onClose()}
+      >
+        <p className="pk-popover__title">{t("shelf.popoverTitle")}</p>
 
-        <div className="popover-checklist">
+        <div className="pk-popover__list">
           {shelves.length === 0 ? (
-            <span className="popover-empty-text">No collections created yet.</span>
+            <p className="pk-popover__empty">{t("shelf.none")}</p>
           ) : (
             shelves.map((shelf) => {
               const checked = selected.includes(shelf);
@@ -36,27 +36,25 @@ function ShelfPopover({ shelves, selected, onToggle, onCreate, onClose }) {
                 <button
                   type="button"
                   key={shelf}
-                  className={`popover-check-row ${checked ? "active" : ""}`}
+                  role="checkbox"
+                  aria-checked={checked}
+                  className={checked ? "pk-popover__row pk-popover__row--on" : "pk-popover__row"}
                   onClick={() => onToggle(shelf)}
                 >
-                  <span className={`popover-checkbox ${checked ? "checked" : ""}`}>{checked && <Check size={10} />}</span>
-                  <span className="popover-shelf-name">{shelf}</span>
+                  <span className="pk-popover__box" aria-hidden="true">
+                    {checked && <Check size={12} />}
+                  </span>
+                  <span>{shelf}</span>
                 </button>
               );
             })
           )}
         </div>
 
-        <form className="popover-add-form" onSubmit={submit}>
-          <input
-            type="text"
-            placeholder="New shelf..."
-            value={draft}
-            onChange={(event) => setDraft(event.target.value)}
-            onClick={(event) => event.stopPropagation()}
-          />
-          <button type="submit" className="popover-add-btn" title="Create and add to shelf">
-            <Plus size={12} />
+        <form className="pk-popover__form" onSubmit={submit}>
+          <input type="text" placeholder={t("shelf.newPlaceholder")} aria-label={t("shelf.newPlaceholder")} value={draft} onChange={(event) => setDraft(event.target.value)} />
+          <button type="submit" className="pk-icon-btn pk-popover__add" title={t("shelf.create")} aria-label={t("shelf.create")}>
+            <Plus size={16} aria-hidden="true" />
           </button>
         </form>
       </div>
