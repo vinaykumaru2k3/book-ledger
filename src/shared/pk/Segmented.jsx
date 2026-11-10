@@ -3,11 +3,17 @@ import React from "react";
 /**
  * Pick-one control drawn as joined buttons (e.g. grid / list / shelf view).
  * `options` is `[{ value, label, icon }]`; labels are exposed to assistive tech
- * even when only the icon is drawn.
+ * even when only the icon is drawn. A thumb slides under the chosen option.
  */
 function Segmented({ label, value, onChange, options }) {
   return (
-    <div className="pk-seg" role="radiogroup" aria-label={label}>
+    <div
+      className="pk-seg"
+      role="radiogroup"
+      aria-label={label}
+      style={{ "--seg-count": options.length, "--seg-index": Math.max(options.findIndex((o) => o.value === value), 0) }}
+    >
+      <span className="pk-seg__thumb" aria-hidden="true" />
       {options.map(({ value: optionValue, label: optionLabel, icon: Icon }) => {
         const selected = optionValue === value;
         return (

@@ -1,47 +1,46 @@
 import React from "react";
 import BookCover from "../../shared/pk/BookCover";
-import ProgressRibbon from "../../shared/pk/ProgressRibbon";
-import { progressFor } from "../../domain/status";
+import { langOf } from "../../shared/lib/script";
 import { useLanguage } from "../../shared/i18n/LanguageContext";
 import { useUi } from "../../app/AppContext";
 import BookActions from "./BookActions";
-import StatusChip from "./StatusChip";
+import BookStatusLine from "./BookStatusLine";
 
-/** A book as one row of the list view. */
+/** A book as one ruled line of the list view (the reading ledger). */
 function BookRow({ book }) {
   const { t } = useLanguage();
   const { openDetails } = useUi();
-  const progress = progressFor(book);
 
   return (
-    <article className="pk-row">
+    <article className={`pk-row pk-row--${book.status}`}>
       <button type="button" className="pk-row__open" onClick={(event) => openDetails(book, event.currentTarget.querySelector(".pk-cover"))}>
         <BookCover book={book} size="sm" />
         <span className="pk-row__text">
-          <span className="pk-row__title">{book.title}</span>
-          <span className="pk-row__author">
+          <span className="pk-row__title" lang={langOf(book.title)}>
+            {book.title}
+            {book.favorite && (
+              <span className="pk-row__fav" title={t("book.favoriteBadge")}>
+                ♥
+              </span>
+            )}
+          </span>
+          <span className="pk-row__author" lang={langOf(book.author || "")}>
             {book.author || t("book.unknownAuthor")}
-            {book.publishedYear ? ` • ${book.publishedYear}` : ""}
+            {book.publishedYear ? ` · ${book.publishedYear}` : ""}
           </span>
         </span>
       </button>
 
       <div className="pk-row__status">
-        <StatusChip status={book.status} />
+        <span className={`pk-row__dot pk-row__dot--${book.status}`} aria-hidden="true" />
+        {t(`status.${["want", "reading", "done"].includes(book.status) ? book.status : "want"}`)}
       </div>
 
       <div className="pk-row__progress">
-        {book.status === "reading" && book.pages ? (
-          <>
-            <ProgressRibbon value={progress} />
-            <span>
-              {progress}% · {t("book.progress", { current: book.currentPage || 0, total: book.pages })}
-            </span>
-          </>
-        ) : (
-          <span>{book.pages ? t("book.pages", { count: book.pages }) : t("book.noPages")}</span>
-        )}
+        {book.status === "want" ? <span className="pk-row__muted">–</span> : <BookStatusLine book={book} />}
       </div>
+
+      <div className="pk-row__pages">{book.pages ? book.pages.toLocaleString() : "–"}</div>
 
       <BookActions book={book} />
     </article>

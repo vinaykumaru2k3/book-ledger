@@ -430,15 +430,6 @@
     pointer-events: auto;
   }
 }
-@media (max-width: 860px) {
-  .pk-row {
-    grid-template-columns: minmax(0, 1fr) auto;
-  }
-  .pk-row__status,
-  .pk-row__progress {
-    grid-column: 1 / -1;
-  }
-}
 
 /* ---- Shelf view: books standing spine-out ----------------------------------- */
 /* A lamp-lit walnut cabinet: dark back wall, shadow under each plank, lit plank edges. */

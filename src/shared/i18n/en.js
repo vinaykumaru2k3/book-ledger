@@ -96,6 +96,13 @@ export default {
   "layout.shelf": "Shelf View",
 
   "book.unknownAuthor": "Unknown Author",
+  "book.ratingOf": "Rated {rating} out of 5",
+  "book.readProgress": "Reading progress for {title}",
+  "collection.title": "Your collection",
+  "list.book": "Book",
+  "list.status": "Status",
+  "list.progress": "Progress",
+  "list.pages": "Pages",
   "book.noPages": "No page count",
   "book.pages": "{count} pages",
   "book.progress": "{current} / {total} pages",
