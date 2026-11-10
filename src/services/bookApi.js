@@ -187,8 +187,18 @@ export function looksLikeReferenceBook(title) {
   return REFERENCE_WORDS.some((word) => lower.includes(word));
 }
 
+/**
+ * A title reduced for comparison: lower case, "&" read as "and", punctuation
+ * dropped and spaces collapsed. Letters and digits of every script are kept,
+ * so Kannada, Hindi or Japanese titles stay distinct from one another.
+ */
 export function normalizeTitle(title) {
-  return title.toLowerCase().trim().replace(/[^\w\s]/g, "");
+  return title
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^\p{L}\p{M}\p{N}\s]/gu, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 /** The fields Discover cards need, from an Open Library search doc. */
@@ -203,6 +213,9 @@ export function itemFromOpenLibraryDoc(doc) {
     genres: doc.subject ? doc.subject.slice(0, 3) : [],
     coverUrl: doc.cover_i ? `${OPEN_LIBRARY_COVERS}/${doc.cover_i}-M.jpg` : "",
     isbn: doc.isbn?.[0] || "",
+    readers: (doc.readinglog_count || 0) + (doc.ratings_count || 0),
+    languages: doc.language || [],
+    rating: doc.ratings_count >= 5 && doc.ratings_average ? Math.round(doc.ratings_average * 10) / 10 : 0,
   };
 }
 

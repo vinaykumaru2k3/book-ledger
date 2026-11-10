@@ -18,7 +18,10 @@ beforeEach(() => {
   vi.clearAllMocks();
   searchOpenLibrary.mockResolvedValue([doc("w1", "Fresh One"), doc("w2", "Fresh Two", "Someone Else")]);
 });
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  localStorage.clear();
+});
 
 describe("useRecommendations", () => {
   it("loads recommendations for the library", async () => {
@@ -72,6 +75,19 @@ describe("useRecommendations", () => {
     const calls = searchOpenLibrary.mock.calls.length;
     act(() => result.current.refresh());
     await waitFor(() => expect(searchOpenLibrary.mock.calls.length).toBeGreaterThan(calls));
+  });
+
+  it("hides a book you dismiss, and keeps it hidden next time", async () => {
+    const { result, unmount } = renderHook(({ books }) => useRecommendations(books), { initialProps: { books: lib() } });
+    await waitFor(() => expect(result.current.recommendations.length).toBeGreaterThan(0));
+    const target = result.current.recommendations[0].id;
+    act(() => result.current.dismiss(target));
+    expect(result.current.recommendations.some((r) => r.id === target)).toBe(false);
+    unmount();
+
+    const again = renderHook(({ books }) => useRecommendations(books), { initialProps: { books: lib() } });
+    await waitFor(() => expect(again.result.current.loading).toBe(false));
+    expect(again.result.current.recommendations.some((r) => r.id === target)).toBe(false);
   });
 
   it("reports a failure instead of staying on the loading spinner", async () => {
