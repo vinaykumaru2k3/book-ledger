@@ -6,14 +6,15 @@
  */
 import { useMemo } from "react";
 
-// Jewel tones that sit well beside the oxblood and gold of the rest of the app.
+// The palette's jewel tones (design-tokens.css), one per shelf.
 const SHELF_COLORS = [
-  "#8b1e2d", // oxblood
-  "#1f6f6b", // teal
-  "#3f4f9a", // indigo
-  "#b7791f", // ochre
-  "#2f6a43", // forest
-  "#6b3a6e", // plum
+  "#7c1838", // garnet
+  "#0f5f6c", // peacock
+  "#27408a", // sapphire
+  "#8c5e10", // gilt
+  "#17644f", // emerald
+  "#5d2c73", // amethyst
+  "#a85a26", // copper
 ];
 
 /** Stable look for a shelf (an accent colour), derived from its name. */

@@ -6,7 +6,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #0d0d0f;
+  background: var(--pk-night);
   overflow: hidden;
 }
 
@@ -15,8 +15,8 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px 16px;
-  background: #151518;
-  border-bottom: 1px solid #27272a;
+  background: var(--pk-night);
+  border-bottom: 1px solid var(--pk-night-3);
   z-index: 10;
 }
 
@@ -33,7 +33,7 @@
 }
 
 .galaxy-search svg {
-  color: #71717a;
+  color: var(--pk-cream-3);
   flex-shrink: 0;
 }
 
@@ -41,82 +41,82 @@
   width: 180px;
   height: 30px;
   padding: 0 10px 0 32px;
-  background: #27272a;
-  border: 1px solid #3f3f46;
+  background: var(--pk-night-3);
+  border: 1px solid var(--pk-night-line);
   border-radius: 4px;
   font-size: 0.8rem;
-  color: #fafafa;
+  color: var(--pk-cream);
 }
 
 .galaxy-search input:focus {
   outline: none;
-  border-color: #d97706;
+  border-color: var(--pk-gilt-2);
 }
 
 .galaxy-search input::placeholder {
-  color: #71717a;
+  color: var(--pk-cream-3);
 }
 
 .galaxy-select {
   height: 30px;
   padding: 0 28px 0 10px;
-  background: #27272a;
-  border: 1px solid #3f3f46;
+  background: var(--pk-night-3);
+  border: 1px solid var(--pk-night-line);
   border-radius: 4px;
   font-size: 0.8rem;
-  color: #fafafa;
+  color: var(--pk-cream);
   cursor: pointer;
 }
 
 .galaxy-btn {
   height: 30px;
   padding: 0 12px;
-  background: #27272a;
-  border: 1px solid #3f3f46;
+  background: var(--pk-night-3);
+  border: 1px solid var(--pk-night-line);
   border-radius: 4px;
   font-size: 0.75rem;
-  color: #a1a1aa;
+  color: var(--pk-cream-2);
   cursor: pointer;
 }
 
 .galaxy-btn:hover {
-  background: #3f3f46;
-  color: #fafafa;
+  background: var(--pk-night-line);
+  color: var(--pk-cream);
 }
 
 .galaxy-filters {
   display: flex;
   gap: 6px;
   padding: 8px 16px;
-  background: #0d0d0f;
-  border-bottom: 1px solid #27272a;
+  background: var(--pk-night);
+  border-bottom: 1px solid var(--pk-night-3);
 }
 
 .galaxy-filter {
   padding: 4px 12px;
   background: transparent;
-  border: 1px solid #3f3f46;
+  border: 1px solid var(--pk-night-line);
   border-radius: 4px;
   font-size: 0.75rem;
-  color: #a1a1aa;
+  color: var(--pk-cream-2);
   cursor: pointer;
 }
 
 .galaxy-filter:hover {
-  background: #27272a;
-  color: #fafafa;
+  background: var(--pk-night-3);
+  color: var(--pk-cream);
 }
 
 .galaxy-filter.active {
-  background: #d97706;
-  border-color: #d97706;
+  background: var(--pk-gilt-2);
+  border-color: var(--pk-gilt-2);
   color: #000;
 }
 
 .galaxy-canvas {
   flex: 1;
   cursor: grab;
-  background: #0d0d0f;
+  background: var(--pk-night);
 }
 
 .galaxy-canvas:active {
@@ -129,11 +129,11 @@
   left: 50%;
   transform: translateX(-50%);
   padding: 8px 16px;
-  background: #18181b;
-  border: 1px solid #27272a;
+  background: var(--pk-night-2);
+  border: 1px solid var(--pk-night-3);
   border-radius: 4px;
   font-size: 0.75rem;
-  color: #71717a;
+  color: var(--pk-cream-3);
   pointer-events: none;
 }
 
@@ -149,8 +149,8 @@
 
 .galaxy-modal {
   width: min(360px, 90vw);
-  background: #18181b;
-  border: 1px solid #3f3f46;
+  background: var(--pk-night-2);
+  border: 1px solid var(--pk-night-line);
   border-radius: 8px;
   padding: 20px;
   position: relative;
@@ -164,7 +164,7 @@
   height: 24px;
   background: transparent;
   border: none;
-  color: #71717a;
+  color: var(--pk-cream-3);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -172,7 +172,7 @@
 }
 
 .galaxy-modal-close:hover {
-  color: #fafafa;
+  color: var(--pk-cream);
 }
 
 .galaxy-modal-cover {
@@ -181,7 +181,7 @@
   margin: 0 auto 16px;
   border-radius: 4px;
   overflow: hidden;
-  background: #27272a;
+  background: var(--pk-night-3);
   display: block;
 }
 
@@ -194,14 +194,14 @@
 .galaxy-modal-info h3 {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #fafafa;
+  color: var(--pk-cream);
   margin: 0 0 4px 0;
   text-align: center;
 }
 
 .galaxy-modal-author {
   font-size: 0.85rem;
-  color: #a1a1aa;
+  color: var(--pk-cream-2);
   margin: 0 0 12px 0;
   text-align: center;
 }
@@ -218,9 +218,9 @@
 .galaxy-modal-rating,
 .galaxy-modal-pages {
   font-size: 0.7rem;
-  color: #a1a1aa;
+  color: var(--pk-cream-2);
   padding: 4px 8px;
-  background: #27272a;
+  background: var(--pk-night-3);
   border-radius: 4px;
   display: flex;
   align-items: center;
@@ -228,17 +228,17 @@
 }
 
 .galaxy-modal-status {
-  color: #fbbf24;
+  color: var(--pk-gilt);
 }
 
 .galaxy-modal-rating {
-  color: #fbbf24;
+  color: var(--pk-gilt);
 }
 
 .galaxy-modal-favorite {
   text-align: center;
   font-size: 0.8rem;
-  color: #ec4899;
+  color: var(--pk-garnet-bright);
   margin-bottom: 12px;
   display: flex;
   align-items: center;
@@ -249,14 +249,14 @@
 .galaxy-modal-connections {
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid #27272a;
+  border-top: 1px solid var(--pk-night-3);
 }
 
 .galaxy-modal-connections h4 {
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
-  color: #71717a;
+  color: var(--pk-cream-3);
   margin: 0 0 8px 0;
 }
 
@@ -271,7 +271,7 @@
   align-items: center;
   gap: 10px;
   padding: 8px;
-  background: #27272a;
+  background: var(--pk-night-3);
   border-radius: 4px;
   cursor: pointer;
   width: 100%;
@@ -279,7 +279,7 @@
 }
 
 .galaxy-modal-connection:hover {
-  background: #3f3f46;
+  background: var(--pk-night-line);
 }
 
 .galaxy-modal-connection-cover {
@@ -287,7 +287,7 @@
   height: 42px;
   border-radius: 2px;
   overflow: hidden;
-  background: #3f3f46;
+  background: var(--pk-night-line);
   flex-shrink: 0;
 }
 
@@ -304,7 +304,7 @@
 
 .galaxy-modal-connection-title {
   font-size: 0.8rem;
-  color: #fafafa;
+  color: var(--pk-cream);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -312,7 +312,7 @@
 
 .galaxy-modal-connection-reasons {
   font-size: 0.7rem;
-  color: #71717a;
+  color: var(--pk-cream-3);
 }
 
 /* Phones: the toolbar and filters wrap instead of pushing the controls off-screen. */

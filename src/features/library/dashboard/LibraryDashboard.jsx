@@ -11,7 +11,7 @@ import { useAuth, useUi } from "../../../app/AppContext";
 import { firstNameOf, goalPace, partOfDay, pileHeightCm, scriptMix } from "./insights";
 import { useReadingGoal } from "./useReadingGoal";
 
-const SCRIPT_COLORS = ["#8b1e2d", "#d9a441", "#3f5aa8", "#2f7d63", "#8e5ba8", "#c4622d", "#5a6b7d"];
+const SCRIPT_COLORS = ["#7c1838", "#c9a052", "#27408a", "#17644f", "#5d2c73", "#a85a26", "#0f5f6c"]; // the jewel set
 
 /** A ring that fills to `percent`, with its centre left for content. */
 function Ring({ percent, size = 120, stroke = 9, className = "", children }) {

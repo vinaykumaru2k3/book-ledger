@@ -5,19 +5,19 @@ export const STATUSES = {
   want: {
     label: "Want",
     longLabel: "Want to read",
-    color: "#d97706",
+    color: "#27408a", // sapphire
     icon: Bookmark,
   },
   reading: {
     label: "Reading",
     longLabel: "Reading",
-    color: "#b91c1c",
+    color: "#8c5e10", // gilt
     icon: BookOpen,
   },
   done: {
     label: "Finished",
     longLabel: "Finished",
-    color: "#1d4ed8",
+    color: "#17644f", // emerald
     icon: BookCheck,
   },
 };

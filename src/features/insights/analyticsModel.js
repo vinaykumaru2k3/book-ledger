@@ -2,7 +2,7 @@
 import { genreLabels } from "../../domain/library";
 
 export const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-export const DONUT_COLORS = ["#d97706", "#10b981", "#3b82f6", "#8b5cf6", "#ec4899"];
+export const DONUT_COLORS = ["#7c1838", "#c9a052", "#27408a", "#17644f", "#5d2c73"]; // garnet, gilt, sapphire, emerald, amethyst
 
 // Both the challenge ring and the genre donut are SVG circles of this size.
 export const RING_RADIUS = 50;

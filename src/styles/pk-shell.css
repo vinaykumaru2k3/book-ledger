@@ -33,7 +33,12 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   min-height: 100vh;
-  background: var(--pk-bg);
+  /* Lit vellum: a gilt glow from the top corner and a garnet warmth at the foot. */
+  background:
+    radial-gradient(1100px 620px at 100% -8%, rgba(var(--pk-gilt-rgb), 0.22), transparent 62%),
+    radial-gradient(900px 560px at 18% 112%, rgba(var(--pk-accent-rgb), 0.07), transparent 60%),
+    var(--pk-bg);
+  background-attachment: fixed;
   color: var(--pk-ink);
   font-family: var(--pk-font-ui);
   line-height: var(--pk-leading-body);
@@ -50,12 +55,12 @@
  * landing page's night sky into the app. Expanded 264px, collapsed 80px.
  */
 .pk-rail {
-  --rail-cream: #efe9de;
-  --rail-cream-2: rgba(239, 233, 222, 0.72);
-  --rail-cream-3: rgba(239, 233, 222, 0.48);
-  --rail-line: rgba(239, 233, 222, 0.08);
-  --rail-hover: rgba(239, 233, 222, 0.05);
-  --rail-gold: #ecc77a;
+  --rail-cream: var(--pk-cream);
+  --rail-cream-2: rgba(var(--pk-cream-rgb), 0.72);
+  --rail-cream-3: rgba(var(--pk-cream-rgb), 0.58);
+  --rail-line: rgba(var(--pk-cream-rgb), 0.08);
+  --rail-hover: rgba(var(--pk-cream-rgb), 0.05);
+  --rail-gold: var(--pk-gilt);
   position: sticky;
   top: 0;
   z-index: var(--pk-z-nav);
@@ -64,17 +69,19 @@
   width: 264px;
   height: 100vh;
   background:
-    radial-gradient(1px 1px at 18% 12%, rgba(239, 233, 222, 0.55), transparent),
-    radial-gradient(1px 1px at 72% 22%, rgba(239, 233, 222, 0.4), transparent),
-    radial-gradient(1.4px 1.4px at 44% 38%, rgba(236, 199, 122, 0.5), transparent),
-    radial-gradient(1px 1px at 86% 54%, rgba(239, 233, 222, 0.35), transparent),
-    radial-gradient(1px 1px at 12% 66%, rgba(239, 233, 222, 0.4), transparent),
-    radial-gradient(1.2px 1.2px at 62% 78%, rgba(239, 233, 222, 0.45), transparent),
-    radial-gradient(1px 1px at 30% 90%, rgba(236, 199, 122, 0.4), transparent),
-    radial-gradient(80% 40% at 50% 0%, rgba(64, 84, 150, 0.22), transparent 70%),
-    linear-gradient(180deg, #0f1526, #0c0f17 55%, #0b0d12);
+    radial-gradient(1px 1px at 18% 12%, rgba(var(--pk-cream-rgb), 0.55), transparent),
+    radial-gradient(1px 1px at 72% 22%, rgba(var(--pk-cream-rgb), 0.4), transparent),
+    radial-gradient(1.4px 1.4px at 44% 38%, rgba(var(--pk-gilt-rgb), 0.5), transparent),
+    radial-gradient(1px 1px at 86% 54%, rgba(var(--pk-cream-rgb), 0.35), transparent),
+    radial-gradient(1px 1px at 12% 66%, rgba(var(--pk-cream-rgb), 0.4), transparent),
+    radial-gradient(1.2px 1.2px at 62% 78%, rgba(var(--pk-cream-rgb), 0.45), transparent),
+    radial-gradient(1px 1px at 30% 90%, rgba(var(--pk-gilt-rgb), 0.4), transparent),
+    radial-gradient(90% 40% at 50% 0%, rgba(var(--pk-sapphire-rgb), 0.42), transparent 70%),
+    radial-gradient(110% 35% at 0% 100%, rgba(var(--pk-accent-rgb), 0.32), transparent 70%),
+    linear-gradient(180deg, var(--pk-night-2), var(--pk-night) 55%, #080b1a);
   color: var(--rail-cream);
-  border-right: 1px solid rgba(0, 0, 0, 0.4);
+  /* A gilt hairline where the night panel meets the page. */
+  border-right: 1px solid rgba(var(--pk-gilt-rgb), 0.16);
   transition: width 260ms var(--pk-ease);
 }
 .pk-rail--collapsed {
@@ -139,7 +146,7 @@
   padding: 0 12px 12px;
   overflow-y: auto;
   scrollbar-width: thin;
-  scrollbar-color: rgba(239, 233, 222, 0.15) transparent;
+  scrollbar-color: rgba(var(--pk-cream-rgb), 0.15) transparent;
 }
 
 /* Navigation groups. */
@@ -212,7 +219,7 @@
 .pk-rail__count {
   padding: 1px 8px;
   border-radius: var(--pk-radius-pill);
-  background: rgba(239, 233, 222, 0.07);
+  background: rgba(var(--pk-cream-rgb), 0.07);
   color: var(--rail-cream-3);
   font: 600 0.72rem var(--pk-font-ui);
   font-variant-numeric: tabular-nums;
@@ -224,8 +231,8 @@
   left: 0;
   right: 0;
   border-radius: 12px;
-  background: rgba(239, 233, 222, 0.08);
-  box-shadow: inset 0 0 0 1px rgba(239, 233, 222, 0.07);
+  background: rgba(var(--pk-cream-rgb), 0.08);
+  box-shadow: inset 0 0 0 1px rgba(var(--pk-cream-rgb), 0.07);
   pointer-events: none;
   transition: transform 320ms cubic-bezier(0.3, 0.8, 0.3, 1), height 320ms var(--pk-ease);
 }
@@ -311,7 +318,7 @@
   height: 3px;
   overflow: hidden;
   border-radius: 2px;
-  background: rgba(239, 233, 222, 0.1);
+  background: rgba(var(--pk-cream-rgb), 0.1);
 }
 .pk-rail__progress i {
   position: absolute;
@@ -337,14 +344,14 @@
   padding: 2px 12px 12px;
   border: 1px solid var(--rail-line);
   border-radius: 14px;
-  background: rgba(239, 233, 222, 0.02);
+  background: rgba(var(--pk-cream-rgb), 0.02);
   color: inherit;
   text-decoration: none;
   transition: border-color 160ms var(--pk-ease), background-color 160ms var(--pk-ease);
 }
 .pk-rail__year:hover {
-  border-color: rgba(239, 233, 222, 0.18);
-  background: rgba(239, 233, 222, 0.04);
+  border-color: rgba(var(--pk-cream-rgb), 0.18);
+  background: rgba(var(--pk-cream-rgb), 0.04);
 }
 .pk-rail__year .pk-rail__label {
   display: block;
@@ -416,7 +423,7 @@
 }
 .pk-rail .pk-avatar {
   flex: none;
-  background: rgba(236, 199, 122, 0.16);
+  background: rgba(var(--pk-gilt-rgb), 0.16);
   color: var(--rail-gold);
 }
 .pk-account__text {
@@ -632,7 +639,7 @@
   margin-left: var(--pk-space-1);
   padding: 1px 7px;
   border-radius: var(--pk-radius-pill);
-  background: rgba(31, 26, 23, 0.08);
+  background: rgba(var(--pk-ink-rgb), 0.08);
   font-size: var(--pk-text-xs);
 }
 .pk-tab--active .pk-tab__count {
@@ -892,7 +899,7 @@
     padding-bottom: env(safe-area-inset-bottom, 0px);
     background: var(--pk-surface-raised);
     border-top: 1px solid var(--pk-line);
-    box-shadow: 0 -4px 16px rgba(60, 40, 20, 0.08);
+    box-shadow: 0 -4px 16px rgba(45, 24, 40, 0.08);
   }
   .pk-tabbar ul {
     display: flex;

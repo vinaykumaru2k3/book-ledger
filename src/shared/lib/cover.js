@@ -2,14 +2,17 @@
  * Generated cover artwork helpers: a stable colour scheme and initials for a book
  * from its title and author, used when a book has no cover image.
  */
+// Bookbinding leathers and cloths, each with its foil and lettering:
+// [binding, foil, lettering]. Same jewel set as the app's palette.
 export const COVER_PALETTE = [
-  ["#1e293b", "#f59e0b", "#f8fafc"], // Slate + Amber
-  ["#31102f", "#ec4899", "#fdf2f8"], // Deep Purple + Pink
-  ["#064e3b", "#10b981", "#ecfdf5"], // Emerald + Mint
-  ["#172554", "#3b82f6", "#eff6ff"], // Navy + Blue
-  ["#450a0a", "#f43f5e", "#fff1f2"], // Rose + Red
-  ["#3f2001", "#d97706", "#fef3c7"], // Amber + Gold
-  ["#18002a", "#8b5cf6", "#f5f3ff"], // Violet + Lavender
+  ["#5e1029", "#d9b46a", "#f6ead4"], // Garnet morocco, gilt
+  ["#16255a", "#c9a052", "#eef0f7"], // Sapphire cloth, gilt
+  ["#0f3d31", "#d6b46e", "#f2ecd9"], // Emerald, gilt
+  ["#381a49", "#e2c27d", "#f3e9f0"], // Amethyst, gilt
+  ["#0c3a43", "#8cc7bb", "#e9f4f1"], // Peacock, verdigris
+  ["#3a2214", "#e0b46a", "#f6ead4"], // Tobacco calf, gilt
+  ["#1b1d36", "#c98f6c", "#f2e6dc"], // Midnight ink, copper
+  ["#6a2238", "#f0c9a8", "#fbeee6"], // Rose madder, blush foil
 ];
 
 export function getCoverStyle(seed = "") {

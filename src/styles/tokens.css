@@ -3,33 +3,34 @@
   color-scheme: light;
 
   /* ── Background layers — each step is clearly lighter ── */
-  --bg-app:              #fcf9f2;  /* Warm linen app background */
-  --bg-surface:          #f5eedf;  /* Sidebar and panels */
-  --bg-surface-elevated: #ebdcc3;  /* Modals, dropdowns, inputs */
-  --bg-input:            #fdfbf7;  /* Input fields */
-  --bg-card:             #fcfbf8;  /* Book cards */
-  --bg-card-hover:       #ffffff;  /* Hovered card */
-  --bg-segmented:        rgba(92, 80, 67, 0.06);
-  --bg-segmented-active: var(--bg-surface);
-  --bg-ghost:            rgba(92, 80, 67, 0.03);
-  --bg-ghost-hover:      rgba(92, 80, 67, 0.06);
+  /* Legacy names, now pointing at the "gilt and jewel" palette in design-tokens.css. */
+  --bg-app:              var(--pk-bg);
+  --bg-surface:          var(--pk-surface);
+  --bg-surface-elevated: var(--pk-surface-sunken);
+  --bg-input:            var(--pk-surface-raised);
+  --bg-card:             var(--pk-surface);
+  --bg-card-hover:       var(--pk-surface-raised);
+  --bg-segmented:        rgba(var(--pk-ink-rgb), 0.06);
+  --bg-segmented-active: var(--pk-surface-raised);
+  --bg-ghost:            rgba(var(--pk-ink-rgb), 0.03);
+  --bg-ghost-hover:      rgba(var(--pk-ink-rgb), 0.06);
 
   /* ── Borders ── */
-  --border-subtle:  rgba(62, 54, 46, 0.09);  /* Cards, panels */
-  --border-hover:   rgba(92, 80, 67, 0.1);  /* Hover state */
-  --border-focus:   #b45309;                    /* Gold focus */
+  --border-subtle:  var(--pk-line);
+  --border-hover:   var(--pk-line-strong);
+  --border-focus:   var(--pk-focus);
 
   /* ── Text ── */
-  --text-primary:   #2d241c;   /* Soft vanilla cream */
-  --text-secondary: #5c5043;   /* tan-gray secondary text */
-  --text-muted:     #8c7e6e;   /* Muted / placeholders */
+  --text-primary:   var(--pk-ink);
+  --text-secondary: var(--pk-ink-2);
+  --text-muted:     var(--pk-ink-3);
 
-  /* ── Accents ── */
-  --accent-emerald: #b45309;   /* Primary accent - gold */
-  --accent-amber:   #b45309;
-  --accent-indigo:  #6366f1;
-  --accent-plum:    #8b5cf6;
-  --accent-coral:   #ef4444;
+  /* ── Accents (names kept; colours are the jewel set) ── */
+  --accent-emerald: var(--pk-accent);
+  --accent-amber:   var(--pk-gold);
+  --accent-indigo:  var(--pk-sapphire);
+  --accent-plum:    var(--pk-amethyst);
+  --accent-coral:   var(--pk-danger);
 
   /* ── Typography ── */
   --font-sans:  'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;

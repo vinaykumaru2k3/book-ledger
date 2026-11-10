@@ -186,7 +186,7 @@ export default function ConstellationGraph() {
         onDoubleClick={handleDoubleClick}
         style={{ width: "100%", height: "100%", display: "block" }}
       >
-        <rect width={VIEW.width} height={VIEW.height} fill="#0d0d0f" />
+        <rect width={VIEW.width} height={VIEW.height} fill="#0a0f22" />
 
         <g
           transform={`translate(${VIEW.width / 2}, ${VIEW.height / 2}) scale(${camera.zoom}) translate(${-camera.x}, ${-camera.y})`}
@@ -200,7 +200,7 @@ export default function ConstellationGraph() {
                 y1={link.source.y}
                 x2={link.target.x}
                 y2={link.target.y}
-                stroke={lit ? link.source.color : "#3f3f46"}
+                stroke={lit ? link.source.color : "#2a3462"}
                 strokeWidth={lit ? 1.5 : 0.5}
                 strokeOpacity={lit ? 1 : 0.4}
               />
@@ -237,7 +237,7 @@ export default function ConstellationGraph() {
                     x={node.x}
                     y={node.y + node.radius + 12}
                     textAnchor="middle"
-                    fill="#fafafa"
+                    fill="#f4ebd9"
                     fontSize={11}
                     fontFamily="system-ui"
                   >

@@ -1,11 +1,11 @@
 import { STATUSES } from "../../domain/status";
 
 export const GALAXY_COLORS = {
-  done: "#10b981",      // Emerald
-  reading: "#d97706",   // Gold
-  want: "#6366f1",      // Indigo
-  abandoned: "#64748b", // Muted slate
-  favorite: "#ec4899",  // Pink glow
+  done: "#3fa57f",      // Emerald
+  reading: "#e4c47f",   // Gilt
+  want: "#7d97e6",      // Sapphire, lit for the night sky
+  abandoned: "#7b7896", // Dusk
+  favorite: "#d65f86",  // Garnet glow
 };
 
 export function getNodeColor(book) {

@@ -145,7 +145,7 @@
 }
 .pk-badge--gold {
   background: var(--pk-gold-soft);
-  color: #7a4f00;
+  color: var(--pk-warning);
 }
 .pk-badge--success {
   background: var(--pk-success-soft);
@@ -159,7 +159,7 @@
 /* ---- Skeleton ---------------------------------------------------------- */
 .pk-skeleton {
   display: block;
-  background: linear-gradient(90deg, var(--pk-surface-sunken) 25%, #f7f1e3 50%, var(--pk-surface-sunken) 75%);
+  background: linear-gradient(90deg, var(--pk-surface-sunken) 25%, var(--pk-surface-raised) 50%, var(--pk-surface-sunken) 75%);
   background-size: 200% 100%;
   animation: pk-shimmer 1.4s var(--pk-ease-in-out) infinite;
   border-radius: var(--pk-radius-sm);
@@ -226,7 +226,7 @@
   display: grid;
   place-items: center;
   padding: var(--pk-space-4);
-  background: rgba(31, 26, 23, 0.5);
+  background: rgba(var(--pk-ink-rgb), 0.5);
   animation: pk-fade var(--pk-duration-2) var(--pk-ease);
 }
 .pk-dialog {
@@ -369,16 +369,16 @@ textarea.pk-field__control {
 
 /* ---- Book cover -------------------------------------------------------- */
 .pk-cover {
-  --cover-a: #1e293b;
-  --cover-b: #f59e0b;
-  --cover-c: #f8fafc;
+  --cover-a: var(--pk-accent);
+  --cover-b: var(--pk-gilt-2);
+  --cover-c: var(--pk-cream);
   position: relative;
   flex: none;
   aspect-ratio: 2 / 3;
   border-radius: 3px 8px 8px 3px;
   overflow: hidden;
   background: linear-gradient(145deg, var(--cover-a), color-mix(in srgb, var(--cover-a) 70%, var(--cover-b)));
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 4px 6px 14px rgba(60, 40, 20, 0.28), 1px 1px 0 rgba(60, 40, 20, 0.18);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 4px 6px 14px rgba(45, 24, 40, 0.28), 1px 1px 0 rgba(45, 24, 40, 0.18);
 }
 .pk-cover--sm {
   width: 56px;
@@ -463,9 +463,9 @@ textarea.pk-field__control {
 
 /* ---- Book spine (a book standing spine-out) ---- */
 .pk-spine {
-  --cover-a: #1e293b;
-  --cover-b: #f59e0b;
-  --cover-c: #f8fafc;
+  --cover-a: var(--pk-accent);
+  --cover-b: var(--pk-gilt-2);
+  --cover-c: var(--pk-cream);
   --foil: color-mix(in srgb, var(--cover-b) 45%, #e9c46f);
   position: relative;
   flex: none;
@@ -528,7 +528,7 @@ textarea.pk-field__control {
   right: 22%;
   width: 6px;
   height: 22px;
-  background: linear-gradient(90deg, #7d1824, #b52a3c 50%, #7d1824);
+  background: linear-gradient(90deg, var(--pk-accent-hover), var(--pk-garnet-bright) 50%, var(--pk-accent-hover));
   clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
   box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
 }

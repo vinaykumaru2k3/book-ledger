@@ -48,12 +48,12 @@
 
 .metric-panel .panel-icon.emerald {
   background-color: rgba(16, 185, 129, 0.08);
-  color: #10b981;
+  color: var(--pk-emerald-bright);
 }
 
 .metric-panel .panel-icon.coral {
   background-color: rgba(239, 68, 68, 0.08);
-  color: #ef4444;
+  color: var(--pk-danger);
 }
 
 .panel-info {
@@ -424,7 +424,7 @@
 
 .highlight-badge.coral {
   background-color: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
+  color: var(--pk-danger);
   border: 1px solid rgba(239, 68, 68, 0.15);
 }
 
