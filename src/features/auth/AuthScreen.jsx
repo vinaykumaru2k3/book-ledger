@@ -15,9 +15,10 @@ const STACK = [
 ];
 
 /**
- * Sign-in screen, split in two: a night-time reading-room panel (drifting
- * letters, rotating lines, a fan of books) and the sign-in card on paper.
- * On phones the panel becomes a short header above the card.
+ * Sign-in screen, set in the same night-time reading room as the landing page:
+ * the same navigation bar and drifting letters, a short pitch with rotating
+ * lines and a fan of books, and the sign-in card beside it.
+ * On phones the pitch shrinks to a title above the card.
  */
 function AuthScreen({ onBackToLanding, ...cardProps }) {
   const { t } = useLanguage();
@@ -31,17 +32,27 @@ function AuthScreen({ onBackToLanding, ...cardProps }) {
 
   return (
     <div className="pk-auth">
-      <aside className="pk-auth__panel">
-        <GlyphField density={0.00009} />
-        <span className="pk-auth__brand">
+      <GlyphField className="pk-auth__field" density={0.00008} />
+
+      <header className="pk-landing__bar pk-auth__bar">
+        <span className="pk-landing__brand">
           <img src="/stack-of-books.png" alt="" width="32" height="32" />
           <span>Pustaka</span>
         </span>
+        <div className="pk-landing__barActions">
+          <LanguageToggle />
+          {onBackToLanding && (
+            <button type="button" className="pk-ghostbtn" onClick={onBackToLanding}>
+              <ArrowLeft size={16} aria-hidden="true" />
+              <span>{t("auth.back")}</span>
+            </button>
+          )}
+        </div>
+      </header>
 
+      <main className="pk-auth__main">
         <div className="pk-auth__pitch">
-          <p className="pk-auth__panelTitle">
-            <em>{t("auth.panelTitle")}</em>
-          </p>
+          <p className="pk-auth__panelTitle">{t("auth.panelTitle")}</p>
           <p className="pk-auth__lines" aria-hidden="true">
             {LINES.map((key, index) => (
               <span key={key} className={`pk-auth__line${index === line ? " is-on" : ""}`}>
@@ -49,32 +60,15 @@ function AuthScreen({ onBackToLanding, ...cardProps }) {
               </span>
             ))}
           </p>
+          <div className="pk-auth__stack" aria-hidden="true">
+            {STACK.map(([title, author], index) => (
+              <MiniCover key={title} title={title} author={author} variant={index} />
+            ))}
+          </div>
         </div>
 
-        <div className="pk-auth__stack" aria-hidden="true">
-          {STACK.map(([title, author], index) => (
-            <MiniCover key={title} title={title} author={author} variant={index} />
-          ))}
-        </div>
-      </aside>
-
-      <div className="pk-auth__side">
-        <header className="pk-auth__bar">
-          {onBackToLanding ? (
-            <button type="button" className="pk-linkbtn" onClick={onBackToLanding}>
-              <ArrowLeft size={14} aria-hidden="true" />
-              {t("auth.back")}
-            </button>
-          ) : (
-            <span />
-          )}
-          <LanguageToggle />
-        </header>
-
-        <main className="pk-auth__main">
-          <AuthCard {...cardProps} />
-        </main>
-      </div>
+        <AuthCard {...cardProps} />
+      </main>
     </div>
   );
 }

@@ -20,7 +20,7 @@ export function createParticles(count, width, height, glyphs, random = Math.rand
       size: 10 + depth * 26,
       spin: (random() - 0.5) * 0.004,
       angle: (random() - 0.5) * 0.6,
-      warm: random() < 0.35,
+      warm: random() < 0.2,
     };
   });
 }
@@ -90,7 +90,7 @@ function GlyphField({ glyphs = DEFAULT_GLYPHS, density = 0.00011, className = ""
           const b = shift(near[j]);
           const d = Math.hypot(a.x - b.x, a.y - b.y);
           if (d < MAX_LINK_DISTANCE) {
-            ctx.strokeStyle = `rgba(226, 176, 74, ${0.16 * (1 - d / MAX_LINK_DISTANCE)})`;
+            ctx.strokeStyle = `rgba(236, 199, 122, ${0.12 * (1 - d / MAX_LINK_DISTANCE)})`;
             ctx.beginPath();
             ctx.moveTo(a.x, a.y);
             ctx.lineTo(b.x, b.y);
@@ -113,8 +113,8 @@ function GlyphField({ glyphs = DEFAULT_GLYPHS, density = 0.00011, className = ""
         ctx.translate(px, py);
         ctx.rotate(p.angle);
         ctx.font = `${p.size}px "Noto Serif Kannada", "Fraunces", Georgia, serif`;
-        const alpha = 0.06 + p.depth * 0.32 + (push ? 0.25 : 0);
-        ctx.fillStyle = p.warm ? `rgba(226, 176, 74, ${alpha})` : `rgba(246, 239, 227, ${alpha})`;
+        const alpha = 0.05 + p.depth * 0.26 + (push ? 0.2 : 0);
+        ctx.fillStyle = p.warm ? `rgba(236, 199, 122, ${alpha})` : `rgba(239, 233, 222, ${alpha})`;
         ctx.fillText(p.glyph, 0, 0);
         ctx.restore();
       });

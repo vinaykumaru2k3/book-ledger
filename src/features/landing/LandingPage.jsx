@@ -16,13 +16,6 @@ const FEATURES = [
   { key: "f4", Demo: SanctuaryDemo, size: "wide" },
 ];
 
-/** Follows the pointer with a soft light inside the tile. */
-const spotlight = (event) => {
-  const rect = event.currentTarget.getBoundingClientRect();
-  event.currentTarget.style.setProperty("--mx", `${event.clientX - rect.left}px`);
-  event.currentTarget.style.setProperty("--my", `${event.clientY - rect.top}px`);
-};
-
 function FeatureTile({ feature, index, t }) {
   const ref = useRef(null);
   const live = useInView(ref);
@@ -32,7 +25,6 @@ function FeatureTile({ feature, index, t }) {
       ref={ref}
       className={`pk-tile3 ${size ? `pk-tile3--${size}` : ""} ${live ? "is-live" : ""}`}
       style={{ "--i": index }}
-      onPointerMove={spotlight}
     >
       <div className="pk-tile3__demo">
         <Demo live={live} t={t} />
@@ -94,7 +86,7 @@ function LandingPage({ onEnter }) {
         </span>
         <div className="pk-landing__barActions">
           <LanguageToggle />
-          <button type="button" className="pk-glassbtn" onClick={onEnter}>
+          <button type="button" className="pk-ghostbtn" onClick={onEnter}>
             {t("action.signIn")}
           </button>
         </div>
@@ -103,11 +95,10 @@ function LandingPage({ onEnter }) {
       <main id="main" tabIndex={-1}>
         <section className="pk-hero">
           <GlyphField className="pk-hero__field" />
-          <div className="pk-hero__lamp" aria-hidden="true" />
           <div className="pk-hero__inner">
             <div className="pk-hero__text">
               <p className="pk-hero__kicker">
-                <span className="pk-hero__pulse" aria-hidden="true" />
+                <span className="pk-hero__dot" aria-hidden="true" />
                 {t("landing.kicker")}
               </p>
               <h1 className="pk-hero__title">
@@ -116,7 +107,7 @@ function LandingPage({ onEnter }) {
               </h1>
               <p className="pk-hero__sub">{t("landing.sub")}</p>
               <div className="pk-hero__actions">
-                <button type="button" className="pk-glowbtn" onClick={onEnter}>
+                <button type="button" className="pk-solidbtn" onClick={onEnter}>
                   <span>{t("landing.cta")}</span>
                   <ArrowRight size={18} aria-hidden="true" />
                 </button>
@@ -149,11 +140,10 @@ function LandingPage({ onEnter }) {
         </section>
 
         <section className="pk-finale">
-          <div className="pk-finale__orb" aria-hidden="true" />
           <Reveal className="pk-finale__inner">
             <h2>{t("landing.band.title")}</h2>
             <p>{t("landing.band.body")}</p>
-            <button type="button" className="pk-glowbtn" onClick={onEnter}>
+            <button type="button" className="pk-solidbtn" onClick={onEnter}>
               <span>{t("landing.band.cta")}</span>
               <ArrowRight size={18} aria-hidden="true" />
             </button>

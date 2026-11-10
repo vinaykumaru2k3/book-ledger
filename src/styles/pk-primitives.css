@@ -524,8 +524,7 @@ textarea.pk-field__control {
 .pk-spine:focus-visible {
   transform: translateY(-16px) rotate(-3deg);
   filter: brightness(1.12);
-  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.12), 2px 0 3px rgba(0, 0, 0, 0.4), 0 22px 26px -10px rgba(0, 0, 0, 0.6),
-    0 0 22px rgba(226, 176, 74, 0.35);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.12), 2px 0 3px rgba(0, 0, 0, 0.4), 0 22px 26px -10px rgba(0, 0, 0, 0.6);
 }
 .pk-spine__title {
   display: block;
