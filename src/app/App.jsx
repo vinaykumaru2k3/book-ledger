@@ -47,6 +47,7 @@ function AppGate() {
       error={auth.authError}
       onEmailSubmit={auth.signInWithEmail}
       onGoogleSignIn={auth.signInWithGoogle}
+      onResetPassword={auth.resetPassword}
       onBackToLanding={() => setShowLanding(true)}
     />
   );

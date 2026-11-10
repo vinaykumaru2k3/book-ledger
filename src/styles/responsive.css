@@ -2,14 +2,6 @@
 /* Responsiveness overrides */
 
 @media (max-width: 768px) {
-  .auth-panel {
-    grid-template-columns: 1fr;
-    min-height: auto;
-  }
-  
-  .auth-art {
-    display: none;
-  }
   
   .toolbar {
     grid-template-columns: 1fr;
@@ -21,10 +13,6 @@
 }
 
 @media (max-width: 480px) {
-  
-  .segmented {
-    overflow-x: auto;
-  }
   
   .modal {
     max-height: 100vh;

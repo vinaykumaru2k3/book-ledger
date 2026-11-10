@@ -11,11 +11,8 @@
 @import "./cover.css";
 @import "./book-card.css";
 @import "./modals.css";
-@import "./auth.css";
 @import "./toast.css";
 @import "./responsive.css";
-@import "./landing.css";
-@import "./auth-back-link.css";
 @import "./details-modal.css";
 @import "./discover.css";
 @import "./shelves.css";
@@ -28,4 +25,5 @@
 @import "./pk-shelves.css";
 @import "./pk-details.css";
 @import "./pk-forms.css";
+@import "./pk-landing.css";
 @import "./pk-dev.css";

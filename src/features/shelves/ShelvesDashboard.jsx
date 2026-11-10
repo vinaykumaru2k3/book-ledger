@@ -4,7 +4,7 @@ import EmptyState from "../../shared/pk/EmptyState";
 import { useLanguage } from "../../shared/i18n/LanguageContext";
 import { shelfPath, shelfRoute } from "../../domain/library";
 import { useShelves } from "../../app/AppContext";
-import BookSpine from "../library/BookSpine";
+import BookSpine from "../../shared/pk/BookSpine";
 
 const PREVIEW_LIMIT = 8;
 

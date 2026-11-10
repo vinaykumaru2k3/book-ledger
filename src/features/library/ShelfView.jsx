@@ -1,7 +1,7 @@
 import React from "react";
 import { useLanguage } from "../../shared/i18n/LanguageContext";
 import { useUi } from "../../app/AppContext";
-import BookSpine from "./BookSpine";
+import BookSpine from "../../shared/pk/BookSpine";
 
 /** Books standing spine-out on wooden shelves. Click a spine to open the book. */
 function ShelfView({ books }) {

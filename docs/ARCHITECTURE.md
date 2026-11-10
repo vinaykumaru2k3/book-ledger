@@ -47,7 +47,7 @@ those hooks and never create their own Firestore subscriptions.
 
 ### `shared/` – reusable building blocks
 - `shared/pk/` – **the new design system** (redesign, see `plan.md`): `Button`, `Card`, `Badge`, `Skeleton`, `Tabs`,
-  `Dialog` (focus trap, scroll lock, optional `labelledBy`), `Menu`, `RatingStars`, `Field`, `SearchBox`, `SelectBox`, `Segmented`, `Pagination`, `ProgressRibbon`, `BookCover`, `EmptyState`, `LanguageToggle`.
+  `Dialog` (focus trap, scroll lock, optional `labelledBy`), `Menu`, `RatingStars`, `BookSpine`, `Field`, `SearchBox`, `SelectBox`, `Segmented`, `Pagination`, `ProgressRibbon`, `BookCover`, `EmptyState`, `LanguageToggle`.
   They read only `--pk-*` tokens (`styles/design-tokens.css`). **Build new screens from these.** Browse them at `/dev/ui`.
 - `shared/i18n/` – English / Kannada text: `en.js` (source of truth), `kn.js` (draft, hidden in production until
   reviewed), `translate()` (pure), `useLanguage()` → `{ t, lang, setLang }`.
@@ -63,8 +63,8 @@ those hooks and never create their own Firestore subscriptions.
 | `discover` | `Recommendations`, `TopCharts`, shared `DiscoverCard`; pure `recommendationsModel.js` and `topChartFilters.js` |
 | `insights` | `Analytics` composed of cards in `AnalyticsCards.jsx`; pure `analyticsModel.js` |
 | `galaxy` | `ConstellationGraph`, `GalaxyControls`, `NodeInspector`, `useForceSimulation`; pure `graph.js`, `graphSimulation.js` |
-| `auth` | `AuthScreen` = `AuthArt` + `AuthCard`, `useAuthController` |
-| `landing` | `LandingPage` |
+| `auth` | `AuthScreen` (bar + `AuthCard`): sign in / register / **password reset**, Google, show-password; `useAuthController` (errors are translation keys via `authErrors.js`; sends a verification email on register; `needsVerification` drives the in-app `VerifyBanner`, which reminds but never locks anyone out) |
+| `landing` | `LandingPage`: hero with a shelf of sample books (`BookSpine`), four features, closing call to action; fully translated |
 | `kannada` | `KannadaExplorerPage` (placeholder for the Kannada Explorer, plan.md track K; public, hidden until the Kannada UI is enabled) |
 
 **Pattern inside a feature:** a pure `*Model.js` (testable logic) → a `use*` hook (state/effects) → components (markup).

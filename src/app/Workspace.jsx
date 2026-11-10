@@ -11,6 +11,7 @@ import ShelfActions from "../features/shelves/ShelfActions";
 import { computeLibraryStats, shelfFromRoute, shelfRoute } from "../domain/library";
 import { useApp, useBooks, useModal, useToast, useUi } from "./AppContext";
 import PageHeader from "./PageHeader";
+import VerifyBanner from "./shell/VerifyBanner";
 import { buildPath } from "./routes";
 import { describeRoute } from "./views";
 import CommandPalette from "./shell/CommandPalette";
@@ -55,6 +56,7 @@ function Workspace({ view, navigate, location }) {
       <NavRail view={view} onNavigate={navigate} />
 
       <div className="pk-shell__body">
+        <VerifyBanner />
         <PageHeader
           kicker={t(kickerKey)}
           title={t(titleKey, titleVars)}

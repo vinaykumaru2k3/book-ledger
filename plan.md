@@ -132,11 +132,11 @@ Size: S ≈ a few hours, M ≈ a day, L ≈ several days.
 ### R3: Book details (M) — **done**
 - Cover-to-details shared-element transition (View Transitions API, fade fallback), cover-tinted page, inline progress/status/notes/rating, "finished a book" moment.
 
-### R4: Add / edit a book (M) — **built, in review**
+### R4: Add / edit a book (M) — **done**
 - Command-style lookup, calmer sectioned form, better duplicate warning and shelf picker.
 - Kannada-aware: lookups accept Kannada script and transliteration (reuses the Explorer's transliteration table from K2 when ready).
 
-### R5: Landing and sign-in (S–M)
+### R5: Landing and sign-in (S–M) — **done**
 - Bilingual editorial landing (with a taste of the Explorer on it), simpler sign-in.
 - **Password reset and email verification** (currently missing).
 

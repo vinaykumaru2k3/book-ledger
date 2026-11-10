@@ -3,36 +3,26 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendEmailVerification,
+  sendPasswordResetEmail,
   signInWithPopup,
   signOut,
 } from "firebase/auth";
 import { auth, googleProvider } from "../../services/firebase";
+import { authErrorKey } from "./authErrors";
 
-function authMessage(error) {
-  console.error("Firebase Auth Error:", error);
-  const code = error?.code || "";
-  const msg = error?.message || "";
-
-  if (code.includes("popup-closed-by-user")) return "The sign-in popup was closed before completion.";
-  if (code.includes("invalid-credential") || code.includes("wrong-password")) {
-    return "The credentials entered were not accepted.";
-  }
-  if (code.includes("email-already-in-use")) return "An account already exists for this email.";
-  if (code.includes("weak-password")) return "Password must be at least 6 characters.";
-  if (code.includes("invalid-email")) return "Invalid email address formatting.";
-  if (code.includes("operation-not-allowed")) {
-    return "Google Sign-In is not enabled. Go to Firebase Console > Authentication > Sign-in method and enable Google.";
-  }
-  if (code.includes("unauthorized-domain")) {
-    return "This local domain is not authorized. Add it under Firebase Authentication > Settings > Authorized Domains.";
-  }
-  return `Authentication failed: ${msg} (${code})`;
-}
-
+/**
+ * Sign-in state and actions.
+ *
+ * `authError` is a translation key (or ""), never English text; the screens
+ * translate it. Email accounts must confirm their address, but this only
+ * *reminds* (`needsVerification`): nobody is locked out of their own library.
+ */
 export function useAuthController() {
   const [user, setUser] = useState(null);
   const [authReady, setAuthReady] = useState(false);
   const [authError, setAuthError] = useState("");
+  const [, setVerifyTick] = useState(0); // bumps a re-render after user.reload()
 
   useEffect(() => {
     return onAuthStateChanged(
@@ -42,19 +32,25 @@ export function useAuthController() {
         setAuthReady(true);
         setAuthError("");
       },
-      () => {
+      (error) => {
+        console.error("Auth state error:", error);
         setAuthReady(true);
-        setAuthError("Failed to fetch sign-in session state.");
+        setAuthError("auth.error.session");
       }
     );
   }, []);
+
+  const fail = (error) => {
+    console.error("Firebase Auth Error:", error);
+    setAuthError(authErrorKey(error));
+  };
 
   async function signInWithGoogle() {
     setAuthError("");
     try {
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
-      setAuthError(authMessage(error));
+      fail(error);
     }
   }
 
@@ -62,25 +58,69 @@ export function useAuthController() {
     setAuthError("");
     try {
       if (mode === "create") {
-        await createUserWithEmailAndPassword(auth, email, password);
+        const credential = await createUserWithEmailAndPassword(auth, email, password);
+        // Best effort: a failed email must not undo a successful registration.
+        sendEmailVerification(credential.user).catch((error) => console.error("Verification email failed:", error));
       } else {
         await signInWithEmailAndPassword(auth, email, password);
       }
     } catch (error) {
-      setAuthError(authMessage(error));
+      fail(error);
     }
   }
 
-  async function signOutRaw() {
-    await signOut(auth);
+  /**
+   * Sends a password-reset email. Resolves true when the request was accepted.
+   * An unknown address also resolves true, so this screen can never be used to
+   * discover which emails have accounts.
+   */
+  async function resetPassword(email) {
+    setAuthError("");
+    try {
+      await sendPasswordResetEmail(auth, email);
+      return true;
+    } catch (error) {
+      if (String(error?.code).includes("user-not-found")) return true;
+      fail(error);
+      return false;
+    }
   }
+
+  /** Re-sends the verification email. Resolves true when it was sent. */
+  async function resendVerification() {
+    try {
+      await sendEmailVerification(auth.currentUser);
+      return true;
+    } catch (error) {
+      console.error("Verification email failed:", error);
+      return false;
+    }
+  }
+
+  /** Re-reads the account (after the user clicked the emailed link). Resolves true when verified. */
+  async function checkVerified() {
+    try {
+      await auth.currentUser?.reload();
+    } catch (error) {
+      console.error("Could not refresh the account:", error);
+    }
+    setVerifyTick((tick) => tick + 1);
+    return Boolean(auth.currentUser?.emailVerified);
+  }
+
+  const needsVerification =
+    Boolean(user) && !user.emailVerified && user.providerData.some((provider) => provider.providerId === "password");
 
   return {
     user,
     authReady,
     authError,
+    needsVerification,
     signInWithGoogle,
     signInWithEmail,
-    signOut: signOutRaw,
+    resetPassword,
+    resendVerification,
+    checkVerified,
+    signOut: () => signOut(auth),
   };
 }
