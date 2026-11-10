@@ -1,0 +1,267 @@
+/* Add / edit a book: catalogue lookup, results, the form, disclosure, chips, alert. Reads only --pk-* tokens. */
+
+/* ---- Lookup ------------------------------------------------------------ */
+.pk-lookup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pk-space-2);
+  margin-bottom: var(--pk-space-5);
+  padding: var(--pk-space-4);
+  background: var(--pk-surface);
+  border: 1px solid var(--pk-line);
+  border-radius: var(--pk-radius-lg);
+}
+.pk-lookup__bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pk-space-3);
+}
+.pk-lookup__search {
+  flex: 1 1 14rem;
+}
+.pk-lookup__status {
+  display: flex;
+  align-items: center;
+  gap: var(--pk-space-2);
+  min-height: 1.4em;
+  font: 400 var(--pk-text-sm) var(--pk-font-ui);
+  color: var(--pk-ink-3);
+}
+.pk-lookup__results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pk-space-2);
+  max-height: 22rem;
+  margin: var(--pk-space-1) 0 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+.pk-result {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--pk-space-3);
+  padding: var(--pk-space-3);
+  background: var(--pk-surface-raised);
+  border: 1px solid var(--pk-line);
+  border-radius: var(--pk-radius-md);
+}
+.pk-result__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.pk-result__text strong {
+  font: 600 var(--pk-text-md) / var(--pk-leading-tight) var(--pk-font-display);
+  color: var(--pk-ink);
+}
+.pk-result__text > span {
+  font: 400 var(--pk-text-sm) var(--pk-font-ui);
+  color: var(--pk-ink-2);
+}
+.pk-result__snippet {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: var(--pk-ink-3) !important;
+}
+.pk-result__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pk-space-1);
+}
+.pk-result__chips span {
+  padding: 1px 8px;
+  border-radius: var(--pk-radius-pill);
+  background: var(--pk-surface-sunken);
+  color: var(--pk-ink-2);
+  font: 500 var(--pk-text-xs) var(--pk-font-ui);
+}
+.pk-result__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pk-space-2);
+}
+@media (max-width: 560px) {
+  .pk-result {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .pk-result__actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+  }
+  .pk-result__actions .pk-btn {
+    flex: 1;
+  }
+}
+
+/* ---- Alert --------------------------------------------------------------- */
+.pk-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--pk-space-3);
+  margin-bottom: var(--pk-space-5);
+  padding: var(--pk-space-3) var(--pk-space-4);
+  background: var(--pk-warning-soft);
+  border: 1px solid color-mix(in srgb, var(--pk-warning) 35%, transparent);
+  border-radius: var(--pk-radius-md);
+  color: #5d4200;
+  font: 400 var(--pk-text-sm) / var(--pk-leading-body) var(--pk-font-ui);
+}
+.pk-alert svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--pk-warning);
+}
+
+/* ---- Form ---------------------------------------------------------------- */
+.pk-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pk-space-4);
+}
+.pk-form__basics {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--pk-space-5);
+  align-items: start;
+}
+.pk-form__cover {
+  position: sticky;
+  top: 0;
+}
+.pk-form__fields,
+.pk-form__more {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pk-space-4);
+  min-width: 0;
+}
+.pk-form__row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+  gap: var(--pk-space-4);
+  align-items: end;
+}
+.pk-form__rating {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pk-space-1);
+}
+.pk-more {
+  border-top: 1px solid var(--pk-line);
+  padding-top: var(--pk-space-3);
+}
+.pk-more > summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  list-style: none;
+  font: 600 var(--pk-text-sm) var(--pk-font-ui);
+  color: var(--pk-ink-2);
+}
+.pk-more > summary::-webkit-details-marker {
+  display: none;
+}
+.pk-more > summary::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  margin-right: var(--pk-space-3);
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform var(--pk-duration-2) var(--pk-ease);
+}
+.pk-more[open] > summary::before {
+  transform: rotate(45deg);
+}
+.pk-more > summary:focus-visible {
+  outline: 3px solid var(--pk-focus);
+  outline-offset: 2px;
+  border-radius: var(--pk-radius-sm);
+}
+.pk-form__more {
+  padding: var(--pk-space-2) 0 var(--pk-space-3);
+}
+@media (max-width: 560px) {
+  .pk-form__basics {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+  }
+  .pk-form__cover {
+    position: static;
+  }
+  .pk-form__fields {
+    width: 100%;
+  }
+}
+
+/* ---- Shelf picker ------------------------------------------------------------ */
+.pk-shelfpicker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pk-space-3);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.pk-shelfpicker legend {
+  margin-bottom: var(--pk-space-2);
+  padding: 0;
+  font: 600 var(--pk-text-sm) var(--pk-font-ui);
+  color: var(--pk-ink);
+}
+.pk-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pk-space-2);
+}
+.pk-chip {
+  min-height: 36px;
+  padding: 0 var(--pk-space-3);
+  border: 1px solid var(--pk-line-strong);
+  border-radius: var(--pk-radius-pill);
+  background: var(--pk-surface-raised);
+  color: var(--pk-ink-2);
+  font: 500 var(--pk-text-sm) var(--pk-font-ui);
+  cursor: pointer;
+  transition: background-color var(--pk-duration-1) var(--pk-ease), color var(--pk-duration-1) var(--pk-ease);
+}
+.pk-chip:hover {
+  border-color: var(--pk-ink-3);
+}
+.pk-chip--on {
+  background: var(--pk-accent-soft);
+  border-color: var(--pk-accent);
+  color: var(--pk-accent);
+}
+.pk-chip:focus-visible {
+  outline: 3px solid var(--pk-focus);
+  outline-offset: 2px;
+}
+.pk-shelfpicker__add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--pk-space-2);
+}
+.pk-shelfpicker__add input {
+  flex: 1 1 12rem;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 var(--pk-space-3);
+  background: var(--pk-surface-raised);
+  border: 1px solid var(--pk-line-strong);
+  border-radius: var(--pk-radius-md);
+  color: var(--pk-ink);
+  font: 400 var(--pk-text-md) var(--pk-font-ui);
+}
+.pk-shelfpicker__add input:focus-visible {
+  outline: 3px solid var(--pk-focus);
+  outline-offset: 2px;
+}

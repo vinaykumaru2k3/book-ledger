@@ -2,7 +2,7 @@ import React from "react";
 import { Search, X } from "lucide-react";
 
 /** Search input with a leading icon and a clear button once there is text. */
-function SearchBox({ value, onChange, label, placeholder, clearLabel = "Clear", className = "" }) {
+function SearchBox({ value, onChange, label, placeholder, clearLabel = "Clear", className = "", ...inputProps }) {
   return (
     <div className={["pk-searchbox", className].filter(Boolean).join(" ")}>
       <Search size={18} aria-hidden="true" />
@@ -12,6 +12,7 @@ function SearchBox({ value, onChange, label, placeholder, clearLabel = "Clear", 
         onChange={(event) => onChange(event.target.value)}
         aria-label={label}
         placeholder={placeholder}
+        {...inputProps}
       />
       {value && (
         <button type="button" className="pk-searchbox__clear" onClick={() => onChange("")} aria-label={clearLabel}>

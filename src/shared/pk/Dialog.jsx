@@ -13,8 +13,10 @@ const FOCUSABLE =
  * button); the title stays available to screen readers. `top` aligns the panel
  * to the top of the screen instead of the centre (command palette). With `bare`,
  * pass `labelledBy` (the id of your own visible heading) to name the dialog by it.
+ * `closeOnBackdrop={false}` stops a stray click outside from closing a dialog that
+ * holds unsaved input (Escape and the close button still work).
  */
-function Dialog({ title, onClose, children, footer, size = "md", closeLabel = "Close", bare = false, top = false, className = "", labelledBy }) {
+function Dialog({ title, onClose, children, footer, size = "md", closeLabel = "Close", bare = false, top = false, className = "", labelledBy, closeOnBackdrop = true }) {
   const titleId = useId();
   const panelRef = useRef(null);
   // Always call the latest onClose without re-running the focus/scroll setup below
@@ -61,7 +63,7 @@ function Dialog({ title, onClose, children, footer, size = "md", closeLabel = "C
   }, []);
 
   return createPortal(
-    <div className={top ? "pk-dialog-backdrop pk-dialog-backdrop--top" : "pk-dialog-backdrop"} onMouseDown={(event) => event.target === event.currentTarget && onCloseRef.current()}>
+    <div className={top ? "pk-dialog-backdrop pk-dialog-backdrop--top" : "pk-dialog-backdrop"} onMouseDown={(event) => closeOnBackdrop && event.target === event.currentTarget && onCloseRef.current()}>
       <div
         ref={panelRef}
         className={`pk-dialog pk-dialog--${size}${bare ? " pk-dialog--bare" : ""}${className ? ` ${className}` : ""}`}
