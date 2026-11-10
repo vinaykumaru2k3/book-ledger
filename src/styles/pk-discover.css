@@ -563,21 +563,16 @@
   font: 500 var(--pk-text-xs) var(--pk-font-ui);
 }
 
-/* Genre pills: one row that scrolls sideways on narrow screens. */
+/* Genre pills wrap onto as many lines as they need, so every chart is in view. */
 .pk-chartgenres {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  padding: 2px 2px 6px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.pk-chartgenres::-webkit-scrollbar {
-  display: none;
 }
 .pk-chartgenres__pill {
   flex: none;
   min-height: 40px;
-  padding: 0 18px;
+  padding: 0 16px;
   border: 1px solid var(--pk-line-strong);
   border-radius: var(--pk-radius-pill);
   background: var(--pk-surface);
@@ -927,6 +922,14 @@
 }
 
 @media (max-width: 640px) {
+  .pk-chartgenres {
+    gap: 6px;
+  }
+  .pk-chartgenres__pill {
+    min-height: 36px;
+    padding: 0 12px;
+    font-size: 0.8rem;
+  }
   .pk-podium {
     gap: 10px;
     padding-inline: 10px;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Edit3, FolderPlus, Heart, Trash2 } from "lucide-react";
 import { useLanguage } from "../../shared/i18n/LanguageContext";
 import { useBooks, useShelves, useUi } from "../../app/AppContext";
@@ -8,6 +8,7 @@ import ShelfPopover from "./ShelfPopover";
 function BookActions({ book }) {
   const { t } = useLanguage();
   const [shelving, setShelving] = useState(false);
+  const shelfButton = useRef(null);
   const { updateBook } = useBooks();
   const { uniqueShelves } = useShelves();
   const { openEditBook, openDeleteConfirm } = useUi();
@@ -31,6 +32,7 @@ function BookActions({ book }) {
         <Heart size={16} fill={book.favorite ? "currentColor" : "none"} aria-hidden="true" />
       </button>
       <button
+        ref={shelfButton}
         type="button"
         className="pk-icon-btn pk-act"
         aria-haspopup="dialog"
@@ -55,7 +57,7 @@ function BookActions({ book }) {
       </button>
 
       {shelving && (
-        <ShelfPopover shelves={uniqueShelves} selected={current} onToggle={toggleShelf} onCreate={createShelf} onClose={() => setShelving(false)} />
+        <ShelfPopover anchorRef={shelfButton} shelves={uniqueShelves} selected={current} onToggle={toggleShelf} onCreate={createShelf} onClose={() => setShelving(false)} />
       )}
     </div>
   );

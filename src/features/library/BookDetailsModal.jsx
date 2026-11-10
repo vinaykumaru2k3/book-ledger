@@ -1,9 +1,8 @@
 import React, { useEffect, useId, useRef, useState } from "react";
-import { Loader2, Plus, X } from "lucide-react";
+import { Loader2, Plus, Star, X } from "lucide-react";
 import BookCover from "../../shared/pk/BookCover";
 import Button from "../../shared/pk/Button";
 import Dialog from "../../shared/pk/Dialog";
-import RatingStars from "../../shared/pk/RatingStars";
 import { formFromBook } from "../../domain/book";
 import { findDuplicate } from "../../domain/library";
 import { useLanguage } from "../../shared/i18n/LanguageContext";
@@ -14,6 +13,8 @@ import FinishedBurst from "./details/FinishedBurst";
 import NotesEditor from "./details/NotesEditor";
 import { useCoverTint } from "./details/useCoverTint";
 import { useBookDescription } from "./useBookDescription";
+
+const compact = new Intl.NumberFormat(undefined, { notation: "compact", maximumFractionDigits: 1 });
 
 function ChipList({ label, items }) {
   if (!items?.length) return null;
@@ -76,10 +77,12 @@ function BookDetails({ book, onClose }) {
             <BookCover book={live} size="lg" />
           </div>
           <div className="pk-details__head">
-            <div className="pk-details__badges">
-              <StatusChip status={live.status} />
-              {finished && <FinishedBurst />}
-            </div>
+            {inLibrary && (
+              <div className="pk-details__badges">
+                <StatusChip status={live.status} />
+                {finished && <FinishedBurst />}
+              </div>
+            )}
             <h2 id={titleId} className="pk-details__title">
               {live.title}
             </h2>
@@ -93,8 +96,19 @@ function BookDetails({ book, onClose }) {
                 .filter(Boolean)
                 .join(" · ")}
             </p>
-            {!inLibrary && (
-              <RatingStars readOnly value={live.rating} label={t("details.rating")} starLabel={(n) => String(n)} />
+            {!inLibrary && live.catalogueRating > 0 && (
+              <p className="pk-details__community">
+                <Star size={15} fill="currentColor" aria-hidden="true" />
+                <strong>{live.catalogueRating.toFixed(1)}</strong>
+                <span>
+                  {[
+                    live.catalogueRatingCount ? `${compact.format(live.catalogueRatingCount)} ratings` : null,
+                    live.catalogueReaders ? `${compact.format(live.catalogueReaders)} readers on Open Library` : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </span>
+              </p>
             )}
           </div>
         </header>
@@ -124,7 +138,8 @@ function BookDetails({ book, onClose }) {
           )}
 
           <ChipList label={t("details.genres")} items={live.genres} />
-          <ChipList label={t("details.tags")} items={live.tags} />
+          {/* Catalogue books carry their genres as tags too; don't list them twice. */}
+          <ChipList label={t("details.tags")} items={(live.tags || []).filter((tag) => !(live.genres || []).includes(tag))} />
 
           <section className="pk-details__section" aria-label={t("details.about")}>
             <h3 className="pk-details__label">{t("details.about")}</h3>

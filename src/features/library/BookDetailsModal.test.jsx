@@ -247,6 +247,16 @@ describe("a book that is not in your library (e.g. from Discover)", () => {
     expect(quickAdd).toHaveBeenCalledWith(expect.objectContaining({ title: "Fresh Find", author: "Someone" }));
   });
 
+  it("shows what other readers think, without a status chip or a repeated tag list", () => {
+    state.detailsBook = { ...discovered, genres: ["Fantasy", "Magic"], tags: ["Fantasy", "Magic"], catalogueRating: 4.26, catalogueRatingCount: 1200, catalogueReaders: 24000 };
+    renderModal();
+    expect(screen.getByText("4.3")).toBeTruthy();
+    expect(screen.getByText(/1.2K ratings · 24K readers on Open Library/)).toBeTruthy();
+    expect(screen.queryByText("Want to read")).toBeNull();
+    expect(screen.queryByText("Tags")).toBeNull();
+    expect(screen.getAllByText("Fantasy")).toHaveLength(1);
+  });
+
   it("switches to the editing controls once the book has been added (found by its source)", () => {
     state.detailsBook = normalizeBook({ id: "/works/OL9W", title: "Fresh Find", author: "Someone", sourceKey: "/works/OL9W" });
     const view = renderModal();

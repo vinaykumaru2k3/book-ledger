@@ -25,10 +25,14 @@
 /* ---- Dialog ---------------------------------------------------------------- */
 .pk-dialog--details {
   width: min(100%, 56rem);
-  max-height: 92vh;
+  max-height: min(92vh, 60rem);
+  max-height: min(92dvh, 60rem);
+  overflow: hidden;
 }
 .pk-dialog--details .pk-dialog__body {
+  display: block;
   padding: 0;
+  overflow-y: auto;
 }
 .pk-details {
   --tint: var(--pk-accent);
@@ -39,12 +43,16 @@
   /* The cover colour only washes the top of the page; text sits on mostly-plain paper. */
   background: linear-gradient(180deg, color-mix(in srgb, var(--tint) 24%, var(--pk-surface-raised)) 0, var(--pk-surface-raised) 340px);
 }
+/* Stays in the corner while the dialog scrolls. */
 .pk-details__close {
-  position: absolute;
+  position: sticky;
   top: var(--pk-space-3);
-  right: var(--pk-space-3);
   z-index: 2;
-  background: rgba(255, 255, 255, 0.6);
+  align-self: flex-end;
+  margin: var(--pk-space-3) var(--pk-space-3) -52px 0;
+  background: color-mix(in srgb, var(--pk-surface-raised) 80%, transparent);
+  box-shadow: 0 2px 8px rgba(40, 25, 10, 0.18);
+  backdrop-filter: blur(6px);
 }
 .pk-details__hero {
   display: grid;
@@ -88,7 +96,18 @@
   flex-direction: column;
   gap: var(--pk-space-5);
   padding: var(--pk-space-3) var(--pk-space-6) var(--pk-space-6);
-  overflow-y: auto;
+}
+.pk-details__community {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  color: var(--pk-ink-3);
+  font: 500 var(--pk-text-sm) var(--pk-font-ui);
+}
+.pk-details__community svg,
+.pk-details__community strong {
+  color: #b7791f;
 }
 .pk-details__label {
   font: 700 var(--pk-text-xs) var(--pk-font-ui);

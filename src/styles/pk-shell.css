@@ -729,11 +729,14 @@
   width: min(100%, 38rem);
   max-height: 70vh;
 }
+/* A bare body scrolls when its content is taller than the panel (never clip it). */
 .pk-dialog__body--bare {
-  padding: 0;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  padding: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 .pk-palette {
   display: flex;

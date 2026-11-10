@@ -602,10 +602,9 @@
   inset: 0;
   z-index: calc(var(--pk-z-menu) - 1);
 }
+/* Drawn at the top of the page and placed by ShelfPopover next to its button. */
 .pk-popover {
-  position: absolute;
-  top: calc(100% + var(--pk-space-2));
-  left: 0;
+  position: fixed;
   z-index: var(--pk-z-menu);
   width: 15rem;
   padding: var(--pk-space-3);
@@ -614,6 +613,24 @@
   border-radius: var(--pk-radius-lg);
   box-shadow: var(--pk-shadow-3);
   animation: pk-rise var(--pk-duration-2) var(--pk-ease);
+}
+.pk-popover:focus {
+  outline: none;
+}
+/* Phones: a sheet along the bottom of the screen, above the tab bar. */
+.pk-popover-backdrop--sheet {
+  z-index: calc(var(--pk-z-dialog) - 1);
+  background: rgba(31, 26, 23, 0.4);
+}
+.pk-popover--sheet {
+  inset: auto 0 0;
+  z-index: var(--pk-z-dialog);
+  width: auto;
+  padding: var(--pk-space-4) var(--pk-space-4) calc(var(--pk-space-4) + env(safe-area-inset-bottom));
+  border-radius: var(--pk-radius-lg) var(--pk-radius-lg) 0 0;
+}
+.pk-popover--sheet .pk-popover__list {
+  max-height: 40vh;
 }
 .pk-popover__title {
   margin-bottom: var(--pk-space-2);

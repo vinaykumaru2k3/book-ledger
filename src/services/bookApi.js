@@ -262,5 +262,9 @@ export function detailsBookFromItem(item) {
     isbn: item.isbn,
     coverUrl: largeCover(item.coverUrl),
     sourceKey: item.id,
+    // What other readers think, from the catalogue (not your own rating).
+    catalogueRating: item.rating || 0,
+    catalogueRatingCount: item.ratingCount || 0,
+    catalogueReaders: item.readers || 0,
   };
 }
