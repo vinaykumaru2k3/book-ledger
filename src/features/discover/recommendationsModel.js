@@ -87,7 +87,10 @@ export function tasteWeight(book) {
 }
 
 /** An author name reduced for comparison: "J.R.R. Tolkien" and "J. R. R. Tolkien" match. */
-const authorKey = (name = "") => normalizeTitle(name).replace(/\s+/g, "");
+export const authorKey = (name = "") => normalizeTitle(name).replace(/\s+/g, "");
+
+/** A summary, retelling, dictionary or magazine issue rather than a book to read. */
+export const isNotTheBook = (title = "") => DERIVATIVE.test(title) || REFERENCE.test(title) || PERIODICAL.test(title);
 
 const ONES = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
 const TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];

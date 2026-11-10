@@ -13,7 +13,7 @@ import { shelfFromRoute } from "../domain/library";
 // Heavy pages load on demand so the first screen stays small.
 export const PAGES = {
   recommendations: { Component: lazy(() => import("../features/discover/Recommendations")), bare: true },
-  topbooks: { Component: lazy(() => import("../features/discover/TopCharts")) },
+  topbooks: { Component: lazy(() => import("../features/discover/TopCharts")), bare: true },
   analytics: { Component: lazy(() => import("../features/insights/Analytics")) },
   shelves: { Component: lazy(() => import("../features/shelves/ShelvesDashboard")), bare: true },
   galaxy: {

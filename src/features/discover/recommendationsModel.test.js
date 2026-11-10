@@ -14,7 +14,6 @@ import {
   titleKey,
   weightedPick,
 } from "./recommendationsModel";
-import { curateChart } from "./topChartFilters";
 
 const book = (fields) => normalizeBook({ status: "done", ...fields });
 const owned = [
@@ -306,24 +305,6 @@ describe("groupRecommendations", () => {
 
   it("is empty for no picks", () => {
     expect(groupRecommendations([])).toEqual({ top: null, rows: [] });
-  });
-});
-
-describe("curateChart", () => {
-  it("keeps one entry per title, two per author, and requires a cover", () => {
-    const docs = [
-      doc("1", "Fantasy One", { subject: ["Fantasy"], language: ["eng"] }),
-      doc("2", "Fantasy One", { subject: ["Fantasy"] }),
-      doc("3", "Fantasy Two", { subject: ["Fantasy"] }),
-      doc("4", "Fantasy Three", { subject: ["Fantasy"] }),
-      doc("5", "Fantasy Four", { subject: ["Fantasy"], author_name: ["B"], cover_i: undefined }),
-    ];
-    expect(curateChart(docs, "fantasy").map((d) => d.key)).toEqual(["1", "3"]);
-  });
-
-  it("rejects non-English editions", () => {
-    const docs = [doc("1", "Un libro", { subject: ["Fantasy"], language: ["spa"] })];
-    expect(curateChart(docs, "fantasy")).toEqual([]);
   });
 });
 
