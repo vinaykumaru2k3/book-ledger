@@ -37,3 +37,28 @@ export function useInView(ref, { once = true, threshold = 0.25, rootMargin = "0p
 
   return inView;
 }
+
+/**
+ * Counts up to `target` with an ease-out over `duration` ms (numbers changing
+ * is not motion, so this runs even with reduced motion). Starts once `start` is true.
+ */
+export function useCountUp(target, { duration = 1200, start = true } = {}) {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    if (!start) return undefined;
+    if (typeof requestAnimationFrame === "undefined" || !target) {
+      setValue(target || 0);
+      return undefined;
+    }
+    let raf;
+    const began = performance.now();
+    const tick = (now) => {
+      const progress = Math.min((now - began) / duration, 1);
+      setValue(Math.round(target * (1 - Math.pow(1 - progress, 3))));
+      if (progress < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration, start]);
+  return value;
+}

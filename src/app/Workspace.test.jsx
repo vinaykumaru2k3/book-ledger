@@ -112,7 +112,7 @@ describe("library", () => {
     renderAt("/");
     fireEvent.click(screen.getAllByText("Add Book")[0]);
     expect(ui.openNewBook).toHaveBeenCalled();
-    fireEvent.click(screen.getAllByText("Dune")[0]);
+    fireEvent.click(within(document.querySelector(".pk-tiles")).getAllByText("Dune")[0]);
     expect(ui.openDetails).toHaveBeenCalled();
   });
 });

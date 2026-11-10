@@ -7,6 +7,7 @@ import BookDetailsModal from "../features/library/BookDetailsModal";
 import DeleteConfirmModal from "../features/library/DeleteConfirmModal";
 import LibraryPage from "../features/library/LibraryPage";
 import LibraryTabs from "../features/library/LibraryTabs";
+import LibraryDashboard from "../features/library/dashboard/LibraryDashboard";
 import ShelfActions from "../features/shelves/ShelfActions";
 import { computeLibraryStats, shelfFromRoute, shelfRoute } from "../domain/library";
 import { useApp, useBooks, useModal, useToast, useUi } from "./AppContext";
@@ -61,7 +62,7 @@ function Workspace({ view, navigate, location }) {
           kicker={t(kickerKey)}
           title={t(titleKey, titleVars)}
           stats={stats}
-          showStats={isLibrary}
+          showStats={isLibrary && view !== "all"}
           onOpenCommand={openPalette}
           onAdd={openNewBook}
           onNavigate={navigate}
@@ -72,6 +73,8 @@ function Workspace({ view, navigate, location }) {
             )
           }
         />
+
+        {view === "all" && <LibraryDashboard books={books} stats={stats} />}
 
         {isLibrary && shelfName === null && <LibraryTabs view={view} stats={stats} onChange={navigate} />}
 

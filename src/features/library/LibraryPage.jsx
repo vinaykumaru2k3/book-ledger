@@ -13,7 +13,8 @@ import { useLibraryView } from "./useLibraryView";
 
 /**
  * The main library screen: toolbar, the paged books for the current view in
- * the chosen layout, and the progress side panel.
+ * the chosen layout, and (on filtered views) the progress side panel. The
+ * "all" view has the dashboard above it instead.
  */
 function LibraryPage({ view, stats, onClearView }) {
   const { t } = useLanguage();
@@ -30,7 +31,7 @@ function LibraryPage({ view, stats, onClearView }) {
   const hasBooks = books.length > 0;
 
   return (
-    <div className="pk-lib">
+    <div className={view === "all" ? "pk-lib pk-lib--wide" : "pk-lib"}>
       <section className="pk-lib__main" aria-label={t("nav.library")}>
         <LibraryToolbar lib={lib} />
 
@@ -70,7 +71,7 @@ function LibraryPage({ view, stats, onClearView }) {
         )}
       </section>
 
-      <LibrarySidePanel books={books} stats={stats} />
+      {view !== "all" && <LibrarySidePanel books={books} stats={stats} />}
     </div>
   );
 }

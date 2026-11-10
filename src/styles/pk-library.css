@@ -15,6 +15,9 @@
     position: sticky;
     top: var(--pk-space-5);
   }
+  .pk-lib--wide {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 /* ---- Stats ------------------------------------------------------------- */
@@ -178,19 +181,19 @@
 .pk-tiles {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: var(--pk-space-5);
+  gap: var(--pk-space-6) var(--pk-space-5);
 }
+/* Cover-forward: the book itself is the card. */
 .pk-tile {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--pk-space-3);
-  padding: var(--pk-space-4);
-  background: var(--pk-surface);
-  border: 1px solid var(--pk-line);
+  gap: var(--pk-space-2);
+  padding: 0;
+  background: transparent;
+  border: 0;
   border-radius: var(--pk-radius-lg);
-  box-shadow: var(--pk-shadow-1);
-  transition: transform var(--pk-duration-2) var(--pk-ease), box-shadow var(--pk-duration-2) var(--pk-ease);
+  transition: transform var(--pk-duration-2) var(--pk-ease);
   animation: pk-tile-in var(--pk-duration-3) var(--pk-ease) backwards;
 }
 .pk-tile:nth-child(2) { animation-delay: 30ms; }
@@ -204,8 +207,7 @@
   }
 }
 .pk-tile:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--pk-shadow-2);
+  transform: none;
 }
 .pk-tile--skeleton {
   animation: none;
@@ -230,15 +232,35 @@
 .pk-tile__cover {
   position: relative;
   display: block;
-  margin-bottom: var(--pk-space-2);
+  margin-bottom: var(--pk-space-3);
+  perspective: 800px;
+}
+.pk-tile__cover::after {
+  /* A soft floor shadow under the book. */
+  content: "";
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  bottom: -10px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(60, 40, 20, 0.28), transparent);
+  transition: transform var(--pk-duration-3) var(--pk-ease), opacity var(--pk-duration-3) var(--pk-ease);
 }
 .pk-tile__cover .pk-cover {
-  width: 78%;
-  margin: 0 auto;
-  transition: transform var(--pk-duration-2) var(--pk-ease), box-shadow var(--pk-duration-2) var(--pk-ease);
+  width: 100%;
+  transform-origin: left center;
+  box-shadow: 6px 10px 22px -10px rgba(40, 25, 10, 0.45);
+  transition: transform var(--pk-duration-3) var(--pk-ease), box-shadow var(--pk-duration-3) var(--pk-ease);
 }
-.pk-tile:hover .pk-cover {
-  transform: translateY(-4px) rotate(-1deg);
+.pk-tile:hover .pk-cover,
+.pk-tile:focus-within .pk-cover {
+  transform: translateY(-8px) rotateY(-12deg);
+  box-shadow: 14px 22px 30px -12px rgba(40, 25, 10, 0.5);
+}
+.pk-tile:hover .pk-tile__cover::after {
+  transform: scaleX(0.85);
+  opacity: 0.7;
 }
 .pk-tile__fav {
   position: absolute;
@@ -273,7 +295,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--pk-space-2);
-  margin-top: auto;
+  margin-top: var(--pk-space-1);
 }
 .pk-tile__progress {
   display: grid;
@@ -286,8 +308,8 @@
 /* ---- Per-book actions (shared by tiles and rows) -------------------------- */
 .pk-actions {
   position: absolute;
-  top: var(--pk-space-3);
-  left: var(--pk-space-3);
+  top: var(--pk-space-2);
+  left: var(--pk-space-2);
   display: flex;
   gap: 2px;
   padding: 2px;
