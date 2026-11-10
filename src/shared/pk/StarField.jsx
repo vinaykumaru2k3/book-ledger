@@ -2,9 +2,14 @@ import React, { useEffect, useRef } from "react";
 import { prefersReducedMotion } from "../lib/motion";
 
 /*
- * A night sky drawn on a canvas: stars at three depths that twinkle and drift
- * slowly, constellations that draw themselves one after another (every book
- * "becomes a star"), and an occasional shooting star. Decorative only.
+ * A night sky drawn on a canvas: stars at three depths that twinkle,
+ * constellations that draw themselves one after another (every book "becomes
+ * a star"), an occasional shooting star and light pointer parallax.
+ *
+ * With "reduce motion" on (Windows: Animation effects off) the sky stays
+ * alive but calm: stars twinkle and constellations fade in and out, while
+ * everything that travels (parallax, shooting stars) is switched off.
+ * Decorative only.
  */
 
 const TINTS = ["239, 233, 222", "239, 233, 222", "239, 233, 222", "236, 199, 122", "196, 210, 255"];
@@ -77,7 +82,7 @@ function StarField({ density = 0.00045, className = "" }) {
     const ctx = canvas?.getContext?.("2d");
     if (!canvas || !ctx) return undefined;
 
-    const still = prefersReducedMotion();
+    const calm = prefersReducedMotion();
     const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
     let stars = [];
     let constellations = [];
@@ -91,32 +96,32 @@ function StarField({ density = 0.00045, className = "" }) {
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
+      // Phones resize the viewport while scrolling (address bar); keep the same sky for small height changes.
+      const sameSky = stars.length && Math.abs(rect.width - width) < 1 && Math.abs(rect.height - height) < 160;
       const ratio = Math.min(window.devicePixelRatio || 1, 2);
       width = rect.width;
       height = rect.height;
       canvas.width = Math.round(width * ratio);
       canvas.height = Math.round(height * ratio);
       ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      if (sameSky) return;
       stars = createStars(Math.round(Math.min(Math.max(width * height * density, 120), 700)), width, height);
       constellations = pickConstellations(stars, width);
     };
 
-    const place = (star, drift) => {
-      // Slow sideways drift (near stars faster) plus a little pointer parallax.
-      let x = (star.x - drift * (0.3 + star.depth)) % width;
-      if (x < 0) x += width;
-      return { x: x + pointer.x * star.depth * 14, y: star.y + pointer.y * star.depth * 10 };
-    };
+    // A little pointer parallax: near stars move more than far ones. Stars never
+    // wrap around the edges, so constellation lines can never stretch across the screen.
+    const place = (star) => ({ x: star.x + pointer.x * star.depth * 16, y: star.y + pointer.y * star.depth * 12 });
 
     const draw = (now) => {
       const elapsed = now - startedAt;
-      const drift = still ? 0 : elapsed * 0.004;
       ctx.clearRect(0, 0, width, height);
 
       // Stars.
       stars.forEach((star) => {
-        const { x, y } = place(star, drift);
-        const twinkle = still ? 1 : 0.65 + 0.35 * Math.sin(elapsed * 0.001 * star.speed + star.phase);
+        const { x, y } = place(star);
+        const depth = calm ? 0.2 : 0.4;
+        const twinkle = 1 - depth + depth * Math.sin(elapsed * 0.001 * star.speed + star.phase);
         ctx.fillStyle = `rgba(${star.tint}, ${star.alpha * twinkle})`;
         ctx.beginPath();
         ctx.arc(x, y, star.r, 0, Math.PI * 2);
@@ -125,17 +130,11 @@ function StarField({ density = 0.00045, className = "" }) {
 
       // Constellations, one at a time: draw the lines in, hold, fade out.
       constellations.forEach((chain, index) => {
-        let progress;
-        let fade = 1;
-        if (still) {
-          progress = 1;
-        } else {
-          const local = (elapsed - index * CYCLE + constellations.length * CYCLE * 10) % (constellations.length * CYCLE);
-          if (local > CYCLE) return;
-          progress = Math.min(local / (CYCLE * 0.45), 1);
-          fade = local > CYCLE * 0.8 ? 1 - (local - CYCLE * 0.8) / (CYCLE * 0.2) : 1;
-        }
-        const points = chain.map((i) => place(stars[i], drift));
+        const local = (elapsed - index * CYCLE + constellations.length * CYCLE * 10) % (constellations.length * CYCLE);
+        if (local > CYCLE) return;
+        const progress = Math.min(local / (CYCLE * 0.45), 1);
+        const fade = local > CYCLE * 0.8 ? 1 - (local - CYCLE * 0.8) / (CYCLE * 0.2) : Math.min(local / 600, 1);
+        const points = chain.map((i) => place(stars[i]));
         const segments = points.length - 1;
         const drawn = progress * segments;
         ctx.strokeStyle = `rgba(236, 199, 122, ${0.32 * fade})`;
@@ -160,7 +159,7 @@ function StarField({ density = 0.00045, className = "" }) {
       });
 
       // An occasional shooting star.
-      if (!still) {
+      if (!calm) {
         if (!shooting && now > nextShot) {
           shooting = { x: width * (0.3 + Math.random() * 0.7), y: height * Math.random() * 0.35, born: now };
           nextShot = now + 7000 + Math.random() * 9000;
@@ -193,7 +192,7 @@ function StarField({ density = 0.00045, className = "" }) {
       raf = visible && !document.hidden ? requestAnimationFrame(tick) : null;
     };
     const start = () => {
-      if (!still && raf === null && visible && !document.hidden) raf = requestAnimationFrame(tick);
+      if (raf === null && visible && !document.hidden) raf = requestAnimationFrame(tick);
     };
 
     resize();
@@ -216,7 +215,7 @@ function StarField({ density = 0.00045, className = "" }) {
           })
         : null;
     viewObserver?.observe(canvas);
-    if (!still) window.addEventListener("pointermove", onPointerMove, { passive: true });
+    if (!calm) window.addEventListener("pointermove", onPointerMove, { passive: true });
     document.addEventListener("visibilitychange", onVisibility);
 
     return () => {

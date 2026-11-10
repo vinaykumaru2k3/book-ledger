@@ -376,7 +376,35 @@
     stroke-dashoffset: 1;
   }
 }
-.pk-atlas__star circle {
+.pk-atlas__dial circle,
+.pk-atlas__dial line {
+  fill: none;
+  stroke: rgba(236, 199, 122, 0.4);
+  stroke-width: 0.45;
+}
+.pk-atlas__dial .pk-atlas__major {
+  stroke: rgba(236, 199, 122, 0.75);
+  stroke-width: 0.7;
+}
+.pk-atlas__months text {
+  fill: rgba(236, 199, 122, 0.7);
+  font: italic 600 6.2px var(--pk-font-display);
+}
+.pk-atlas__pole {
+  fill: rgba(236, 199, 122, 0.6);
+}
+/* A dark outline around star labels, so constellation lines pass cleanly behind the words. */
+.pk-atlas__star text {
+  paint-order: stroke;
+  stroke: #121b34;
+  stroke-width: 2.4px;
+  stroke-linejoin: round;
+}
+.pk-atlas__legend {
+  fill: rgba(239, 233, 222, 0.55);
+  font: italic 400 6px var(--pk-font-display);
+}
+.pk-atlas__glyph {
   fill: #f6e4b4;
 }
 .pk-atlas__star text {
@@ -389,7 +417,7 @@
 .pk-atlas__star--new {
   --d: 5800ms;
 }
-.pk-atlas__star--new circle {
+.pk-atlas__star--new .pk-atlas__glyph {
   fill: #fff2c8;
 }
 .pk-atlas__star--new text {
@@ -402,7 +430,9 @@
     opacity: 0;
   }
 }
-.pk-atlas__star circle {
+.pk-atlas__glyph {
+  transform-box: fill-box;
+  transform-origin: center;
   animation: pk-twinkle-star 4s ease-in-out infinite;
   animation-delay: var(--d);
 }
@@ -548,16 +578,16 @@
     transform: translateZ(2em) scale(1.5);
   }
   55% {
-    top: -2.2em;
-    left: 26.5em;
+    top: -2.6em;
+    left: 21em;
     transform: translateZ(4em) scale(1.8);
   }
   92% {
     opacity: 1;
   }
   100% {
-    top: 7.7em;
-    left: 14.85em;
+    top: 8.36em;
+    left: 5.18em;
     opacity: 0;
     transform: translateZ(2em) scale(1);
   }
@@ -1632,33 +1662,62 @@
   font-weight: 600;
 }
 
-/* ---- Reduced motion: keep everything, just still ------------------------------------- */
+/* ---- Reduced motion -----------------------------------------------------------------
+ * "Reduce motion" (Windows: Animation effects off) means less movement, not a frozen
+ * page. Fades, twinkles, line drawing, typing and count-ups keep playing; anything that
+ * travels across the screen (sliding in, parallax, scrolling covers, the flying star,
+ * floating, spinning) is switched off or turned into a plain fade.
+ */
+@keyframes pk-fade {
+  from {
+    opacity: 0;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
-  .pk-landing *,
-  .pk-landing *::before,
-  .pk-landing *::after,
-  .pk-auth *,
-  .pk-auth *::before,
-  .pk-auth *::after {
+  .pk-hero__kicker,
+  .pk-hero__line,
+  .pk-hero__sub,
+  .pk-hero__actions,
+  .pk-bookscene,
+  .pk-auth__panelTitle,
+  .pk-authcard,
+  .pk-ledger__row,
+  .pk-openbook__tally,
+  .pk-auth__stack .pk-mcover,
+  .pk-ledger__mark--new {
+    animation-name: pk-fade !important;
+  }
+  .pk-auth__stack .pk-mcover:nth-child(1) {
+    transform: rotate(-8deg);
+  }
+  .pk-marquee__track,
+  .pk-hero__explore svg,
+  .pk-demo__packet,
+  .pk-authcard__error {
     animation: none !important;
-    transition: none !important;
+  }
+  .pk-openbook__rise {
+    display: none;
+  }
+  /* Without the flight, the new star simply appears once the ledger entry is stamped. */
+  .pk-atlas__star--new {
+    --d: 4900ms;
+  }
+  .pk-atlas__line--new {
+    --d: 5000ms;
   }
   .pk-tile3,
-  .pk-reveal {
-    opacity: 1;
+  .pk-reveal,
+  .pk-auth__line,
+  .pk-demo__result {
+    transform: none !important;
+  }
+  .pk-mcover,
+  .pk-solidbtn svg {
+    transition: none;
+  }
+  .pk-mcover:hover,
+  .pk-solidbtn:hover svg {
     transform: none;
-  }
-  .pk-demo__bars span {
-    transform: none;
-  }
-  .pk-demo__constellation path {
-    stroke-dashoffset: 0;
-  }
-  .pk-demo__cover--new,
-  .pk-demo__synced {
-    opacity: 1;
-  }
-  .pk-auth__line:not(.is-on) {
-    display: none;
   }
 }

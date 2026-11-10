@@ -3,7 +3,6 @@ import { ArrowLeft } from "lucide-react";
 import StarField from "../../shared/pk/StarField";
 import MiniCover from "../../shared/pk/MiniCover";
 import { useLanguage } from "../../shared/i18n/LanguageContext";
-import { prefersReducedMotion } from "../../shared/lib/motion";
 import AuthCard from "./AuthCard";
 
 const LINES = ["auth.line1", "auth.line2", "auth.line3"];
@@ -24,7 +23,6 @@ function AuthScreen({ onBackToLanding, ...cardProps }) {
   const [line, setLine] = useState(0);
 
   useEffect(() => {
-    if (prefersReducedMotion()) return undefined;
     const timer = setInterval(() => setLine((current) => (current + 1) % LINES.length), 3800);
     return () => clearInterval(timer);
   }, []);

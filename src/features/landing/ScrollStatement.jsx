@@ -1,10 +1,9 @@
 import React, { useEffect, useRef } from "react";
-import { prefersReducedMotion } from "../../shared/lib/motion";
 
 /**
  * A large statement whose words light up one by one as it scrolls through
- * the viewport. Screen readers get the plain sentence; people who prefer
- * reduced motion see it fully lit.
+ * the viewport (a brightness change only, so it also runs with reduced
+ * motion). Screen readers get the plain sentence.
  */
 function ScrollStatement({ text }) {
   const ref = useRef(null);
@@ -14,10 +13,6 @@ function ScrollStatement({ text }) {
     const element = ref.current;
     if (!element) return undefined;
     const spans = [...element.querySelectorAll(".pk-statement__word")];
-    if (prefersReducedMotion()) {
-      spans.forEach((span) => span.style.setProperty("--lit", "1"));
-      return undefined;
-    }
     let raf = null;
     const update = () => {
       raf = null;

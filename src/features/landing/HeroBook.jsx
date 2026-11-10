@@ -4,38 +4,55 @@ import { langOf } from "../../shared/lib/script";
 
 /*
  * The hero centrepiece: an open book.
- *  - Left page: a star-atlas plate. Every star is a finished book, labelled in
- *    its own script, joined into a constellation that draws itself.
+ *  - Left page: a reading-year dial, like a planisphere in an old star atlas.
+ *    Each star is a finished book, labelled in its own script and placed at
+ *    the month it was finished.
+ *    The constellation joins them in reading order, tracing the year.
  *  - Right page: the reading ledger. The last entry is still being read; its
- *    progress fills, it is marked finished, and its star lifts off the page,
- *    crosses the gutter and settles into the constellation.
+ *    progress fills, it is stamped finished, and its star lifts off the page,
+ *    crosses the gutter and settles into its month on the dial.
  * The whole spread tilts gently toward the pointer. Decorative, so it is one
  * labelled image for assistive tech.
  */
 
-// Star positions are in the plate's 200 × 230 coordinate space.
-const STARS = [
-  { x: 30, y: 44, title: "ಕರ್ವಾಲೋ" },
-  { x: 84, y: 80, title: "गोदान" },
-  { x: 38, y: 142, title: "ノルウェイの森" },
-  { x: 124, y: 120, title: "Анна Каренина" },
-  { x: 150, y: 178, title: "பொன்னியின் செல்வன்", anchor: "end" },
-  { x: 68, y: 206, title: "Cien años de soledad" },
-];
-const LINES = [
-  [0, 1],
-  [1, 3],
-  [3, 4],
-  [4, 5],
-  [5, 2],
-  [2, 1],
-];
-const NEW_STAR = { x: 166, y: 56, title: "Middlemarch" };
+// The dial lives in the plate's 200 x 230 coordinate space.
+const CX = 100;
+const CY = 108;
+const MONTHS = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
+
+/** Where a book sits on the dial: the angle comes from the day of the year it was finished. */
+export function dialPosition(dayOfYear, radius) {
+  const angle = ((-90 + (dayOfYear / 365) * 360) * Math.PI) / 180;
+  return { x: CX + radius * Math.cos(angle), y: CY + radius * Math.sin(angle) };
+}
+
+/** A four-point sparkle centred on (x, y). */
+const sparkle = (x, y, size) =>
+  `M${x} ${y - size}Q${x} ${y} ${x + size} ${y}Q${x} ${y} ${x} ${y + size}Q${x} ${y} ${x - size} ${y}Q${x} ${y} ${x} ${y - size}Z`;
+
+// Finished books in reading order. Radii are chosen so each label gets its own row;
+// labels point inward, and a dark outline lets constellation lines pass behind them.
+const BOOKS = [
+  { title: "\u0c95\u0cb0\u0ccd\u0cb5\u0cbe\u0cb2\u0ccb", day: 20, radius: 58, size: 3.6, label: "left" },
+  { title: "\u0917\u094b\u0926\u093e\u0928", day: 70, radius: 52, size: 3.8, label: "left" },
+  { title: "\u30ce\u30eb\u30a6\u30a7\u30a4\u306e\u68ee", day: 125, radius: 60, size: 4, label: "left" },
+  { title: "\u0410\u043d\u043d\u0430 \u041a\u0430\u0440\u0435\u043d\u0438\u043d\u0430", day: 172, radius: 70, size: 5, label: "left" },
+  { title: "\u0baa\u0bca\u0ba9\u0bcd\u0ba9\u0bbf\u0baf\u0bbf\u0ba9\u0bcd \u0b9a\u0bc6\u0bb2\u0bcd\u0bb5\u0ba9\u0bcd", day: 225, radius: 66, size: 5, label: "below" },
+  { title: "Cien a\u00f1os de soledad", day: 262, radius: 50, size: 4, label: "right" },
+].map((book) => ({ ...book, ...dialPosition(book.day, book.radius) }));
+const NEW_BOOK = { title: "Middlemarch", ...dialPosition(314, 66), size: 5 };
+
+/** Label anchor and offset for a star. */
+const labelAt = (book, where) => {
+  if (where === "left") return { x: book.x - 6, y: book.y + 2.4, anchor: "end" };
+  if (where === "below") return { x: book.x + 5, y: book.y + 9, anchor: "start" };
+  return { x: book.x + 6, y: book.y + 2.4, anchor: "start" };
+};
 
 const LEDGER = [
-  { title: "ಕರ್ವಾಲೋ", author: "Tejasvi", date: "12 Jan" },
-  { title: "गोदान", author: "Premchand", date: "3 Mar" },
-  { title: "ノルウェイの森", author: "Murakami", date: "28 Apr" },
+  { title: "Анна Каренина", author: "Tolstoy", date: "20 Jun" },
+  { title: "பொன்னியின் செல்வன்", author: "Kalki", date: "15 Aug" },
+  { title: "Cien años de soledad", author: "García Márquez", date: "22 Sep" },
 ];
 
 function HeroBook({ label, t }) {
@@ -66,7 +83,12 @@ function HeroBook({ label, t }) {
     };
   }, []);
 
-  const last = STARS[3]; // the new star joins the constellation here
+  const last = BOOKS[BOOKS.length - 1]; // the new star continues the line from here
+  const r = (n) => Math.round(n * 10) / 10;
+  const polar = (radius, turn) => {
+    const a = ((-90 + turn * 360) * Math.PI) / 180;
+    return [r(CX + radius * Math.cos(a)), r(CY + radius * Math.sin(a))];
+  };
 
   return (
     <div className="pk-bookscene" ref={sceneRef} role="img" aria-label={label}>
@@ -74,58 +96,85 @@ function HeroBook({ label, t }) {
         <div className="pk-openbook__board" />
         <div className="pk-openbook__stack" />
 
-        {/* Left page: the star atlas. */}
+        {/* Left page: the reading-year dial. */}
         <div className="pk-openbook__page pk-openbook__page--left">
           <p className="pk-openbook__head pk-openbook__head--sky">
             <span>{t("landing.book.sky")}</span>
             <span>MMXXVI</span>
           </p>
           <svg className="pk-atlas" viewBox="0 0 200 230" aria-hidden="true">
+            {/* The dial: guide rings, the month band with week ticks, month initials. */}
             <g className="pk-atlas__grid">
-              <circle cx="100" cy="115" r="48" />
-              <circle cx="100" cy="115" r="86" />
-              <line x1="100" y1="10" x2="100" y2="220" />
-              <line x1="8" y1="115" x2="192" y2="115" />
+              <circle cx={CX} cy={CY} r="40" />
+              <circle cx={CX} cy={CY} r="60" />
             </g>
-            {LINES.map(([a, b], index) => (
+            <g className="pk-atlas__dial">
+              <circle cx={CX} cy={CY} r="80" />
+              <circle cx={CX} cy={CY} r="86" />
+              {Array.from({ length: 52 }, (_, week) => {
+                const [x1, y1] = polar(83.5, week / 52);
+                const [x2, y2] = polar(86, week / 52);
+                return <line key={week} x1={x1} y1={y1} x2={x2} y2={y2} />;
+              })}
+              {MONTHS.map((_, month) => {
+                const [x1, y1] = polar(80, month / 12);
+                const [x2, y2] = polar(86, month / 12);
+                return <line key={month} className="pk-atlas__major" x1={x1} y1={y1} x2={x2} y2={y2} />;
+              })}
+            </g>
+            <g className="pk-atlas__months">
+              {MONTHS.map((letter, month) => {
+                const [x, y] = polar(93, (month + 0.5) / 12);
+                return (
+                  <text key={month} x={x} y={r(y + 2)} textAnchor="middle">
+                    {letter}
+                  </text>
+                );
+              })}
+            </g>
+            <circle className="pk-atlas__pole" cx={CX} cy={CY} r="1.2" />
+
+            {/* The constellation, in reading order. */}
+            {BOOKS.slice(1).map((book, index) => (
               <line
-                key={`${a}-${b}`}
+                key={book.title}
                 className="pk-atlas__line"
-                x1={STARS[a].x}
-                y1={STARS[a].y}
-                x2={STARS[b].x}
-                y2={STARS[b].y}
+                x1={r(BOOKS[index].x)}
+                y1={r(BOOKS[index].y)}
+                x2={r(book.x)}
+                y2={r(book.y)}
                 pathLength="1"
-                style={{ "--d": `${900 + index * 220}ms` }}
+                style={{ "--d": `${900 + index * 240}ms` }}
               />
             ))}
             <line
               className="pk-atlas__line pk-atlas__line--new"
-              x1={last.x}
-              y1={last.y}
-              x2={NEW_STAR.x}
-              y2={NEW_STAR.y}
+              x1={r(last.x)}
+              y1={r(last.y)}
+              x2={r(NEW_BOOK.x)}
+              y2={r(NEW_BOOK.y)}
               pathLength="1"
             />
-            {STARS.map((star, index) => (
-              <g key={star.title} className="pk-atlas__star" style={{ "--d": `${700 + index * 160}ms` }}>
-                <circle cx={star.x} cy={star.y} r="2.6" />
-                <text
-                  x={star.anchor === "end" ? star.x - 5 : star.x + 5}
-                  y={star.y + 2.4}
-                  textAnchor={star.anchor || "start"}
-                  lang={langOf(star.title)}
-                >
-                  {star.title}
-                </text>
-              </g>
-            ))}
+            {BOOKS.map((book, index) => {
+              const at = labelAt(book, book.label);
+              return (
+                <g key={book.title} className="pk-atlas__star" style={{ "--d": `${700 + index * 200}ms` }}>
+                  <path className="pk-atlas__glyph" d={sparkle(r(book.x), r(book.y), book.size)} />
+                  <text x={r(at.x)} y={r(at.y)} textAnchor={at.anchor} lang={langOf(book.title)}>
+                    {book.title}
+                  </text>
+                </g>
+              );
+            })}
             <g className="pk-atlas__star pk-atlas__star--new">
-              <circle cx={NEW_STAR.x} cy={NEW_STAR.y} r="3.2" />
-              <text x={NEW_STAR.x - 4} y={NEW_STAR.y - 7} textAnchor="end">
-                {NEW_STAR.title}
+              <path className="pk-atlas__glyph" d={sparkle(r(NEW_BOOK.x), r(NEW_BOOK.y), NEW_BOOK.size)} />
+              <text x={r(NEW_BOOK.x + 6)} y={r(NEW_BOOK.y + 2.4)} textAnchor="start">
+                {NEW_BOOK.title}
               </text>
             </g>
+            <text className="pk-atlas__legend" x={CX} y="225" textAnchor="middle">
+              {t("landing.book.legend")}
+            </text>
           </svg>
           <span className="pk-openbook__folio pk-openbook__folio--left">i</span>
         </div>

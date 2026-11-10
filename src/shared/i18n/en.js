@@ -291,6 +291,7 @@ export default {
   "landing.book.sky": "My reading sky",
   "landing.book.ledger": "Reading ledger",
   "landing.book.today": "today",
+  "landing.book.legend": "Each star, a book, set in the month you finished it",
   "landing.book.note": "Finished it on the train home. Next: Pather Panchali.",
   "landing.book.books": "books",
   "landing.book.languages": "languages",

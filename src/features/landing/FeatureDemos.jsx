@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Check, Search } from "lucide-react";
-import { prefersReducedMotion } from "../../shared/lib/motion";
 
 /*
  * Small, looping illustrations for the feature tiles. Each one is decorative
@@ -38,10 +37,10 @@ const QUERY = "karvalo";
 
 /** Types a title in Latin letters and finds the book in its own script, plus its translation. */
 export function SearchDemo({ live, t }) {
-  const [typed, setTyped] = useState(prefersReducedMotion() ? QUERY.length : 0);
+  const [typed, setTyped] = useState(0);
 
   useEffect(() => {
-    if (!live || prefersReducedMotion()) return undefined;
+    if (!live) return undefined;
     let step = 0;
     const timer = setInterval(() => {
       // Type 7 letters, hold for a while with the result showing, then clear.
@@ -86,10 +85,10 @@ const TARGET = 42;
 
 /** A yearly count ticks up while the monthly bars grow. */
 export function InsightsDemo({ live, t }) {
-  const [count, setCount] = useState(prefersReducedMotion() ? TARGET : 0);
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
-    if (!live || prefersReducedMotion()) return undefined;
+    if (!live) return undefined;
     let raf;
     const start = performance.now();
     const tick = (now) => {
