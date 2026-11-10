@@ -67,9 +67,27 @@ function NavRail({ view, onNavigate }) {
   };
 
   // Move the highlight to the active link (it glides there with a CSS transition).
+  // The rail animates its width when it collapses or expands, and fonts can load late,
+  // so the links keep moving after the first measurement: measure again whenever the
+  // list or the rail changes size, and once more when the width animation ends.
   useLayoutEffect(() => {
-    const active = listRef.current?.querySelector('[aria-current="page"]');
-    setMarker(active ? { top: active.offsetTop, height: active.offsetHeight } : null);
+    const list = listRef.current;
+    if (!list) return undefined;
+    const measure = () => {
+      const active = list.querySelector('[aria-current="page"]');
+      const next = active ? { top: active.offsetTop, height: active.offsetHeight } : null;
+      setMarker((current) => (current && next && current.top === next.top && current.height === next.height ? current : next));
+    };
+    measure();
+    const rail = list.closest(".pk-rail");
+    const observer = typeof ResizeObserver === "function" ? new ResizeObserver(measure) : null;
+    observer?.observe(list);
+    if (rail) observer?.observe(rail);
+    rail?.addEventListener("transitionend", measure);
+    return () => {
+      observer?.disconnect();
+      rail?.removeEventListener("transitionend", measure);
+    };
   }, [view, collapsed]);
 
   return (
@@ -117,7 +135,7 @@ function NavRail({ view, onNavigate }) {
                           className={active ? "pk-rail__link pk-rail__link--active" : "pk-rail__link"}
                           title={collapsed ? t(labelKey) : undefined}
                         >
-                          <Icon size={19} aria-hidden="true" />
+                          <Icon size={21} aria-hidden="true" />
                           <span className="pk-rail__text pk-rail__linkText">{label}</span>
                           {counts[id] > 0 && <span className="pk-rail__count pk-rail__text">{counts[id]}</span>}
                         </NavLink>

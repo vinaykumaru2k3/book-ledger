@@ -4,18 +4,18 @@
  * exactly one place (plus its entry in `views.js`). `shortKey` is a shorter
  * label for the narrow rail and tab bar; the palette uses the full `labelKey`.
  */
-import { BarChart3, FolderOpen, Languages, Library, Sparkles, Telescope, Trophy } from "lucide-react";
 import { shelfFromRoute } from "../domain/library";
+import { ForYouIcon, GalaxyIcon, InsightsIcon, LibraryIcon, ScriptIcon, ShelvesIcon, TopBooksIcon } from "../shared/pk/NavIcons";
 import { isValidView } from "./routes";
 
 const ALL_DESTINATIONS = [
-  { id: "all", labelKey: "nav.library", icon: Library },
-  { id: "shelves", labelKey: "nav.shelves", icon: FolderOpen },
-  { id: "recommendations", labelKey: "nav.recommendations", shortKey: "nav.recommendationsShort", icon: Sparkles },
-  { id: "topbooks", labelKey: "nav.topBooks", icon: Trophy },
-  { id: "analytics", labelKey: "nav.insights", icon: BarChart3 },
-  { id: "galaxy", labelKey: "nav.galaxy", shortKey: "nav.galaxyShort", icon: Telescope },
-  { id: "kannada", labelKey: "nav.kannada", shortKey: "nav.kannadaShort", icon: Languages },
+  { id: "all", labelKey: "nav.library", icon: LibraryIcon },
+  { id: "shelves", labelKey: "nav.shelves", icon: ShelvesIcon },
+  { id: "recommendations", labelKey: "nav.recommendations", shortKey: "nav.recommendationsShort", icon: ForYouIcon },
+  { id: "topbooks", labelKey: "nav.topBooks", icon: TopBooksIcon },
+  { id: "analytics", labelKey: "nav.insights", icon: InsightsIcon },
+  { id: "galaxy", labelKey: "nav.galaxy", shortKey: "nav.galaxyShort", icon: GalaxyIcon },
+  { id: "kannada", labelKey: "nav.kannada", shortKey: "nav.kannadaShort", icon: ScriptIcon },
 ];
 
 /** Destinations that exist in this build (the Kannada Explorer is flag-gated). */

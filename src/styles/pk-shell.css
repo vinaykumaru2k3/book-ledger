@@ -148,6 +148,9 @@
 }
 .pk-rail__label {
   margin: 18px 12px 6px;
+  overflow: hidden;
+  white-space: nowrap; /* never wrap while the rail is mid-animation */
+  text-overflow: clip;
   color: var(--rail-cream-3);
   font: 600 0.66rem var(--pk-font-ui);
   letter-spacing: 0.14em;
