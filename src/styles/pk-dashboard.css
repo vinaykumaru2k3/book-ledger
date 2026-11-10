@@ -106,13 +106,13 @@
   perspective: 900px;
 }
 .pk-spot__cover .pk-cover {
-  transform: rotateY(-14deg) rotateZ(-2deg);
-  box-shadow: 18px 26px 40px -12px rgba(0, 0, 0, 0.7);
-  transition: transform 400ms var(--pk-ease);
+  box-shadow: 10px 22px 36px -14px rgba(0, 0, 0, 0.75);
+  transition: transform 300ms var(--pk-ease), box-shadow 300ms var(--pk-ease);
 }
 .pk-spot__cover:hover .pk-cover,
 .pk-spot__cover:focus-visible .pk-cover {
-  transform: rotateY(-4deg) translateY(-4px);
+  transform: translateY(-4px);
+  box-shadow: 12px 28px 40px -14px rgba(0, 0, 0, 0.8);
 }
 .pk-spot__cover:focus-visible {
   outline: 2px solid var(--gold);
