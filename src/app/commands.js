@@ -4,11 +4,11 @@
  * component only renders the result and performs the chosen `action`.
  *
  * An `action` is plain data: { type: "navigate", view } | { type: "book", book }
- * | { type: "addBook" } | { type: "toggleLanguage" }.
+ * | { type: "addBook" }.
  */
 const MAX_BOOKS = 6;
 
-export function buildCommands({ t, destinations, books, canSwitchLanguage }) {
+export function buildCommands({ t, destinations, books }) {
   const go = destinations.map((d) => ({
     id: `go:${d.id}`,
     group: "go",
@@ -18,9 +18,6 @@ export function buildCommands({ t, destinations, books, canSwitchLanguage }) {
   }));
 
   const actions = [{ id: "act:add", group: "actions", label: t("action.addBook"), action: { type: "addBook" } }];
-  if (canSwitchLanguage) {
-    actions.push({ id: "act:lang", group: "actions", label: t("command.switchLanguage"), action: { type: "toggleLanguage" } });
-  }
 
   const bookItems = books.map((book) => ({
     id: `book:${book.id}`,

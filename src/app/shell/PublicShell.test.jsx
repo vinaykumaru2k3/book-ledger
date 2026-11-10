@@ -11,7 +11,7 @@ afterEach(cleanup);
 describe("PublicShell", () => {
   const location = parseLocation("/kannada/author/bendre");
 
-  it("shows a public page to a signed-out visitor, with sign-in and language controls", async () => {
+  it("shows a public page to a signed-out visitor, with a sign-in button", async () => {
     const onSignIn = vi.fn();
     render(
       <LanguageProvider>
@@ -20,7 +20,7 @@ describe("PublicShell", () => {
     );
     expect(screen.getByRole("heading", { level: 1, name: "Kannada Explorer" })).toBeTruthy();
     expect(await screen.findByText("You opened: /kannada/author/bendre", {}, { timeout: 5000 })).toBeTruthy();
-    expect(screen.getByRole("group", { name: "Language" })).toBeTruthy();
+    expect(screen.queryByRole("group", { name: "Language" })).toBeNull();
 
     fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
     expect(onSignIn).toHaveBeenCalled();

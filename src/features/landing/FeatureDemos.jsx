@@ -34,9 +34,9 @@ export function SyncDemo({ t }) {
   );
 }
 
-const QUERY = "karvalo";
+const QUERY = "hobbit";
 
-/** Types a romanised title and finds the Kannada book. */
+/** Types a title and finds the book. */
 export function SearchDemo({ live, t }) {
   const [typed, setTyped] = useState(prefersReducedMotion() ? QUERY.length : 0);
 
@@ -65,15 +65,15 @@ export function SearchDemo({ live, t }) {
         <div className="pk-demo__result">
           <span className="pk-demo__thumb" />
           <span>
-            <strong lang="kn">ಕರ್ವಾಲೋ</strong>
-            <small lang="kn">ಪೂರ್ಣಚಂದ್ರ ತೇಜಸ್ವಿ · 1980</small>
+            <strong>The Hobbit</strong>
+            <small>J. R. R. Tolkien · 1937</small>
           </span>
         </div>
         <div className="pk-demo__result pk-demo__result--dim">
           <span className="pk-demo__thumb pk-demo__thumb--b" />
           <span>
-            <strong>Carvalho</strong>
-            <small>K. P. Poornachandra Tejasvi · tr.</small>
+            <strong>The Hobbit: Illustrated Edition</strong>
+            <small>J. R. R. Tolkien · 2013</small>
           </span>
         </div>
       </div>

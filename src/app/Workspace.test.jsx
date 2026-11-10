@@ -266,12 +266,4 @@ describe("command palette", () => {
     expect(ui.openNewBook).toHaveBeenCalled();
   });
 
-  it("switches language from the palette", () => {
-    renderAt("/");
-    open();
-    fireEvent.click(screen.getByRole("option", { name: "Switch language" }));
-    act(() => {});
-    expect(document.documentElement.lang).toBe("kn");
-    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("ನನ್ನ ಗ್ರಂಥಾಲಯ");
-  });
 });

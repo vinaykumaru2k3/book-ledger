@@ -1,7 +1,6 @@
 import React, { useRef } from "react";
 import { ArrowDown, ArrowRight, BookOpen, Flame, Plus } from "lucide-react";
-import GlyphField from "../../shared/pk/GlyphField";
-import LanguageToggle from "../../shared/pk/LanguageToggle";
+import StarField from "../../shared/pk/StarField";
 import { useLanguage } from "../../shared/i18n/LanguageContext";
 import { useInView } from "../../shared/lib/motion";
 import CoverMarquee from "./CoverMarquee";
@@ -59,7 +58,7 @@ function LandingPage({ onEnter }) {
     <>
       <BookOpen size={14} />
       <span>
-        <b lang="kn">ಕರ್ವಾಲೋ</b>
+        <b>Middlemarch</b>
         <i className="pk-chip__bar" style={{ "--p": "64%" }} />
       </span>
     </>,
@@ -85,7 +84,6 @@ function LandingPage({ onEnter }) {
           <span>Pustaka</span>
         </span>
         <div className="pk-landing__barActions">
-          <LanguageToggle />
           <button type="button" className="pk-ghostbtn" onClick={onEnter}>
             {t("action.signIn")}
           </button>
@@ -94,7 +92,7 @@ function LandingPage({ onEnter }) {
 
       <main id="main" tabIndex={-1}>
         <section className="pk-hero">
-          <GlyphField className="pk-hero__field" />
+          <StarField className="pk-hero__field" />
           <div className="pk-hero__inner">
             <div className="pk-hero__text">
               <p className="pk-hero__kicker">

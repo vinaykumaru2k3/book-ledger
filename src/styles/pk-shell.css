@@ -119,13 +119,6 @@
   align-items: center;
   gap: var(--pk-space-3);
 }
-.pk-rail__foot .pk-lang {
-  flex-direction: column;
-}
-.pk-rail__foot .pk-lang__btn {
-  min-width: 40px;
-  padding: 0;
-}
 
 /* ---- Menu (account) ---------------------------------------------------- */
 .pk-menu {

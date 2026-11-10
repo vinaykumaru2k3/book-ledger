@@ -1,26 +1,26 @@
 import React from "react";
 import MiniCover from "../../shared/pk/MiniCover";
 
-// Sample covers (decorative only): a mix of Kannada and English classics.
+// Sample covers (decorative only).
 const ROW_A = [
-  ["ಕರ್ವಾಲೋ", "ಪೂರ್ಣಚಂದ್ರ ತೇಜಸ್ವಿ"],
-  ["Dune", "Frank Herbert"],
-  ["ಸಂಸ್ಕಾರ", "ಯು. ಆರ್. ಅನಂತಮೂರ್ತಿ"],
-  ["Emma", "Jane Austen"],
-  ["ಮಲೆಗಳಲ್ಲಿ ಮದುಮಗಳು", "ಕುವೆಂಪು"],
-  ["The Hobbit", "J. R. R. Tolkien"],
   ["Middlemarch", "George Eliot"],
-  ["ಚೋಮನ ದುಡಿ", "ಕೆ. ಶಿವರಾಮ ಕಾರಂತ"],
+  ["Dune", "Frank Herbert"],
+  ["Beloved", "Toni Morrison"],
+  ["Emma", "Jane Austen"],
+  ["The Hobbit", "J. R. R. Tolkien"],
+  ["Things Fall Apart", "Chinua Achebe"],
+  ["Jane Eyre", "Charlotte Brontë"],
+  ["The Overstory", "Richard Powers"],
 ];
 const ROW_B = [
   ["1984", "George Orwell"],
-  ["ಮೂಕಜ್ಜಿಯ ಕನಸುಗಳು", "ಕೆ. ಶಿವರಾಮ ಕಾರಂತ"],
-  ["Kim", "Rudyard Kipling"],
-  ["ಪರ್ವ", "ಎಸ್. ಎಲ್. ಭೈರಪ್ಪ"],
   ["Persuasion", "Jane Austen"],
-  ["ಜುಗಾರಿ ಕ್ರಾಸ್", "ಪೂರ್ಣಚಂದ್ರ ತೇಜಸ್ವಿ"],
+  ["Kim", "Rudyard Kipling"],
   ["Frankenstein", "Mary Shelley"],
-  ["ಗ್ರಹಣ", "ಎಸ್. ಎಲ್. ಭೈರಪ್ಪ"],
+  ["Moby-Dick", "Herman Melville"],
+  ["The Remains of the Day", "Kazuo Ishiguro"],
+  ["Rebecca", "Daphne du Maurier"],
+  ["Little Women", "Louisa May Alcott"],
 ];
 
 function Row({ books, reverse }) {

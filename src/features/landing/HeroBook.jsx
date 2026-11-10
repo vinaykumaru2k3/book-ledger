@@ -47,7 +47,7 @@ function HeroBook({ label, chips = [] }) {
 
         {/* The page you see once the cover is open. */}
         <div className="pk-book3d__page pk-book3d__page--right">
-          <span className="pk-book3d__chapter">ಅಧ್ಯಾಯ ೧</span>
+          <span className="pk-book3d__chapter">Chapter One</span>
           <span className="pk-book3d__drop">P</span>
           {Array.from({ length: 9 }, (_, i) => (
             <span key={i} className="pk-book3d__line" style={{ "--w": `${[92, 100, 86, 97, 74, 100, 90, 63, 0][i]}%` }} />
@@ -70,8 +70,8 @@ function HeroBook({ label, chips = [] }) {
           <div className="pk-book3d__coverFront">
             <span className="pk-book3d__frame" />
             <span className="pk-book3d__ornament">❦</span>
-            <span className="pk-book3d__title">ಪುಸ್ತಕ</span>
-            <span className="pk-book3d__subtitle">Pustaka</span>
+            <span className="pk-book3d__title">Pustaka</span>
+            <span className="pk-book3d__subtitle">A Reading Life</span>
             <span className="pk-book3d__ornament pk-book3d__ornament--low">✦ ✦ ✦</span>
           </div>
           <div className="pk-book3d__coverInside" />

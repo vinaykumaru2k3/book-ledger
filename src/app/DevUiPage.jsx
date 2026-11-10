@@ -10,7 +10,6 @@ import Field from "../shared/pk/Field";
 import ProgressRibbon from "../shared/pk/ProgressRibbon";
 import BookCover from "../shared/pk/BookCover";
 import EmptyState from "../shared/pk/EmptyState";
-import LanguageToggle from "../shared/pk/LanguageToggle";
 import { useLanguage } from "../shared/i18n/LanguageContext";
 
 const SWATCHES = [
@@ -51,7 +50,7 @@ function Section({ title, children }) {
  * Phase R0 and the reference for anyone building new screens.
  */
 function DevUiPage() {
-  const { t, lang } = useLanguage();
+  const { t } = useLanguage();
   const [tab, setTab] = useState("library");
   const [dialog, setDialog] = useState(false);
   const [progress, setProgress] = useState(42);
@@ -63,10 +62,9 @@ function DevUiPage() {
           <p className="pk-dev__kicker">Design system</p>
           <h1 className="pk-dev__h1">Reading Room</h1>
           <p className="pk-dev__lede">
-            Tokens and components for the Pustaka redesign. Current language: <strong>{lang}</strong>.
+            Tokens and components for the Pustaka redesign.
           </p>
         </div>
-        <LanguageToggle />
       </header>
 
       <Section title="Colour">

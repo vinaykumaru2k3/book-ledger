@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Ellipsis, Plus } from "lucide-react";
 import Dialog from "../../shared/pk/Dialog";
-import LanguageToggle from "../../shared/pk/LanguageToggle";
 import { useLanguage } from "../../shared/i18n/LanguageContext";
 import { MORE_DESTINATIONS, TAB_BAR_DESTINATIONS, isActiveDestination } from "../nav";
 import NavLink from "./NavLink";
@@ -51,7 +50,6 @@ function MoreSheet({ view, onNavigate, onClose }) {
             </button>
           ))}
         </div>
-        <LanguageToggle />
       </div>
       {fileInput}
     </Dialog>

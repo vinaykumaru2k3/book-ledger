@@ -8,13 +8,10 @@ import Field from "./Field";
 import Tabs from "./Tabs";
 import ProgressRibbon from "./ProgressRibbon";
 import BookCover from "./BookCover";
-import LanguageToggle from "./LanguageToggle";
-import { LanguageProvider, useLanguage } from "../i18n/LanguageContext";
 
 afterEach(() => {
   cleanup();
   localStorage.clear();
-  document.documentElement.lang = "";
 });
 
 describe("Button", () => {
@@ -158,47 +155,5 @@ describe("BookCover", () => {
     expect(img.alt).toBe("Cover of Dune");
     fireEvent.error(img);
     expect(withImage.querySelector("img")).toBeNull();
-  });
-});
-
-describe("language", () => {
-  function Probe() {
-    const { t, lang } = useLanguage();
-    return <p data-testid="probe">{`${lang}:${t("action.save")}`}</p>;
-  }
-
-  it("defaults to English, switches to Kannada, remembers it, and updates <html lang>", () => {
-    const { unmount } = render(
-      <LanguageProvider>
-        <LanguageToggle />
-        <Probe />
-      </LanguageProvider>
-    );
-    expect(screen.getByTestId("probe").textContent).toBe("en:Save");
-    expect(document.documentElement.lang).toBe("en");
-
-    fireEvent.click(screen.getByRole("button", { name: /ಕನ್ನಡ/ }));
-    expect(screen.getByTestId("probe").textContent).toMatch(/^kn:ಉಳಿಸಿ/);
-    expect(document.documentElement.lang).toBe("kn");
-    expect(localStorage.getItem("pustaka:language")).toBe("kn");
-    expect(screen.getByRole("button", { name: /ಕನ್ನಡ/ }).getAttribute("aria-pressed")).toBe("true");
-
-    unmount();
-    render(
-      <LanguageProvider>
-        <Probe />
-      </LanguageProvider>
-    );
-    expect(screen.getByTestId("probe").textContent).toMatch(/^kn:/); // remembered
-  });
-
-  it("ignores an unsupported saved language", () => {
-    localStorage.setItem("pustaka:language", "fr");
-    render(
-      <LanguageProvider>
-        <Probe />
-      </LanguageProvider>
-    );
-    expect(screen.getByTestId("probe").textContent).toBe("en:Save");
   });
 });

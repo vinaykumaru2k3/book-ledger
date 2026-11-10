@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { isActiveDestination } from "./nav";
 import { buildCommands, groupResults, searchCommands } from "./commands";
 
-const t = (key) => ({ "nav.library": "Library", "nav.galaxy": "Knowledge Galaxy", "nav.shelves": "Shelves", "action.addBook": "Add Book", "command.switchLanguage": "Switch language" })[key] || key;
+const t = (key) => ({ "nav.library": "Library", "nav.galaxy": "Knowledge Galaxy", "nav.shelves": "Shelves", "action.addBook": "Add Book" })[key] || key;
 const destinations = [
   { id: "all", labelKey: "nav.library" },
   { id: "shelves", labelKey: "nav.shelves" },
@@ -13,7 +13,7 @@ const books = [
   { id: "2", title: "ಕರ್ವಾಲೋ", author: "ಪೂರ್ಣಚಂದ್ರ ತೇಜಸ್ವಿ" },
   ...Array.from({ length: 10 }, (_, i) => ({ id: `d${i}`, title: `Dune Companion ${i}`, author: "Anon" })),
 ];
-const commands = buildCommands({ t, destinations, books, canSwitchLanguage: true });
+const commands = buildCommands({ t, destinations, books });
 
 describe("searchCommands", () => {
   it("shows pages and actions, not books, for an empty query", () => {
@@ -41,11 +41,6 @@ describe("searchCommands", () => {
     expect(searchCommands(commands, "zzzzqq")).toEqual([]);
   });
 
-  it("only offers the language switch when it is available", () => {
-    const without = buildCommands({ t, destinations, books: [], canSwitchLanguage: false });
-    expect(without.some((c) => c.action.type === "toggleLanguage")).toBe(false);
-    expect(commands.some((c) => c.action.type === "toggleLanguage")).toBe(true);
-  });
 });
 
 describe("groupResults", () => {

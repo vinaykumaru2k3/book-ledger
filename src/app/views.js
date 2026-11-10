@@ -7,7 +7,7 @@
  * "favorites", "shelf:<name>") show the library list.
  */
 import { lazy } from "react";
-import { KANNADA_UI_ENABLED } from "../shared/i18n/config";
+import { KANNADA_EXPLORER_ENABLED } from "../shared/i18n/config";
 import { shelfFromRoute } from "../domain/library";
 
 // Heavy pages load on demand so the first screen stays small.
@@ -20,8 +20,8 @@ export const PAGES = {
     Component: lazy(() => import("../features/galaxy/ConstellationGraph")),
     fullBleed: true, // draws edge to edge, without the panel padding
   },
-  // The Kannada Explorer is public (no sign-in) and hidden until the Kannada UI is reviewed.
-  ...(KANNADA_UI_ENABLED
+  // The Kannada Explorer is public (no sign-in) and a placeholder, so it only shows in development builds.
+  ...(KANNADA_EXPLORER_ENABLED
     ? { kannada: { Component: lazy(() => import("../features/kannada/KannadaExplorerPage")), public: true, bare: true } }
     : {}),
 };

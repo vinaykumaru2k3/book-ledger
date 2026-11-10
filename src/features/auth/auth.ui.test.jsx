@@ -123,7 +123,7 @@ describe("LandingPage", () => {
     const { container } = wrap(<LandingPage onEnter={() => {}} />);
     expect(screen.getByRole("img", { name: "An open leather-bound book with a page turning" })).toBeTruthy();
     expect(container.querySelector(".pk-marquee").getAttribute("aria-hidden")).toBe("true");
-    expect(container.querySelector(".pk-glyphfield").getAttribute("aria-hidden")).toBe("true");
+    expect(container.querySelector(".pk-starfield").getAttribute("aria-hidden")).toBe("true");
     container.querySelectorAll(".pk-demo").forEach((demo) => expect(demo.getAttribute("aria-hidden")).toBe("true"));
   });
 

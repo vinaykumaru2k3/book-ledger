@@ -8,7 +8,7 @@ import DevUiPage from "./DevUiPage";
 afterEach(cleanup);
 
 describe("DevUiPage (design system showcase)", () => {
-  it("renders every section without crashing and switches language", () => {
+  it("renders every section without crashing", () => {
     render(
       <LanguageProvider>
         <DevUiPage />
@@ -19,8 +19,6 @@ describe("DevUiPage (design system showcase)", () => {
     );
 
     expect(screen.getAllByText("Want to read").length).toBeGreaterThan(0);
-    fireEvent.click(screen.getByRole("button", { name: /ಕನ್ನಡ/ }));
-    expect(screen.getAllByText("ಓದಬೇಕಾದವು").length).toBeGreaterThan(0);
   });
 
   it("opens and closes the sample dialog", () => {

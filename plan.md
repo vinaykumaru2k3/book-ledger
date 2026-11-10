@@ -256,3 +256,7 @@ could launch **before** the redesign finishes (after K5), because it is built on
 ## 13. Backlog (not in scope yet)
 
 Classical anchors (Pampa, Ranna…) · movement timeline view (your P2) · audio pronunciation of names · poem snippets (public-domain only) · community-contributed authors · offline cache and installable app · Goodreads/CSV import · reading sessions · ESLint/Prettier · Firebase emulator tests for security rules · more languages (Tamil, Telugu, Hindi…).
+
+## Decision log
+
+- **2026-11-10:** The Kannada UI language switch was removed at the owner's request; the app is English only (`en.js`). The Kannada Explorer placeholder stays, visible only in development builds (`KANNADA_EXPLORER_ENABLED`), until track K is picked up again.

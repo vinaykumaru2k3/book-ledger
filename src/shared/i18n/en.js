@@ -57,7 +57,6 @@ export default {
   "command.groupBooks": "Your books",
   "command.groupActions": "Actions",
   "command.hint": "Type to search · ↑ ↓ to move · Enter to open · Esc to close",
-  "command.switchLanguage": "Switch language",
 
   "account.menu": "Account menu",
   "account.signedInAs": "Signed in as",
@@ -67,8 +66,6 @@ export default {
   "kannada.body": "A map of Kannada literature (authors, books, movements and the influences between them) is on its way.",
   "kannada.route": "You opened: {path}",
 
-  "language.label": "Language",
-  "language.switchTo": "Switch language to {language}",
 
 
   "library.search.label": "Filter library",
@@ -274,13 +271,13 @@ export default {
   "landing.kicker": "A reading room that remembers",
   "landing.titleA": "Every book you read",
   "landing.titleB": "becomes a star.",
-  "landing.sub": "Pustaka is a quiet, private home for your books, your progress and your thoughts, in English and Kannada. No feeds, no noise. Just your reading life, beautifully kept.",
+  "landing.sub": "Pustaka is a quiet, private home for your books, your progress and your thoughts. No feeds, no noise. Just your reading life, beautifully kept.",
   "landing.cta": "Enter the Reading Room",
   "landing.featuresTitle": "Built for intentional reading",
   "landing.f1.title": "Library Ledger",
   "landing.f1.body": "Your collection is securely stored and synced in real time. Open it on any device.",
   "landing.f2.title": "Instant Book Finder",
-  "landing.f2.body": "Search by title, author or ISBN, in English or Kannada, and fill in the details in a click.",
+  "landing.f2.body": "Search by title, author or ISBN and fill in the details in a click.",
   "landing.f3.title": "Shelf Insights",
   "landing.f3.body": "Understand your reading habits: completion rates, page counts and yearly milestones.",
   "landing.f4.title": "Reading Sanctuary",

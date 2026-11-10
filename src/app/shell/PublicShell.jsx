@@ -1,14 +1,13 @@
 import React, { Suspense } from "react";
 import LoadingPanel from "../../shared/ui/LoadingPanel";
 import Button from "../../shared/pk/Button";
-import LanguageToggle from "../../shared/pk/LanguageToggle";
 import { useLanguage } from "../../shared/i18n/LanguageContext";
 import { buildPath } from "../routes";
 import { describeRoute } from "../views";
 
 /**
  * Frame for pages that anyone may open without signing in (e.g. the Kannada
- * Explorer): a slim top bar with the brand, the language switch and "Sign in".
+ * Explorer): a slim top bar with the brand, "Sign in".
  */
 function PublicShell({ view, location, onSignIn }) {
   const { t } = useLanguage();
@@ -26,7 +25,6 @@ function PublicShell({ view, location, onSignIn }) {
           <span>Pustaka</span>
         </a>
         <div className="pk-public__actions">
-          <LanguageToggle />
           <Button variant="primary" size="sm" onClick={onSignIn}>
             {t("action.signIn")}
           </Button>

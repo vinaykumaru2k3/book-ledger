@@ -18,6 +18,11 @@
   --line: rgba(239, 233, 222, 0.1);
   --line-2: rgba(239, 233, 222, 0.18);
   --glass: rgba(239, 233, 222, 0.04);
+  /* The night sky: deep blue at the top settling into ink, with a faint band of distant light. */
+  --sky: radial-gradient(60% 45% at 78% 18%, rgba(64, 84, 150, 0.22), transparent 70%),
+    radial-gradient(45% 35% at 12% 85%, rgba(110, 50, 70, 0.14), transparent 70%),
+    linear-gradient(115deg, transparent 30%, rgba(150, 160, 210, 0.05) 45%, rgba(150, 160, 210, 0.07) 52%, transparent 68%),
+    linear-gradient(180deg, #0e1424 0%, #0c0f18 45%, var(--night) 100%);
 
   min-height: 100vh;
   overflow-x: clip;
@@ -113,18 +118,6 @@
   align-items: center;
   gap: var(--pk-space-2);
 }
-.pk-landing__bar .pk-lang {
-  background: transparent;
-  box-shadow: inset 0 0 0 1px var(--line-2);
-}
-.pk-landing__bar .pk-lang__btn {
-  color: var(--cream-2);
-}
-.pk-landing__bar .pk-lang__btn--active {
-  background: var(--cream);
-  color: var(--night);
-  box-shadow: none;
-}
 
 /* ---- Hero --------------------------------------------------------------------------------- */
 .pk-hero {
@@ -134,7 +127,7 @@
   align-items: center;
   overflow: hidden;
   isolation: isolate;
-  background: radial-gradient(70% 60% at 72% 46%, #161a23 0%, var(--night) 70%);
+  background: var(--sky);
 }
 .pk-hero__field,
 .pk-auth__field {
@@ -146,8 +139,8 @@
 }
 .pk-hero__field {
   /* Letters stay faint behind the headline, fuller around the book. */
-  -webkit-mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.25) 42%, #000 70%);
-  mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.25) 42%, #000 70%);
+  -webkit-mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.55) 40%, #000 66%);
+  mask-image: linear-gradient(90deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.55) 40%, #000 66%);
 }
 .pk-hero__inner {
   position: relative;
@@ -306,7 +299,7 @@
   align-self: center;
   margin-bottom: 6px;
   color: var(--ox);
-  font: 600 0.82rem "Noto Serif Kannada", var(--pk-font-display);
+  font: italic 500 0.82rem var(--pk-font-display);
   letter-spacing: 0.06em;
 }
 .pk-book3d__drop {
@@ -409,7 +402,8 @@
   box-shadow: inset 0 0 0 5px rgba(236, 199, 122, 0.3);
 }
 .pk-book3d__title {
-  font: 600 2.4rem "Noto Serif Kannada", var(--pk-font-display);
+  font: 600 2.1rem var(--pk-font-display);
+  letter-spacing: 0.02em;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
 }
 .pk-book3d__subtitle {
@@ -1128,8 +1122,8 @@
     padding-top: 104px;
   }
   .pk-hero__field {
-    -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.25) 50%, #000 70%);
-    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.25) 0%, rgba(0, 0, 0, 0.25) 50%, #000 70%);
+    -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.55) 50%, #000 70%);
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.55) 50%, #000 70%);
   }
   .pk-book3d {
     --w: 190px;
@@ -1232,12 +1226,11 @@
   display: flex;
   flex-direction: column;
   min-height: 100svh;
-  background: radial-gradient(70% 60% at 30% 40%, #161a23 0%, var(--night) 70%);
+  background: var(--sky);
 }
 .pk-auth__field {
   position: fixed;
-  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 40%, rgba(0, 0, 0, 0.2) 62%);
-  mask-image: linear-gradient(90deg, #000 0%, #000 40%, rgba(0, 0, 0, 0.2) 62%);
+
 }
 .pk-auth__main {
   flex: 1;
@@ -1522,10 +1515,6 @@
     gap: var(--pk-space-5);
     max-width: 32rem;
     padding-top: 96px;
-  }
-  .pk-auth__field {
-    -webkit-mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.25) 40%);
-    mask-image: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.25) 40%);
   }
   .pk-auth__panelTitle {
     font-size: clamp(2rem, 9vw, 2.8rem);

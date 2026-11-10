@@ -13,14 +13,14 @@ const GROUP_LABEL = { go: "command.groupGo", actions: "command.groupActions", bo
  * `onRun` receives the chosen command's plain-data `action`.
  */
 function CommandPalette({ books, onRun, onClose }) {
-  const { t, setLang, lang, canSwitch } = useLanguage();
+  const { t } = useLanguage();
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
   const listId = useId();
 
   const commands = useMemo(
-    () => buildCommands({ t, destinations: DESTINATIONS, books, canSwitchLanguage: canSwitch }),
-    [t, books, canSwitch]
+    () => buildCommands({ t, destinations: DESTINATIONS, books }),
+    [t, books]
   );
   const results = useMemo(() => searchCommands(commands, query), [commands, query]);
   const groups = useMemo(() => groupResults(results), [results]);
@@ -31,8 +31,7 @@ function CommandPalette({ books, onRun, onClose }) {
   const run = (item) => {
     if (!item) return;
     onClose();
-    if (item.action.type === "toggleLanguage") setLang(lang === "en" ? "kn" : "en");
-    else onRun(item.action);
+    onRun(item.action);
   };
 
   const onKeyDown = (event) => {

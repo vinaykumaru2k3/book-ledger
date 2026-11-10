@@ -1,6 +1,5 @@
 import React from "react";
 import { useLanguage } from "../../shared/i18n/LanguageContext";
-import LanguageToggle from "../../shared/pk/LanguageToggle";
 import { DESTINATIONS, isActiveDestination } from "../nav";
 import AccountMenu from "./AccountMenu";
 import NavLink from "./NavLink";
@@ -31,7 +30,6 @@ function NavRail({ view, onNavigate }) {
       </ul>
 
       <div className="pk-rail__foot">
-        <LanguageToggle />
         <AccountMenu />
       </div>
     </nav>

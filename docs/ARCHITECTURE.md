@@ -47,10 +47,10 @@ those hooks and never create their own Firestore subscriptions.
 
 ### `shared/` – reusable building blocks
 - `shared/pk/` – **the new design system** (redesign, see `plan.md`): `Button`, `Card`, `Badge`, `Skeleton`, `Tabs`,
-  `Dialog` (focus trap, scroll lock, optional `labelledBy`), `Menu`, `RatingStars`, `BookSpine`, `MiniCover`, `GlyphField` (drifting-letter canvas; pauses off-screen), `Field`, `SearchBox`, `SelectBox`, `Segmented`, `Pagination`, `ProgressRibbon`, `BookCover`, `EmptyState`, `LanguageToggle`.
+  `Dialog` (focus trap, scroll lock, optional `labelledBy`), `Menu`, `RatingStars`, `BookSpine`, `MiniCover`, `StarField` (night-sky canvas: twinkling stars, constellations that draw themselves, an occasional shooting star; pauses off-screen), `Field`, `SearchBox`, `SelectBox`, `Segmented`, `Pagination`, `ProgressRibbon`, `BookCover`, `EmptyState`.
   They read only `--pk-*` tokens (`styles/design-tokens.css`). **Build new screens from these.** Browse them at `/dev/ui`.
-- `shared/i18n/` – English / Kannada text: `en.js` (source of truth), `kn.js` (draft, hidden in production until
-  reviewed), `translate()` (pure), `useLanguage()` → `{ t, lang, setLang }`.
+- `shared/i18n/` – all user-facing text (English only) in one dictionary, `en.js`; `translate()` (pure) and
+  `useLanguage()` → `{ t }`. Keeping wording in one place makes it easy to find and change.
 - `shared/lib/` – small helpers: `viewTransition.js` (the cover-to-dialog shared-element animation, with a plain fallback) and `cover.js` (generated cover colours and initials).
 - `shared/ui/` – the few older components still used by pages that have not been redesigned yet (`Button`, `Cover`,
   `LoadingPanel`, `LoadingScreen`, `Toast`, `ErrorBoundary`). They are removed page by page as the redesign proceeds (plan.md, phase R10).
@@ -64,8 +64,8 @@ those hooks and never create their own Firestore subscriptions.
 | `insights` | `Analytics` composed of cards in `AnalyticsCards.jsx`; pure `analyticsModel.js` |
 | `galaxy` | `ConstellationGraph`, `GalaxyControls`, `NodeInspector`, `useForceSimulation`; pure `graph.js`, `graphSimulation.js` |
 | `auth` | `AuthScreen` (bar + `AuthCard`): sign in / register / **password reset**, Google, show-password; `useAuthController` (errors are translation keys via `authErrors.js`; sends a verification email on register; `needsVerification` drives the in-app `VerifyBanner`, which reminds but never locks anyone out) |
-| `landing` | `LandingPage`, a night-time "reading room": `GlyphField` canvas hero, CSS-3D `HeroBook` (opens, turns a page, tilts toward the pointer), `CoverMarquee`, bento tiles with live `FeatureDemos` (play only once scrolled into view via `useInView`), `ScrollStatement` (words light up on scroll), finale. Every animation has a still fallback under `prefers-reduced-motion`; decoration is `aria-hidden` |
-| `kannada` | `KannadaExplorerPage` (placeholder for the Kannada Explorer, plan.md track K; public, hidden until the Kannada UI is enabled) |
+| `landing` | `LandingPage`, a night-time "reading room": `StarField` night-sky hero, CSS-3D `HeroBook` (opens, turns a page, tilts toward the pointer), `CoverMarquee`, bento tiles with live `FeatureDemos` (play only once scrolled into view via `useInView`), `ScrollStatement` (words light up on scroll), finale. Every animation has a still fallback under `prefers-reduced-motion`; decoration is `aria-hidden` |
+| `kannada` | `KannadaExplorerPage` (placeholder for the Kannada Explorer, plan.md track K; public, only in development builds, behind `KANNADA_EXPLORER_ENABLED`) |
 
 **Pattern inside a feature:** a pure `*Model.js` (testable logic) → a `use*` hook (state/effects) → components (markup).
 
@@ -86,7 +86,7 @@ those hooks and never create their own Firestore subscriptions.
 
 ## Adding a feature (example: a "Time Machine" page)
 1. Create `features/timeline/` with `timelineModel.js` (+ test), `useTimeline.js`, `TimelinePage.jsx`.
-2. Register it in `app/views.js` (`PAGES.timeline = { Component: lazy(...) }`) and add `view.timeline.kicker|title` to `en.js` and `kn.js`.
+2. Register it in `app/views.js` (`PAGES.timeline = { Component: lazy(...) }`) and add `view.timeline.kicker|title` to `en.js`.
 3. Add a destination in `app/nav.js` (icon, `labelKey`, optional `shortKey`).
 4. Build the UI from `shared/pk`, and use `services/bookApi.js` for any catalogue calls.
 That is the whole change: routing, the rail, the tab bar and the command palette pick it up automatically.
