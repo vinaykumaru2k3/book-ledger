@@ -8,7 +8,7 @@ import DeleteConfirmModal from "../features/library/DeleteConfirmModal";
 import LibraryPage from "../features/library/LibraryPage";
 import LibraryTabs from "../features/library/LibraryTabs";
 import LibraryDashboard from "../features/library/dashboard/LibraryDashboard";
-import ShelfActions from "../features/shelves/ShelfActions";
+import ShelfHero from "../features/shelves/ShelfHero";
 import { computeLibraryStats, shelfFromRoute, shelfRoute } from "../domain/library";
 import { useApp, useBooks, useModal, useToast, useUi } from "./AppContext";
 import PageHeader from "./PageHeader";
@@ -62,19 +62,17 @@ function Workspace({ view, navigate, location }) {
           kicker={t(kickerKey)}
           title={t(titleKey, titleVars)}
           stats={stats}
-          showStats={isLibrary && view !== "all"}
+          showStats={isLibrary && view !== "all" && shelfName === null}
           onOpenCommand={openPalette}
           onAdd={openNewBook}
           onNavigate={navigate}
           back={shelfName !== null ? { view: "shelves", label: t("shelves.back") } : undefined}
-          extra={
-            shelfName !== null && (
-              <ShelfActions name={shelfName} onRenamed={(next) => navigate(shelfRoute(next))} onDeleted={() => navigate("shelves")} />
-            )
-          }
         />
 
         {view === "all" && <LibraryDashboard books={books} stats={stats} />}
+        {shelfName !== null && (
+          <ShelfHero name={shelfName} onRenamed={(next) => navigate(shelfRoute(next))} onDeleted={() => navigate("shelves")} />
+        )}
 
         {isLibrary && shelfName === null && <LibraryTabs view={view} stats={stats} onChange={navigate} />}
 

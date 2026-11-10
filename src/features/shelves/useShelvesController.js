@@ -6,13 +6,14 @@
  */
 import { useMemo } from "react";
 
+// Jewel tones that sit well beside the oxblood and gold of the rest of the app.
 const SHELF_COLORS = [
-  "#d97706",
-  "#6366f1",
-  "#10b981",
-  "#ef4444",
-  "#f59e0b",
-  "#14b8a6",
+  "#8b1e2d", // oxblood
+  "#1f6f6b", // teal
+  "#3f4f9a", // indigo
+  "#b7791f", // ochre
+  "#2f6a43", // forest
+  "#6b3a6e", // plum
 ];
 
 /** Stable look for a shelf (an accent colour), derived from its name. */
@@ -63,5 +64,21 @@ export function useShelvesController(books, updateManyBooks, notify) {
     await updateManyBooks(changes, `Shelf "${shelfName}" removed. Its books are still in your library.`);
   }
 
-  return { uniqueShelves, shelfBooks, getPreset, renameShelf, deleteShelf };
+  /**
+   * Puts the given books on a shelf (creating it if it is new), in one batched
+   * write. Books already on the shelf are left alone. Resolves to true on success.
+   */
+  async function addToShelf(shelfName, bookIds) {
+    const name = shelfName.trim();
+    if (!name) return false;
+    const changes = books
+      .filter((book) => bookIds.includes(book.id) && !(book.shelves || []).includes(name))
+      .map((book) => ({ id: book.id, updates: { shelves: [...(book.shelves || []), name] } }));
+    if (!changes.length) return true;
+    const isNew = !uniqueShelves.includes(name);
+    const count = changes.length === 1 ? "1 book" : `${changes.length} books`;
+    return updateManyBooks(changes, isNew ? `Shelf "${name}" created with ${count}.` : `Added ${count} to "${name}".`);
+  }
+
+  return { uniqueShelves, shelfBooks, getPreset, renameShelf, deleteShelf, addToShelf };
 }

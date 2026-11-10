@@ -18,11 +18,13 @@ const shelves = {
   getPreset: () => ({ color: "#123456" }),
   renameShelf: vi.fn(),
   deleteShelf: vi.fn(),
+  addToShelf: vi.fn(),
 };
 const state = { shelves };
 
 vi.mock("../../app/AppContext", () => ({
   useShelves: () => state.shelves,
+  useBooks: () => ({ books }),
 }));
 
 const { default: ShelvesDashboard } = await import("./ShelvesDashboard");
@@ -35,6 +37,7 @@ beforeEach(() => {
   state.shelves = shelves;
   shelves.renameShelf.mockResolvedValue(true);
   shelves.deleteShelf.mockResolvedValue(undefined);
+  shelves.addToShelf.mockResolvedValue(true);
 });
 afterEach(() => {
   cleanup();
@@ -73,6 +76,40 @@ describe("ShelvesDashboard", () => {
     wrap(<ShelvesDashboard navigate={vi.fn()} />);
     expect(screen.getByRole("heading", { name: "No shelves yet" })).toBeTruthy();
     expect(screen.queryByRole("link")).toBeNull();
+  });
+});
+
+describe("Shelf builder", () => {
+  it("summarises the bookcase", () => {
+    wrap(<ShelvesDashboard navigate={vi.fn()} />);
+    expect(screen.getByText(/books shelved/)).toBeTruthy();
+  });
+
+  it("builds a new shelf from ticked books and opens it", async () => {
+    const navigate = vi.fn();
+    wrap(<ShelvesDashboard navigate={navigate} />);
+    fireEvent.click(screen.getByRole("button", { name: "New shelf" }));
+    const dialog = screen.getByRole("dialog", { name: "Build a new shelf" });
+    const create = within(dialog).getByRole("button", { name: "Create shelf" });
+    expect(create.disabled).toBe(true);
+
+    fireEvent.change(within(dialog).getByLabelText("Shelf name"), { target: { value: "  Desert Island  " } });
+    fireEvent.click(within(dialog).getByRole("checkbox", { name: /Dune/ }));
+    expect(within(dialog).getByText("1 selected")).toBeTruthy();
+    fireEvent.click(create);
+
+    await waitFor(() => expect(shelves.addToShelf).toHaveBeenCalledWith("Desert Island", ["1"]));
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith("shelf:Desert Island"));
+  });
+
+  it("will not reuse the name of an existing shelf", () => {
+    wrap(<ShelvesDashboard navigate={vi.fn()} />);
+    fireEvent.click(screen.getByRole("button", { name: "New shelf" }));
+    const dialog = screen.getByRole("dialog");
+    fireEvent.change(within(dialog).getByLabelText("Shelf name"), { target: { value: "Classics" } });
+    fireEvent.click(within(dialog).getByRole("checkbox", { name: /Dune/ }));
+    expect(within(dialog).getByText(/already have a shelf with this name/)).toBeTruthy();
+    expect(within(dialog).getByRole("button", { name: "Create shelf" }).disabled).toBe(true);
   });
 });
 

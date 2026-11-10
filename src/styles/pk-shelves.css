@@ -1,105 +1,402 @@
-/* Shelves: the shelf cards (miniature wooden shelves), back link and the shelf menu. Reads only --pk-* tokens. */
+/* Shelves: the bookcase of all shelves, the shelf builder, a shelf's hero, back link and menu. */
 
-.pk-shelves-intro {
-  max-width: 60ch;
-  margin-bottom: var(--pk-space-5);
-  font: 400 var(--pk-text-md) / var(--pk-leading-body) var(--pk-font-ui);
+/* ---- Summary bar ------------------------------------------------------------------ */
+.pk-shelves__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--pk-space-3);
+  margin: var(--pk-space-2) 0 var(--pk-space-5);
+}
+.pk-shelves__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
   color: var(--pk-ink-2);
+  font: 500 var(--pk-text-md) var(--pk-font-ui);
 }
-
-.pk-shelfgrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
-  gap: var(--pk-space-5);
-}
-
-.pk-shelfcard {
-  --shelf-accent: var(--pk-accent);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: var(--pk-surface);
-  border: 1px solid var(--pk-line);
-  border-top: 4px solid var(--shelf-accent);
-  border-radius: var(--pk-radius-lg);
-  box-shadow: var(--pk-shadow-1);
+.pk-shelves__summary strong {
   color: var(--pk-ink);
+  font: 600 1.25rem var(--pk-font-display);
+}
+.pk-shelves__loose {
+  color: var(--pk-ink-3);
+  font-style: italic;
+}
+
+/* ---- The bookcase ------------------------------------------------------------------ */
+.pk-case {
+  position: relative;
+  padding: 18px 22px 0;
+  border-radius: 18px;
+  background:
+    radial-gradient(70% 40% at 50% 0%, rgba(236, 199, 122, 0.18), transparent 70%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.014) 0 2px, transparent 2px 9px),
+    linear-gradient(180deg, #2f2017, #1d130d);
+  box-shadow: inset 0 0 0 12px #4b301a, inset 0 0 0 13px rgba(255, 220, 160, 0.14), inset 0 0 70px rgba(0, 0, 0, 0.55),
+    0 30px 60px -30px rgba(40, 25, 10, 0.6);
+}
+.pk-case__crown {
+  height: 6px;
+  margin: 0 -10px 6px;
+  border-radius: 3px;
+  background: linear-gradient(#a87440, #6a4220);
+  opacity: 0.7;
+}
+.pk-case__base {
+  height: 26px;
+  margin: 0 -22px;
+  border-radius: 0 0 18px 18px;
+  background: linear-gradient(#5e3b1a, #3a2410);
+}
+
+/* One shelf: nameplate + books on a plank. */
+.pk-case__row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  align-items: end;
+  gap: 22px;
+  min-height: 210px;
+  padding: 26px 8px 22px;
+  color: inherit;
   text-decoration: none;
-  transition: transform var(--pk-duration-2) var(--pk-ease), box-shadow var(--pk-duration-2) var(--pk-ease);
+  /* Shadow under the plank above, and the plank this shelf stands on. */
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.5), transparent 34px),
+    linear-gradient(to top, #2e1b0c 0, #6a4220 5px, #8a5a2b 13px, #a87440 16px, #c99560 18px, rgba(0, 0, 0, 0.35) 18px, transparent 30px);
+  animation: pk-case-in 600ms var(--pk-ease) backwards;
+  animation-delay: calc(var(--i) * 70ms);
 }
-.pk-shelfcard:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--pk-shadow-2);
+@keyframes pk-case-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 }
-.pk-shelfcard:focus-visible {
+.pk-case__row:focus-visible {
   outline: 3px solid var(--pk-focus);
-  outline-offset: 2px;
+  outline-offset: -3px;
+  border-radius: 10px;
 }
 
-/* The books standing on the shelf. */
-.pk-shelfcard__scene {
-  display: flex;
-  align-items: flex-end;
-  gap: 3px;
-  height: 148px;
-  padding: var(--pk-space-5) var(--pk-space-4) 0;
-  overflow: hidden;
-  background: radial-gradient(80% 70% at 50% 0%, rgba(226, 176, 74, 0.22), transparent 70%),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.5), transparent 26px), linear-gradient(180deg, #2f2017, #1d130d);
-}
-.pk-shelfcard .pk-spine {
-  pointer-events: none;
-  background-size: auto, 100% 14px, 100% 14px, auto, auto;
-}
-.pk-shelfcard .pk-spine:nth-child(4) {
-  rotate: -5deg;
-  margin-left: 4px;
-}
-.pk-shelfcard .pk-spine__title {
-  font-size: 0.6rem;
-  max-height: calc(var(--spine-h) - 36px);
-}
-.pk-shelfcard .pk-spine__fav {
-  top: 16px;
-}
-.pk-shelfcard .pk-spine--done::after {
-  bottom: 16px;
-}
-.pk-shelfcard:hover .pk-spine,
-.pk-shelfcard:focus-visible .pk-spine {
-  transform: translateY(-8px);
-}
-.pk-shelfcard .pk-spine:nth-child(2n) {
-  transition-delay: 30ms;
-}
-.pk-shelfcard .pk-spine:nth-child(3n) {
-  transition-delay: 60ms;
-}
-
-/* The wooden plank under them. */
-.pk-shelfcard__plank {
-  height: 14px;
-  background: linear-gradient(to bottom, #c99560, #a87440 15%, #8a5a2b 40%, #6a4220 80%, #2e1b0c);
-  box-shadow: 0 6px 12px -4px rgba(0, 0, 0, 0.35);
-}
-.pk-shelfcard__info {
+/* The engraved brass nameplate, edged with the shelf's colour. */
+.pk-case__plate {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: var(--pk-space-3) var(--pk-space-4) var(--pk-space-4);
+  gap: 4px;
+  align-self: center;
+  padding: 14px 16px 14px 20px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #f1d79a, #c99a45 45%, #e9c77e 70%, #b98a3a);
+  color: #3a2410;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), inset 0 -1px 0 rgba(0, 0, 0, 0.25), 0 6px 14px -6px rgba(0, 0, 0, 0.7);
+  transition: transform var(--pk-duration-2) var(--pk-ease), filter var(--pk-duration-2) var(--pk-ease);
 }
-.pk-shelfcard__name {
+.pk-case__plate::before {
+  /* The shelf's colour as a cloth tab on the plate. */
+  content: "";
+  position: absolute;
+  inset: 8px auto 8px 7px;
+  width: 4px;
+  border-radius: 2px;
+  background: var(--shelf-accent);
+}
+.pk-case__plate::after {
+  /* Two brass screws. */
+  content: "";
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff6d6, #8a6a2a);
+  box-shadow: 0 calc(100% + 0px) 0 transparent;
+}
+.pk-case__name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font: 600 var(--pk-text-lg) / var(--pk-leading-tight) var(--pk-font-display);
+  font: 600 1.15rem / 1.2 var(--pk-font-display);
+  text-shadow: 0 1px 0 rgba(255, 245, 210, 0.6);
 }
-.pk-shelfcard__count {
-  font: 500 var(--pk-text-sm) var(--pk-font-ui);
-  color: var(--pk-ink-3);
+.pk-case__meta {
+  font: 600 0.72rem var(--pk-font-ui);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.pk-case__read {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  font: 600 0.72rem var(--pk-font-ui);
+}
+.pk-case__readBar {
+  position: relative;
+  flex: 1;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgba(58, 36, 16, 0.2);
+}
+.pk-case__readBar i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 2px;
+  background: #5a1520;
 }
 
-/* Back link above the title on a shelf's page. */
+.pk-case__books {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  min-width: 0;
+  padding-bottom: 18px;
+  overflow: hidden;
+}
+.pk-case__books .pk-spine {
+  pointer-events: none;
+  transition: transform var(--pk-duration-3) var(--pk-ease);
+}
+.pk-case__books .pk-spine:nth-child(5n + 3) {
+  rotate: -3deg;
+  margin-left: 4px;
+}
+.pk-case__row:hover .pk-spine {
+  transform: translateY(-6px);
+}
+.pk-case__row:hover .pk-spine:nth-child(2n) {
+  transition-delay: 40ms;
+}
+.pk-case__row:hover .pk-spine:nth-child(3n) {
+  transition-delay: 80ms;
+}
+.pk-case__row:hover .pk-case__plate {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+}
+/* "+12 more": a few books lying flat. */
+.pk-case__more {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-left: 10px;
+  color: rgba(239, 233, 222, 0.7);
+  font: 600 0.72rem var(--pk-font-ui);
+  white-space: nowrap;
+}
+.pk-case__moreStack {
+  width: 54px;
+  height: 30px;
+  border-radius: 2px;
+  background: linear-gradient(#7b2d3a 0 9px, #e9dec6 9px 10px, #2f4f6b 10px 19px, #e9dec6 19px 20px, #8a6a2a 20px 30px);
+  box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.45);
+}
+.pk-case__bookend {
+  flex: none;
+  width: 10px;
+  height: 64px;
+  margin-left: 8px;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(90deg, #6e7175, #c9ccd1 40%, #7c8085);
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.4);
+}
+
+/* ---- Shelf builder ------------------------------------------------------------------ */
+.pk-builder {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pk-space-4);
+}
+.pk-builder__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+  max-height: 46vh;
+  margin: 0;
+  padding: 2px;
+  overflow-y: auto;
+  list-style: none;
+}
+.pk-builder__item {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px 8px 8px;
+  border: 1px solid var(--pk-line);
+  border-radius: 12px;
+  background: var(--pk-surface);
+  cursor: pointer;
+  transition: border-color 140ms var(--pk-ease), background-color 140ms var(--pk-ease);
+}
+.pk-builder__item input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.pk-builder__item:hover {
+  border-color: var(--pk-line-strong);
+}
+.pk-builder__item:focus-within {
+  outline: 3px solid var(--pk-focus);
+  outline-offset: 1px;
+}
+.pk-builder__item--on {
+  border-color: var(--pk-accent);
+  background: var(--pk-accent-soft);
+}
+.pk-builder__item .pk-cover--sm {
+  width: 32px;
+}
+.pk-builder__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.pk-builder__title,
+.pk-builder__author {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pk-builder__title {
+  color: var(--pk-ink);
+  font: 600 0.92rem var(--pk-font-display);
+}
+.pk-builder__author {
+  color: var(--pk-ink-3);
+  font-size: var(--pk-text-xs);
+}
+.pk-builder__check {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 1.5px solid var(--pk-line-strong);
+  border-radius: 50%;
+  color: transparent;
+}
+.pk-builder__item--on .pk-builder__check {
+  border-color: var(--pk-accent);
+  background: var(--pk-accent);
+  color: #fff;
+}
+.pk-builder__empty {
+  color: var(--pk-ink-3);
+  font-style: italic;
+}
+.pk-builder__picked {
+  margin-right: auto;
+  color: var(--pk-ink-3);
+  font: 600 var(--pk-text-sm) var(--pk-font-ui);
+}
+
+/* ---- A shelf's hero ------------------------------------------------------------------ */
+.pk-shelfhero {
+  --shelf-accent: var(--pk-accent);
+  position: relative;
+  margin: var(--pk-space-5) 0 var(--pk-space-2);
+  padding: clamp(20px, 3vw, 32px) clamp(20px, 3vw, 32px) 0;
+  overflow: hidden;
+  border-radius: 24px;
+  background:
+    radial-gradient(70% 90% at 100% 0%, color-mix(in srgb, var(--shelf-accent) 55%, transparent), transparent 70%),
+    linear-gradient(135deg, color-mix(in srgb, var(--shelf-accent) 70%, #0c0e13), #0c0e13);
+  color: #efe9de;
+  box-shadow: 0 30px 60px -30px rgba(12, 14, 19, 0.6);
+  animation: pk-case-in 600ms var(--pk-ease) both;
+}
+.pk-shelfhero__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--pk-space-4);
+}
+.pk-shelfhero__figures {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(18px, 3.5vw, 44px);
+  margin: 0;
+}
+.pk-shelfhero__figures div {
+  display: flex;
+  flex-direction: column-reverse;
+}
+.pk-shelfhero__figures dd {
+  margin: 0;
+  font: 500 clamp(1.8rem, 3vw, 2.4rem) / 1 var(--pk-font-display);
+}
+.pk-shelfhero__figures dt {
+  margin-top: 6px;
+  color: rgba(239, 233, 222, 0.6);
+  font: 600 0.7rem var(--pk-font-ui);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.pk-shelfhero__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--pk-space-2);
+}
+.pk-shelfhero__add {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 var(--pk-space-5);
+  border: 0;
+  border-radius: var(--pk-radius-pill);
+  background: #efe9de;
+  color: #0c0e13;
+  font: 600 var(--pk-text-sm) var(--pk-font-ui);
+  cursor: pointer;
+}
+.pk-shelfhero__add:hover {
+  background: #fff;
+}
+.pk-shelfhero__add:focus-visible,
+.pk-shelfhero .pk-shelf-menu:focus-visible {
+  outline: 2px solid #ecc77a;
+  outline-offset: 3px;
+}
+.pk-shelfhero .pk-shelf-menu {
+  border-color: rgba(239, 233, 222, 0.25);
+  background: transparent;
+  color: #efe9de;
+}
+.pk-shelfhero__shelf {
+  margin: var(--pk-space-5) calc(clamp(20px, 3vw, 32px) * -1) 0;
+}
+.pk-shelfhero__books {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  padding: 0 clamp(20px, 3vw, 32px);
+  overflow: hidden;
+}
+.pk-shelfhero__books .pk-spine {
+  pointer-events: none;
+}
+.pk-shelfhero__books .pk-spine:nth-child(6n + 4) {
+  rotate: -3deg;
+  margin-left: 4px;
+}
+.pk-shelfhero__plank {
+  height: 16px;
+  background: linear-gradient(to bottom, #c99560, #a87440 15%, #8a5a2b 40%, #6a4220 80%, #2e1b0c);
+}
+
+/* ---- Back link above the title on a shelf's page ------------------------------------- */
 .pk-backlink {
   display: inline-flex;
   align-items: center;
@@ -121,4 +418,49 @@
 .pk-shelf-menu {
   border: 1px solid var(--pk-line-strong);
   background: var(--pk-surface-raised);
+}
+
+/* ---- Smaller screens -------------------------------------------------------------------- */
+@media (max-width: 760px) {
+  .pk-case {
+    padding: 14px 14px 0;
+  }
+  .pk-case__base {
+    margin: 0 -14px;
+  }
+  .pk-case__row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    min-height: 0;
+    padding-top: 18px;
+  }
+  .pk-case__plate {
+    align-self: start;
+    width: min(100%, 280px);
+  }
+  .pk-case__books .pk-spine {
+    --spine-h: 120px !important;
+  }
+  .pk-shelfhero__figures dd {
+    font-size: 1.6rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pk-case__row,
+  .pk-shelfhero {
+    animation-name: pk-shelf-fade;
+  }
+  .pk-case__books .pk-spine,
+  .pk-case__plate {
+    transition: none;
+  }
+  .pk-case__row:hover .pk-spine {
+    transform: none;
+  }
+}
+@keyframes pk-shelf-fade {
+  from {
+    opacity: 0;
+  }
 }
