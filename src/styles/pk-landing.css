@@ -237,286 +237,400 @@
   }
 }
 
-/* ---- The 3D book ---------------------------------------------------------------- */
-.pk-book3d {
-  --w: 230px;
-  --h: 318px;
+/* ---- The open book: a star atlas and a reading ledger ------------------------------
+ * Sized in em so the whole spread scales with its column (container query units).
+ * Every element's resting style is its FINAL state; animations play *from* the
+ * starting state (fill: backwards), so reduced motion simply shows the end.
+ */
+.pk-bookscene {
   --tilt-x: 0deg;
   --tilt-y: 0deg;
   position: relative;
   justify-self: center;
-  width: calc(var(--w) * 2 + 40px);
-  height: calc(var(--h) + 120px);
-  perspective: 1700px;
-  animation: pk-rise 1000ms 300ms var(--pk-ease) both;
+  width: 100%;
+  max-width: 620px;
+  padding: 1.5rem 0 3.5rem;
+  container-type: inline-size;
+  perspective: 1800px;
+  animation: pk-rise 1000ms 200ms var(--pk-ease) both;
 }
-.pk-book3d__glow {
-  display: none;
-}
-.pk-book3d__body {
-  position: absolute;
-  top: 54px;
-  left: 50%;
-  width: var(--w);
-  height: var(--h);
-  transform-style: preserve-3d;
-  transform: rotateX(calc(16deg + var(--tilt-x))) rotateY(calc(-8deg + var(--tilt-y))) rotateZ(-1.5deg);
-}
-.pk-book3d__body > * {
-  position: absolute;
-  inset: 0;
-  transform-style: preserve-3d;
-}
-.pk-book3d__back {
-  border-radius: 2px 8px 8px 2px;
-  background: linear-gradient(135deg, #5a1520, #2d0a10);
-  transform: translateZ(-16px);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
-}
-.pk-book3d__block {
-  inset: 4px 6px 4px 0;
-  background: #e8dcc2;
-  transform: translateZ(-8px);
-  box-shadow: 1px 1px 0 #d9caa9, 2px 2px 0 #e6d9bd, 3px 3px 0 #d4c39f, 4px 4px 0 #e2d4b6, 5px 5px 0 #cdbb95,
-    6px 6px 0 #ddcfae, 7px 7px 0 #c6b48c;
-}
-.pk-book3d__page,
-.pk-book3d__leafFront,
-.pk-book3d__leafBack {
-  inset: 4px 6px 4px 0;
-  display: flex;
-  flex-direction: column;
-  gap: 9px;
-  padding: 34px 26px 26px 30px;
-  border-radius: 0 4px 4px 0;
-  background: linear-gradient(90deg, rgba(120, 90, 40, 0.2), transparent 14%), linear-gradient(#fbf6ea, #f0e7d3);
-  box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.06);
-}
-.pk-book3d__page {
-  transform: translateZ(0);
-}
-.pk-book3d__chapter {
-  align-self: center;
-  margin-bottom: 6px;
-  color: var(--ox);
-  font: italic 500 0.82rem var(--pk-font-display);
-  letter-spacing: 0.06em;
-}
-.pk-book3d__drop {
-  float: left;
-  margin: -2px 0 -38px;
-  color: var(--ox);
-  font: 600 2.9rem / 1 var(--pk-font-display);
-}
-.pk-book3d__line {
-  display: block;
-  width: var(--w);
-  height: 4px;
-  border-radius: 2px;
-  background: rgba(40, 35, 30, 0.2);
-}
-.pk-book3d__page .pk-book3d__line:nth-of-type(-n + 3) {
-  margin-left: 42px;
-  width: calc(var(--w) - 42px);
-}
-.pk-book3d__folio {
-  margin-top: auto;
-  align-self: center;
-  color: rgba(40, 35, 30, 0.5);
-  font: 500 0.7rem var(--pk-font-display);
-}
-.pk-book3d__leaf {
-  transform-origin: left center;
-  transform: translateZ(1px);
-  animation: pk-turn 8s 3s cubic-bezier(0.55, 0.05, 0.3, 1) infinite;
-}
-.pk-book3d__leafFront,
-.pk-book3d__leafBack {
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-.pk-book3d__leafBack {
-  inset: 4px 0 4px 6px;
-  border-radius: 4px 0 0 4px;
-  transform: rotateY(180deg);
-  background: linear-gradient(270deg, rgba(120, 90, 40, 0.2), transparent 14%), linear-gradient(#f6efdf, #ebe0c8);
-}
-@keyframes pk-turn {
-  0%,
-  35% {
-    transform: translateZ(1px) rotateY(0deg);
-    opacity: 1;
-  }
-  62%,
-  94% {
-    transform: translateZ(3px) rotateY(-176deg);
-    opacity: 1;
-  }
-  97% {
-    transform: translateZ(3px) rotateY(-176deg);
-    opacity: 0;
-  }
-  98% {
-    transform: translateZ(1px) rotateY(0deg);
-    opacity: 0;
-  }
-  100% {
-    transform: translateZ(1px) rotateY(0deg);
-    opacity: 1;
-  }
-}
-.pk-book3d__cover {
-  transform-origin: left center;
-  transform: translateZ(4px) rotateY(-172deg);
-  animation: pk-open 2000ms 600ms cubic-bezier(0.6, 0, 0.2, 1) backwards;
-}
-@keyframes pk-open {
-  from {
-    transform: translateZ(4px) rotateY(0deg);
-  }
-}
-.pk-book3d__coverFront,
-.pk-book3d__coverInside {
-  position: absolute;
-  inset: 0;
-  border-radius: 2px 8px 8px 2px;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-.pk-book3d__coverFront {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  color: var(--gold-2);
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.45), rgba(255, 255, 255, 0.08) 5%, transparent 9%),
-    radial-gradient(120% 90% at 30% 20%, #a3283a, #6e1622 55%, #3e0b13);
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.3), inset 0 0 40px rgba(0, 0, 0, 0.45);
-}
-.pk-book3d__frame {
-  position: absolute;
-  inset: 16px 16px 16px 22px;
-  border: 1.5px solid rgba(236, 199, 122, 0.75);
-  border-radius: 4px;
-  box-shadow: inset 0 0 0 5px rgba(236, 199, 122, 0.3);
-}
-.pk-book3d__title {
-  font: 600 2.1rem var(--pk-font-display);
-  letter-spacing: 0.02em;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
-}
-.pk-book3d__subtitle {
-  font: italic 500 1rem var(--pk-font-display);
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  opacity: 0.85;
-}
-.pk-book3d__ornament {
-  font-size: 1.4rem;
-  opacity: 0.85;
-}
-.pk-book3d__ornament--low {
-  font-size: 0.6rem;
-  letter-spacing: 0.6em;
-}
-.pk-book3d__coverInside {
-  transform: rotateY(180deg);
-  border-radius: 8px 2px 2px 8px;
-  background: radial-gradient(circle at 20% 30%, rgba(236, 199, 122, 0.35) 0 2px, transparent 3px) 0 0 / 22px 22px,
-    radial-gradient(circle at 70% 70%, rgba(239, 233, 222, 0.16) 0 1.5px, transparent 2.5px) 0 0 / 22px 22px,
-    linear-gradient(135deg, #20304a, #14203a 60%, #0e172b);
-  box-shadow: inset 0 0 0 10px #6e1622, inset 0 0 0 11px rgba(236, 199, 122, 0.4), inset -18px 0 30px rgba(0, 0, 0, 0.4);
-}
-.pk-book3d__ribbon {
-  inset: auto auto -46px 62% !important;
-  width: 12px;
-  height: 64px;
-  background: linear-gradient(90deg, #6e1622, #a3283a 50%, #6e1622);
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 84%, 0 100%);
-  transform: translateZ(2px);
-}
-.pk-book3d__shadow {
-  position: absolute;
-  left: 18%;
-  right: 6%;
-  bottom: 22px;
-  height: 40px;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.7), transparent);
-  filter: blur(6px);
-}
-
-/* Small cards floating around the book. */
-.pk-chip {
-  position: absolute;
-  z-index: 3;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 14px;
-  border: 1px solid var(--line-2);
-  border-radius: 12px;
-  background: rgba(18, 21, 28, 0.82);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: var(--cream);
-  font: 600 0.8rem var(--pk-font-ui);
-  white-space: nowrap;
-  animation: pk-float 7s ease-in-out infinite, pk-rise 800ms var(--pk-ease) backwards;
-}
-.pk-chip svg {
-  color: var(--gold-2);
-}
-.pk-chip > span {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-.pk-chip b {
-  font: 600 0.85rem "Noto Sans Kannada", var(--pk-font-ui);
-}
-.pk-chip__bar {
+.pk-openbook {
   position: relative;
-  width: 96px;
-  height: 4px;
-  overflow: hidden;
-  border-radius: 2px;
-  background: rgba(239, 233, 222, 0.14);
+  width: 40em;
+  height: 26em;
+  margin: 0 auto;
+  font-size: min(15px, calc(100cqw / 42));
+  transform-style: preserve-3d;
+  transform: rotateX(calc(16deg + var(--tilt-x))) rotateY(var(--tilt-y));
 }
-.pk-chip__bar::after {
+/* The leather boards peeking out around the pages. */
+.pk-openbook__board {
+  position: absolute;
+  inset: -0.55em -0.7em -0.7em;
+  border-radius: 0.5em;
+  background: linear-gradient(90deg, #5c1520, #7d1d2b 30%, #4a0f18 49.6%, #2a070d 50%, #4a0f18 50.4%, #7d1d2b 70%, #5c1520);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35), 0 2.4em 3em -1.2em rgba(0, 0, 0, 0.75);
+  transform: translateZ(-0.6em);
+}
+/* The block of pages under the spread. */
+.pk-openbook__stack {
+  position: absolute;
+  inset: 0.3em 0.15em -0.45em;
+  border-radius: 0.3em;
+  background: repeating-linear-gradient(180deg, #e9dec6 0 1px, #d8c9a8 1px 2px);
+  transform: translateZ(-0.3em);
+}
+.pk-openbook__page {
+  position: absolute;
+  top: 0;
+  width: 20em;
+  height: 26em;
+  background: linear-gradient(#fbf7ec, #f2e9d6);
+  transform-style: preserve-3d;
+}
+.pk-openbook__page--left {
+  left: 0;
+  border-radius: 0.35em 0 0 0.35em;
+  background: linear-gradient(270deg, rgba(90, 60, 20, 0.22), transparent 14%), linear-gradient(#fbf7ec, #f2e9d6);
+  transform-origin: right center;
+  transform: rotateY(5deg);
+}
+.pk-openbook__page--right {
+  left: 20em;
+  border-radius: 0 0.35em 0.35em 0;
+  background: linear-gradient(90deg, rgba(90, 60, 20, 0.22), transparent 14%), linear-gradient(#fbf7ec, #f2e9d6);
+  transform-origin: left center;
+  transform: rotateY(-5deg);
+}
+/* The printed night-sky plate on the left page. */
+.pk-openbook__page--left::before {
   content: "";
   position: absolute;
-  inset: 0 auto 0 0;
-  width: var(--p);
-  border-radius: 2px;
-  background: var(--gold-2);
-  animation: pk-fill 1400ms 2.2s var(--pk-ease) backwards;
+  inset: 0.9em 1.3em 1.7em 0.9em;
+  border-radius: 0.2em;
+  background: radial-gradient(90% 70% at 60% 30%, #1d2a4d, #111a33 60%, #0b1124);
+  box-shadow: inset 0 0 0 0.25em #0b1124, inset 0 0 0 0.32em rgba(236, 199, 122, 0.45);
 }
-@keyframes pk-fill {
+.pk-openbook__head {
+  position: absolute;
+  top: 1.55em;
+  left: 2em;
+  right: 1.8em;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 0.35em;
+  border-bottom: 1px solid rgba(139, 30, 45, 0.25);
+  color: var(--ox);
+  font: italic 500 0.78em var(--pk-font-display);
+  letter-spacing: 0.08em;
+}
+.pk-openbook__head--sky {
+  left: 1.7em;
+  right: 2.1em;
+  z-index: 1;
+  border-bottom-color: rgba(236, 199, 122, 0.25);
+  color: var(--gold-2);
+}
+.pk-openbook__folio {
+  position: absolute;
+  bottom: 0.55em;
+  right: 1.8em;
+  color: rgba(60, 45, 30, 0.5);
+  font: italic 500 0.7em var(--pk-font-display);
+}
+.pk-openbook__folio--left {
+  left: 1.9em;
+  right: auto;
+}
+
+/* The atlas. */
+.pk-atlas {
+  position: absolute;
+  top: 3.3em;
+  left: 1.5em;
+  z-index: 1;
+  width: 16.6em;
+  height: 19.1em;
+  overflow: visible;
+}
+.pk-atlas__grid * {
+  fill: none;
+  stroke: rgba(236, 199, 122, 0.16);
+  stroke-width: 0.5;
+  stroke-dasharray: 1.5 2.5;
+}
+.pk-atlas__line {
+  stroke: rgba(236, 199, 122, 0.6);
+  stroke-width: 0.8;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  animation: pk-draw 700ms var(--d) var(--pk-ease) backwards;
+}
+.pk-atlas__line--new {
+  stroke: var(--gold-2);
+  --d: 5900ms;
+}
+@keyframes pk-draw {
   from {
-    width: 0;
+    stroke-dashoffset: 1;
   }
 }
-.pk-chip--1 {
-  top: 8%;
-  left: 0;
-  animation-delay: 0s, 1.4s;
+.pk-atlas__star circle {
+  fill: #f6e4b4;
 }
-.pk-chip--2 {
-  top: 40%;
-  right: -4%;
-  animation-delay: -2.5s, 1.8s;
+.pk-atlas__star text {
+  fill: rgba(239, 233, 222, 0.82);
+  font: 500 7.4px var(--pk-font-ui);
 }
-.pk-chip--3 {
-  bottom: 6%;
-  left: 6%;
-  animation-delay: -5s, 2.2s;
+.pk-atlas__star {
+  animation: pk-pop 600ms var(--d) var(--pk-ease) backwards;
 }
-@keyframes pk-float {
+.pk-atlas__star--new {
+  --d: 5800ms;
+}
+.pk-atlas__star--new circle {
+  fill: #fff2c8;
+}
+.pk-atlas__star--new text {
+  fill: var(--gold-2);
+  font-style: italic;
+  font-family: var(--pk-font-display);
+}
+@keyframes pk-pop {
+  from {
+    opacity: 0;
+  }
+}
+.pk-atlas__star circle {
+  animation: pk-twinkle-star 4s ease-in-out infinite;
+  animation-delay: var(--d);
+}
+@keyframes pk-twinkle-star {
   50% {
-    transform: translateY(-8px);
+    opacity: 0.55;
   }
+}
+
+/* The ledger. */
+.pk-ledger {
+  position: absolute;
+  top: 3.6em;
+  left: 2em;
+  right: 1.8em;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pk-ledger__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 1.1em;
+  align-items: center;
+  gap: 0.6em;
+  height: 2.6em;
+  border-bottom: 1px solid rgba(139, 30, 45, 0.13);
+  animation: pk-ink 600ms var(--d) var(--pk-ease) backwards;
+}
+@keyframes pk-ink {
+  from {
+    opacity: 0;
+    transform: translateY(0.4em);
+  }
+}
+.pk-ledger__book {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.15;
+}
+.pk-ledger__title {
+  overflow: hidden;
+  color: #2a211b;
+  font: 600 0.9em var(--pk-font-display);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.pk-ledger__author {
+  color: #8a7c6c;
+  font: 500 0.6em var(--pk-font-ui);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.pk-ledger__date {
+  display: grid;
+  justify-items: end;
+  color: #6b5f52;
+  font: italic 500 0.74em var(--pk-font-display);
+}
+.pk-ledger__date > * {
+  grid-area: 1 / 1;
+}
+.pk-ledger__mark {
+  color: #b98a2c;
+  font-size: 0.85em;
+  text-align: center;
+}
+/* The book still being read: progress fills, then it is marked finished. */
+.pk-ledger__progress {
+  position: relative;
+  align-self: center;
+  width: 4.6em;
+  height: 0.32em;
+  overflow: hidden;
+  border-radius: 1em;
+  background: rgba(60, 45, 30, 0.12);
+  opacity: 0;
+  animation: pk-out 400ms 4300ms ease backwards;
+}
+.pk-ledger__progress i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 100%;
+  border-radius: 1em;
+  background: linear-gradient(90deg, #b98a2c, #d9a441);
+  animation: pk-progress 1600ms 2600ms var(--pk-ease) backwards;
+}
+@keyframes pk-progress {
+  from {
+    width: 64%;
+  }
+}
+@keyframes pk-out {
+  from {
+    opacity: 1;
+  }
+}
+.pk-ledger__today {
+  color: var(--ox);
+  animation: pk-pop 500ms 4500ms ease backwards;
+}
+.pk-ledger__mark--new {
+  animation: pk-stamp 500ms 4500ms var(--pk-ease) backwards;
+}
+@keyframes pk-stamp {
+  from {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+}
+
+/* The star that lifts off the ledger and joins the atlas. */
+.pk-openbook__rise {
+  position: absolute;
+  top: 12.3em;
+  left: 37.4em;
+  width: 0.8em;
+  height: 0.8em;
+  opacity: 0;
+  transform: translateZ(2em);
+  pointer-events: none;
+}
+.pk-openbook__rise::before {
+  content: "★";
+  display: block;
+  margin: -0.15em 0 0 -0.15em;
+  color: #fff2c8;
+  font-size: 1.1em;
+  line-height: 1;
+}
+.pk-openbook__rise {
+  animation: pk-fly 1500ms 4700ms cubic-bezier(0.45, 0, 0.35, 1) forwards;
+}
+@keyframes pk-fly {
+  0% {
+    top: 12.3em;
+    left: 37.4em;
+    opacity: 0;
+    transform: translateZ(2em) scale(0.6);
+  }
+  12% {
+    opacity: 1;
+    transform: translateZ(2em) scale(1.5);
+  }
+  55% {
+    top: -2.2em;
+    left: 26.5em;
+    transform: translateZ(4em) scale(1.8);
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    top: 7.7em;
+    left: 14.85em;
+    opacity: 0;
+    transform: translateZ(2em) scale(1);
+  }
+}
+
+/* A margin note that writes itself once the star lands, and the year's tally. */
+.pk-openbook__note {
+  /* Offsets are in this element's own (smaller) em: 15.6 / 2 / 2.4 book-em ÷ 0.86. */
+  position: absolute;
+  top: 18.1em;
+  left: 2.33em;
+  right: 2.8em;
+  padding-left: 0.8em;
+  border-left: 2px solid rgba(185, 138, 44, 0.55);
+  color: #4a3d33;
+  font: italic 400 0.86em / 1.5 var(--pk-font-display);
+  animation: pk-write 1800ms 6400ms steps(28, end) backwards;
+}
+@keyframes pk-write {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+.pk-openbook__tally {
+  position: absolute;
+  top: 20.4em;
+  left: 2em;
+  right: 1.8em;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin: 0;
+  padding-top: 0.7em;
+  border-top: 1px solid rgba(139, 30, 45, 0.25);
+  animation: pk-ink 700ms 1700ms var(--pk-ease) backwards;
+}
+.pk-openbook__tally div {
+  display: flex;
+  flex-direction: column-reverse;
+}
+.pk-openbook__tally dd {
+  margin: 0;
+  color: var(--ox);
+  font: 500 1.35em / 1.1 var(--pk-font-display);
+}
+.pk-openbook__tally dt {
+  color: #8a7c6c;
+  font: 600 0.56em var(--pk-font-ui);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pk-openbook__ribbon {
+  position: absolute;
+  bottom: -2.4em;
+  left: 21.3em;
+  width: 0.75em;
+  height: 3.6em;
+  background: linear-gradient(90deg, #6e1622, #a3283a 50%, #6e1622);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%);
+  transform: translateZ(0.2em);
+}
+.pk-bookscene__shadow {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 1.2rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, 0.6), transparent);
+  filter: blur(6px);
 }
 
 /* ---- Cover marquee ---------------------------------------------------------------- */
@@ -1125,10 +1239,6 @@
     -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.55) 50%, #000 70%);
     mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.55) 50%, #000 70%);
   }
-  .pk-book3d {
-    --w: 190px;
-    --h: 262px;
-  }
   .pk-bento__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1157,45 +1267,6 @@
   }
   .pk-hero__explore {
     justify-content: center;
-  }
-  .pk-book3d {
-    --w: 148px;
-    --h: 206px;
-    width: 100%;
-    max-width: 340px;
-  }
-  .pk-book3d__body {
-    top: 40px;
-  }
-  .pk-book3d__title {
-    font-size: 1.6rem;
-  }
-  .pk-book3d__page,
-  .pk-book3d__leafFront {
-    padding: 22px 16px 16px 20px;
-    gap: 6px;
-  }
-  .pk-book3d__drop {
-    font-size: 2rem;
-    margin-bottom: -26px;
-  }
-  .pk-book3d__page .pk-book3d__line:nth-of-type(-n + 3) {
-    margin-left: 30px;
-    width: calc(var(--w) - 30px);
-  }
-  .pk-chip {
-    font-size: 0.72rem;
-    padding: 7px 10px;
-  }
-  .pk-chip--1 {
-    left: -2%;
-    top: 2%;
-  }
-  .pk-chip--2 {
-    right: -2%;
-  }
-  .pk-chip--3 {
-    display: none;
   }
   .pk-mcover {
     width: 104px;

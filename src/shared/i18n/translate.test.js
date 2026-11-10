@@ -13,7 +13,7 @@ describe("translate", () => {
 
   it("fills {placeholders} and leaves unknown ones visible", () => {
     expect(translate("count.books", { count: 3 })).toBe("3 books");
-    expect(translate("landing.demo.streak", {})).toBe("{days}-day streak");
+    expect(translate("count.books", {})).toContain("{count}");
   });
 });
 

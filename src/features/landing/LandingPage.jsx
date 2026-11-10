@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { ArrowDown, ArrowRight, BookOpen, Flame, Plus } from "lucide-react";
+import { ArrowDown, ArrowRight } from "lucide-react";
 import StarField from "../../shared/pk/StarField";
 import { useLanguage } from "../../shared/i18n/LanguageContext";
 import { useInView } from "../../shared/lib/motion";
@@ -48,29 +48,11 @@ function Reveal({ as: Tag = "div", className = "", children, ...rest }) {
 
 /**
  * The public front page, set in a lamp-lit reading room at night:
- * drifting letters, a 3D book that opens itself, covers sliding past,
+ * a night sky, an open book where a finished book becomes a star, covers sliding past,
  * feature tiles with live demos, and a statement that lights up as you scroll.
  */
 function LandingPage({ onEnter }) {
   const { t } = useLanguage();
-
-  const chips = [
-    <>
-      <BookOpen size={14} />
-      <span>
-        <b lang="kn">ಕರ್ವಾಲೋ</b>
-        <i className="pk-chip__bar" style={{ "--p": "64%" }} />
-      </span>
-    </>,
-    <>
-      <Flame size={14} />
-      <span>{t("landing.demo.streak", { days: 12 })}</span>
-    </>,
-    <>
-      <Plus size={14} />
-      <span>{t("landing.demo.added", { title: "ノルウェイの森" })}</span>
-    </>,
-  ];
 
   return (
     <div className="pk-landing">
@@ -115,7 +97,7 @@ function LandingPage({ onEnter }) {
                 </a>
               </div>
             </div>
-            <HeroBook label={t("landing.bookLabel")} chips={chips} />
+            <HeroBook label={t("landing.bookLabel")} t={t} />
           </div>
           <div className="pk-hero__fade" aria-hidden="true" />
         </section>
