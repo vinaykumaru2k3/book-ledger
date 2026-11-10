@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import { useAuthController } from "../features/auth/useAuthController";
 import { useBooksController } from "../features/library/useBooksController";
 import { useShelvesController } from "../features/shelves/useShelvesController";
@@ -42,17 +42,20 @@ export function AppProvider({ children }) {
   const authController = useAuthController();
   const [toast, setToast] = useState("");
   const [toastType, setToastType] = useState("success");
+  const [toastSeq, setToastSeq] = useState(0);
 
-  // Toast auto-dismiss
+  // Toast auto-dismiss. `toastSeq` restarts the timer when the same message is shown
+  // again, so a repeated message gets its full time instead of the previous one's remainder.
   useEffect(() => {
     if (!toast) return undefined;
     const timer = window.setTimeout(() => setToast(""), 2600);
     return () => window.clearTimeout(timer);
-  }, [toast]);
+  }, [toast, toastSeq]);
 
   const notify = (message, type = "success") => {
     setToastType(type);
     setToast(message);
+    setToastSeq((n) => n + 1);
   };
 
   const booksApi = useBooksController(authController.user, notify);
@@ -133,11 +136,19 @@ export function AppProvider({ children }) {
     });
   };
 
+  // One save at a time: pressing Save twice must not create two copies of a new book.
+  const submitting = useRef(false);
   const submitForm = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
-    if (!form || !form.title.trim()) return;
-    await booksApi.submitBook(editingId, form);
-    closeModal();
+    if (!form || !form.title.trim() || submitting.current) return;
+    submitting.current = true;
+    try {
+      const saved = await booksApi.submitBook(editingId, form);
+      // If the save failed the dialog stays open, so what you typed is not lost.
+      if (saved) closeModal();
+    } finally {
+      submitting.current = false;
+    }
   };
 
   const modal = {

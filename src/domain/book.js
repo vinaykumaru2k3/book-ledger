@@ -28,22 +28,40 @@ function toStringList(value) {
 }
 
 /**
- * Keeps page progress and status consistent with each other:
+ * Keeps page progress and status consistent with each other.
+ *
+ * Without `previous` (loading stored data, importing, adding a new book) the
+ * rules infer the status from progress:
  *  - reaching the last page marks a book "done"
  *  - turning a "want" book's page counter above 0 marks it "reading"
- *  - "want" resets progress, "done" fills it
+ *
+ * With `previous` (the stored copy, when the user is *editing*) we can tell
+ * what the user changed, and an explicit choice always wins over inference:
+ *  - picking a status ("Want to read", "Reading", "Finished") sticks. Progress
+ *    is adjusted to fit it, never the other way round, so a finished book can
+ *    be set back to "Reading" (restarting at the beginning) and a book you are
+ *    reading can be set back to "Want to read".
+ *  - lowering the page of a *finished* book means you are reading it again.
+ *
+ * In every case "want" resets progress and "done" fills it.
  *
  * `stampAt` controls timestamps. Pass `Date.now()` when the user is *writing*
  * a change so that a status transition records startedAt / finishedAt. Leave
  * it undefined when merely *reading* stored data, so loading a book never
  * invents dates (which used to rewrite "finished" dates on every load).
  */
-export function reconcileBookStatus(book, stampAt) {
+export function reconcileBookStatus(book, stampAt, previous) {
   const pages = Math.max(0, toNumber(book.pages, 0));
   let currentPage = clamp(toNumber(book.currentPage, 0), 0, pages || 999999);
   let status = STATUSES[book.status] ? book.status : "want";
+  const statusChanged = Boolean(previous) && previous.status !== status;
 
-  if (pages > 0 && currentPage >= pages && status !== "done") {
+  if (statusChanged) {
+    // Explicit choice: keep it. Re-reading a finished book starts again from the top.
+    if (status === "reading" && previous.status === "done" && pages > 0 && currentPage >= pages) currentPage = 0;
+  } else if (previous?.status === "done" && status === "done" && pages > 0 && currentPage < pages && currentPage < toNumber(previous.currentPage, 0)) {
+    status = "reading"; // the page of a finished book was lowered
+  } else if (pages > 0 && currentPage >= pages && status !== "done") {
     status = "done";
   } else if (currentPage > 0 && currentPage < pages && status === "want") {
     status = "reading";
@@ -74,9 +92,10 @@ export function reconcileBookStatus(book, stampAt) {
 
 /**
  * Turns anything (a form, a Firestore doc, an imported JSON entry) into a
- * complete book. Pass `{ stamp: true }` when the user is saving a change.
+ * complete book. Pass `{ stamp: true }` when the user is saving a change, and
+ * `previous` (the stored copy) when editing, so explicit status choices are honoured.
  */
-export function normalizeBook(raw, { stamp = false } = {}) {
+export function normalizeBook(raw, { stamp = false, previous } = {}) {
   const now = Date.now();
   const book = {
     id: raw.id || uid(),
@@ -103,7 +122,17 @@ export function normalizeBook(raw, { stamp = false } = {}) {
     updatedAt: stamp ? now : raw.updatedAt || now,
   };
 
-  return reconcileBookStatus(book, stamp ? now : undefined);
+  return reconcileBookStatus(book, stamp ? now : undefined, previous);
+}
+
+/**
+ * The fields whose values differ between two versions of a book. Saving only
+ * these (instead of the whole book) keeps two quick edits to *different*
+ * fields from overwriting each other with stale copies.
+ */
+export function changedFields(before, after) {
+  const same = (a, b) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
+  return Object.fromEntries(Object.entries(after).filter(([key, value]) => !same(before[key], value)));
 }
 
 /* ------------------------- import / dedupe ------------------------- */
@@ -181,7 +210,7 @@ export function formFromBook(book) {
 
 /** Builds a book to save from the edit form, preserving fields the form lacks. */
 export function createBookFromForm(form, existing = null) {
-  return normalizeBook({ ...(existing || {}), ...form }, { stamp: true });
+  return normalizeBook({ ...(existing || {}), ...form }, { stamp: true, previous: existing || undefined });
 }
 
 /**

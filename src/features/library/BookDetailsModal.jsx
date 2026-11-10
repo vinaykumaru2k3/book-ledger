@@ -5,6 +5,7 @@ import Button from "../../shared/pk/Button";
 import Dialog from "../../shared/pk/Dialog";
 import RatingStars from "../../shared/pk/RatingStars";
 import { formFromBook } from "../../domain/book";
+import { findDuplicate } from "../../domain/library";
 import { useLanguage } from "../../shared/i18n/LanguageContext";
 import { useApp, useBooks, useModal, useUi } from "../../app/AppContext";
 import StatusChip from "./StatusChip";
@@ -52,9 +53,12 @@ function BookDetails({ book, onClose }) {
   const { quickAdd } = useModal();
   const { openEditBook } = useUi();
 
-  // Always show the library's current copy so edits appear immediately.
-  const live = books.find((item) => item.id === book.id) || book;
-  const inLibrary = books.some((item) => item.id === book.id);
+  // Always show the library's current copy so edits appear immediately. A book opened from
+  // Discover has a catalogue id, so once it is added the library copy is found by its source
+  // (or title and author); otherwise the dialog would keep offering to add it again.
+  const libraryCopy = books.find((item) => item.id === book.id) || findDuplicate(books, book);
+  const live = libraryCopy || book;
+  const inLibrary = Boolean(libraryCopy);
   const tint = useCoverTint(live);
   const { description, loading } = useBookDescription(live);
   const finished = useJustFinished(live.status);
