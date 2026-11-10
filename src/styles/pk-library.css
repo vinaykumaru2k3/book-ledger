@@ -419,30 +419,49 @@
 }
 
 /* ---- Shelf view: books standing spine-out ----------------------------------- */
+/* A lamp-lit walnut cabinet: dark back wall, shadow under each plank, lit plank edges. */
 .pk-shelfview {
   --row: 252px;
-  --plank: 16px;
+  --plank: 18px;
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
-  gap: 0 6px;
-  padding: 0 var(--pk-space-5);
-  background: repeating-linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent calc(var(--row) - var(--plank)),
-    #a4713f calc(var(--row) - var(--plank)),
-    #8a5a2b calc(var(--row) - var(--plank) + 4px),
-    #5e3b1a calc(var(--row) - 4px),
-    #3f2710 var(--row)
-  );
-  border-radius: var(--pk-radius-md);
+  gap: 0 4px;
+  padding: 0 var(--pk-space-6);
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.55) 0,
+      transparent 34px,
+      transparent calc(var(--row) - var(--plank) - 14px),
+      rgba(0, 0, 0, 0.35) calc(var(--row) - var(--plank)),
+      #c99560 calc(var(--row) - var(--plank)),
+      #a87440 calc(var(--row) - var(--plank) + 2px),
+      #8a5a2b calc(var(--row) - var(--plank) + 5px),
+      #6a4220 calc(var(--row) - 5px),
+      #2e1b0c var(--row)
+    ),
+    radial-gradient(90% 60% at 50% 0%, rgba(226, 176, 74, 0.2), transparent 70%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.015) 0 2px, transparent 2px 9px),
+    linear-gradient(180deg, #2f2017, #1d130d);
+  border-radius: var(--pk-radius-lg);
+  box-shadow: inset 0 0 0 10px #4a2f19, inset 0 0 0 11px rgba(255, 220, 160, 0.12), inset 0 0 60px rgba(0, 0, 0, 0.55),
+    var(--pk-shadow-2);
 }
 .pk-shelfslot {
   display: flex;
   align-items: flex-end;
   height: var(--row);
   padding-bottom: var(--plank);
+}
+/* A few books lean on their neighbours, as on a real shelf. */
+.pk-shelfslot:nth-child(7n + 3) .pk-spine {
+  rotate: -4deg;
+  margin-left: 6px;
+}
+.pk-shelfslot:nth-child(11n + 8) .pk-spine {
+  rotate: 3deg;
+  margin-right: 5px;
 }
 /* ---- Side panel ------------------------------------------------------------- */
 .pk-side {

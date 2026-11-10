@@ -47,7 +47,7 @@ those hooks and never create their own Firestore subscriptions.
 
 ### `shared/` – reusable building blocks
 - `shared/pk/` – **the new design system** (redesign, see `plan.md`): `Button`, `Card`, `Badge`, `Skeleton`, `Tabs`,
-  `Dialog` (focus trap, scroll lock, optional `labelledBy`), `Menu`, `RatingStars`, `BookSpine`, `Field`, `SearchBox`, `SelectBox`, `Segmented`, `Pagination`, `ProgressRibbon`, `BookCover`, `EmptyState`, `LanguageToggle`.
+  `Dialog` (focus trap, scroll lock, optional `labelledBy`), `Menu`, `RatingStars`, `BookSpine`, `MiniCover`, `GlyphField` (drifting-letter canvas; pauses off-screen), `Field`, `SearchBox`, `SelectBox`, `Segmented`, `Pagination`, `ProgressRibbon`, `BookCover`, `EmptyState`, `LanguageToggle`.
   They read only `--pk-*` tokens (`styles/design-tokens.css`). **Build new screens from these.** Browse them at `/dev/ui`.
 - `shared/i18n/` – English / Kannada text: `en.js` (source of truth), `kn.js` (draft, hidden in production until
   reviewed), `translate()` (pure), `useLanguage()` → `{ t, lang, setLang }`.
@@ -64,7 +64,7 @@ those hooks and never create their own Firestore subscriptions.
 | `insights` | `Analytics` composed of cards in `AnalyticsCards.jsx`; pure `analyticsModel.js` |
 | `galaxy` | `ConstellationGraph`, `GalaxyControls`, `NodeInspector`, `useForceSimulation`; pure `graph.js`, `graphSimulation.js` |
 | `auth` | `AuthScreen` (bar + `AuthCard`): sign in / register / **password reset**, Google, show-password; `useAuthController` (errors are translation keys via `authErrors.js`; sends a verification email on register; `needsVerification` drives the in-app `VerifyBanner`, which reminds but never locks anyone out) |
-| `landing` | `LandingPage`: hero with a shelf of sample books (`BookSpine`), four features, closing call to action; fully translated |
+| `landing` | `LandingPage`, a night-time "reading room": `GlyphField` canvas hero, CSS-3D `HeroBook` (opens, turns a page, tilts toward the pointer), `CoverMarquee`, bento tiles with live `FeatureDemos` (play only once scrolled into view via `useInView`), `ScrollStatement` (words light up on scroll), finale. Every animation has a still fallback under `prefers-reduced-motion`; decoration is `aria-hidden` |
 | `kannada` | `KannadaExplorerPage` (placeholder for the Kannada Explorer, plan.md track K; public, hidden until the Kannada UI is enabled) |
 
 **Pattern inside a feature:** a pure `*Model.js` (testable logic) → a `use*` hook (state/effects) → components (markup).

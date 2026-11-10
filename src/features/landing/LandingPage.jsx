@@ -1,33 +1,85 @@
-import React from "react";
-import { ArrowRight, BarChart3, Cloud, Search, ShieldCheck } from "lucide-react";
-import BookSpine from "../../shared/pk/BookSpine";
-import Button from "../../shared/pk/Button";
-import Card from "../../shared/pk/Card";
+import React, { useRef } from "react";
+import { ArrowDown, ArrowRight, BookOpen, Flame, Plus } from "lucide-react";
+import GlyphField from "../../shared/pk/GlyphField";
 import LanguageToggle from "../../shared/pk/LanguageToggle";
 import { useLanguage } from "../../shared/i18n/LanguageContext";
-
-// Decorative sample books for the hero shelf (not real data).
-const SAMPLE_SHELF = [
-  { id: "a", title: "ಕರ್ವಾಲೋ", author: "ಪೂರ್ಣಚಂದ್ರ ತೇಜಸ್ವಿ", pages: 200, status: "done", favorite: true },
-  { id: "b", title: "Dune", author: "Frank Herbert", pages: 412, status: "done" },
-  { id: "c", title: "ಸಂಸ್ಕಾರ", author: "ಯು. ಆರ್. ಅನಂತಮೂರ್ತಿ", pages: 150, status: "reading" },
-  { id: "d", title: "Emma", author: "Jane Austen", pages: 474, status: "reading" },
-  { id: "e", title: "The Hobbit", author: "J. R. R. Tolkien", pages: 310, status: "want" },
-  { id: "f", title: "ಮೂಕಜ್ಜಿಯ ಕನಸುಗಳು", author: "ಕೆ. ಶಿವರಾಮ ಕಾರಂತ", pages: 180, status: "want", favorite: true },
-  { id: "g", title: "1984", author: "George Orwell", pages: 328, status: "done" },
-  { id: "h", title: "Kim", author: "Rudyard Kipling", pages: 336, status: "want" },
-];
+import { useInView } from "../../shared/lib/motion";
+import CoverMarquee from "./CoverMarquee";
+import HeroBook from "./HeroBook";
+import ScrollStatement from "./ScrollStatement";
+import { InsightsDemo, SanctuaryDemo, SearchDemo, SyncDemo } from "./FeatureDemos";
 
 const FEATURES = [
-  { icon: Cloud, key: "f1" },
-  { icon: Search, key: "f2" },
-  { icon: BarChart3, key: "f3" },
-  { icon: ShieldCheck, key: "f4" },
+  { key: "f1", Demo: SyncDemo, size: "wide" },
+  { key: "f2", Demo: SearchDemo, size: "" },
+  { key: "f3", Demo: InsightsDemo, size: "" },
+  { key: "f4", Demo: SanctuaryDemo, size: "wide" },
 ];
 
-/** The public front page: a hero with a shelf of books, four reasons to join, and a call to action. */
+/** Follows the pointer with a soft light inside the tile. */
+const spotlight = (event) => {
+  const rect = event.currentTarget.getBoundingClientRect();
+  event.currentTarget.style.setProperty("--mx", `${event.clientX - rect.left}px`);
+  event.currentTarget.style.setProperty("--my", `${event.clientY - rect.top}px`);
+};
+
+function FeatureTile({ feature, index, t }) {
+  const ref = useRef(null);
+  const live = useInView(ref);
+  const { key, Demo, size } = feature;
+  return (
+    <li
+      ref={ref}
+      className={`pk-tile3 ${size ? `pk-tile3--${size}` : ""} ${live ? "is-live" : ""}`}
+      style={{ "--i": index }}
+      onPointerMove={spotlight}
+    >
+      <div className="pk-tile3__demo">
+        <Demo live={live} t={t} />
+      </div>
+      <div className="pk-tile3__text">
+        <h3>{t(`landing.${key}.title`)}</h3>
+        <p>{t(`landing.${key}.body`)}</p>
+      </div>
+    </li>
+  );
+}
+
+function Reveal({ as: Tag = "div", className = "", children, ...rest }) {
+  const ref = useRef(null);
+  const shown = useInView(ref);
+  return (
+    <Tag ref={ref} className={`pk-reveal ${shown ? "is-shown" : ""} ${className}`} {...rest}>
+      {children}
+    </Tag>
+  );
+}
+
+/**
+ * The public front page, set in a lamp-lit reading room at night:
+ * drifting letters, a 3D book that opens itself, covers sliding past,
+ * feature tiles with live demos, and a statement that lights up as you scroll.
+ */
 function LandingPage({ onEnter }) {
   const { t } = useLanguage();
+
+  const chips = [
+    <>
+      <BookOpen size={14} />
+      <span>
+        <b lang="kn">ಕರ್ವಾಲೋ</b>
+        <i className="pk-chip__bar" style={{ "--p": "64%" }} />
+      </span>
+    </>,
+    <>
+      <Flame size={14} />
+      <span>{t("landing.demo.streak", { days: 12 })}</span>
+    </>,
+    <>
+      <Plus size={14} />
+      <span>{t("landing.demo.added", { title: "Dune" })}</span>
+    </>,
+  ];
 
   return (
     <div className="pk-landing">
@@ -37,69 +89,75 @@ function LandingPage({ onEnter }) {
 
       <header className="pk-landing__bar">
         <span className="pk-landing__brand" aria-label={t("landing.nav")}>
-          <img src="/stack-of-books.png" alt="" width="36" height="36" />
+          <img src="/stack-of-books.png" alt="" width="32" height="32" />
           <span>Pustaka</span>
         </span>
         <div className="pk-landing__barActions">
           <LanguageToggle />
-          <Button onClick={onEnter}>{t("action.signIn")}</Button>
+          <button type="button" className="pk-glassbtn" onClick={onEnter}>
+            {t("action.signIn")}
+          </button>
         </div>
       </header>
 
       <main id="main" tabIndex={-1}>
         <section className="pk-hero">
-          <div className="pk-hero__text">
-            <p className="pk-kicker">{t("landing.kicker")}</p>
-            <h1 className="pk-hero__title">
-              {t("landing.titleA")}
-              <br />
-              <em>{t("landing.titleB")}</em>
-            </h1>
-            <p className="pk-hero__sub">{t("landing.sub")}</p>
-            <Button variant="primary" size="lg" onClick={onEnter}>
-              {t("landing.cta")}
-              <ArrowRight size={18} aria-hidden="true" />
-            </Button>
-          </div>
-
-          <div className="pk-heroshelf" role="img" aria-label={t("landing.shelfLabel")}>
-            <div className="pk-heroshelf__books">
-              {SAMPLE_SHELF.map((book) => (
-                <BookSpine key={book.id} book={book} />
-              ))}
+          <GlyphField className="pk-hero__field" />
+          <div className="pk-hero__lamp" aria-hidden="true" />
+          <div className="pk-hero__inner">
+            <div className="pk-hero__text">
+              <p className="pk-hero__kicker">
+                <span className="pk-hero__pulse" aria-hidden="true" />
+                {t("landing.kicker")}
+              </p>
+              <h1 className="pk-hero__title">
+                <span className="pk-hero__line">{t("landing.titleA")}</span>{" "}
+                <em className="pk-hero__line pk-hero__line--gold">{t("landing.titleB")}</em>
+              </h1>
+              <p className="pk-hero__sub">{t("landing.sub")}</p>
+              <div className="pk-hero__actions">
+                <button type="button" className="pk-glowbtn" onClick={onEnter}>
+                  <span>{t("landing.cta")}</span>
+                  <ArrowRight size={18} aria-hidden="true" />
+                </button>
+                <a className="pk-hero__explore" href="#features">
+                  {t("landing.explore")}
+                  <ArrowDown size={16} aria-hidden="true" />
+                </a>
+              </div>
             </div>
-            <div className="pk-heroshelf__plank" />
+            <HeroBook label={t("landing.bookLabel")} chips={chips} />
           </div>
+          <div className="pk-hero__fade" aria-hidden="true" />
         </section>
 
-        <section className="pk-features" aria-labelledby="features-title">
-          <h2 id="features-title" className="pk-features__title">
+        <CoverMarquee />
+
+        <section id="features" className="pk-bento" aria-labelledby="features-title">
+          <Reveal as="h2" id="features-title" className="pk-bento__title">
             {t("landing.featuresTitle")}
-          </h2>
-          <ul className="pk-features__grid">
-            {FEATURES.map(({ icon: Icon, key }) => (
-              <li key={key}>
-                <Card className="pk-feature">
-                  <span className="pk-feature__icon" aria-hidden="true">
-                    <Icon size={22} />
-                  </span>
-                  <h3>{t(`landing.${key}.title`)}</h3>
-                  <p>{t(`landing.${key}.body`)}</p>
-                </Card>
-              </li>
+          </Reveal>
+          <ul className="pk-bento__grid">
+            {FEATURES.map((feature, index) => (
+              <FeatureTile key={feature.key} feature={feature} index={index} t={t} />
             ))}
           </ul>
         </section>
 
-        <section className="pk-band">
-          <div>
+        <section className="pk-statementwrap">
+          <ScrollStatement text={t("landing.statement")} />
+        </section>
+
+        <section className="pk-finale">
+          <div className="pk-finale__orb" aria-hidden="true" />
+          <Reveal className="pk-finale__inner">
             <h2>{t("landing.band.title")}</h2>
             <p>{t("landing.band.body")}</p>
-          </div>
-          <Button variant="primary" size="lg" onClick={onEnter}>
-            {t("landing.band.cta")}
-            <ArrowRight size={18} aria-hidden="true" />
-          </Button>
+            <button type="button" className="pk-glowbtn" onClick={onEnter}>
+              <span>{t("landing.band.cta")}</span>
+              <ArrowRight size={18} aria-hidden="true" />
+            </button>
+          </Reveal>
         </section>
       </main>
 

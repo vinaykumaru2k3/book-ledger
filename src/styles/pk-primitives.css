@@ -490,64 +490,91 @@ textarea.pk-field__control {
   --cover-a: #1e293b;
   --cover-b: #f59e0b;
   --cover-c: #f8fafc;
+  --foil: color-mix(in srgb, var(--cover-b) 45%, #e9c46f);
   position: relative;
   flex: none;
   width: var(--spine-w);
   height: var(--spine-h);
   display: grid;
   justify-items: center;
+  align-items: center;
   padding: 0;
   border: 0;
-  border-top: 7px solid var(--cover-b);
-  border-radius: 3px 3px 1px 1px;
-  background: linear-gradient(90deg, rgba(0, 0, 0, 0.3), rgba(255, 255, 255, 0.16) 16%, transparent 38%, rgba(0, 0, 0, 0.22)),
-    linear-gradient(180deg, var(--cover-a), color-mix(in srgb, var(--cover-a) 72%, var(--cover-b)));
-  color: var(--cover-c);
-  box-shadow: 1px 0 3px rgba(0, 0, 0, 0.35);
+  border-radius: 3px 3px 2px 2px;
+  /* Layers: rounded-spine light, gold bands top and bottom, fine cloth weave, base colour. */
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.12) 9%, rgba(255, 255, 255, 0.24) 24%,
+      rgba(255, 255, 255, 0.06) 42%, rgba(0, 0, 0, 0.1) 72%, rgba(0, 0, 0, 0.5) 100%),
+    linear-gradient(to bottom, transparent 12px, var(--foil) 12px 14px, transparent 14px 17px, var(--foil) 17px 18px, transparent 18px)
+      top / 100% 20px no-repeat,
+    linear-gradient(to top, transparent 12px, var(--foil) 12px 14px, transparent 14px 17px, var(--foil) 17px 18px, transparent 18px)
+      bottom / 100% 20px no-repeat,
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 3px),
+    linear-gradient(180deg, color-mix(in srgb, var(--cover-a) 88%, white), var(--cover-a) 30%,
+      color-mix(in srgb, var(--cover-a) 75%, var(--cover-b)));
+  color: color-mix(in srgb, var(--cover-c) 55%, #f3d48a);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.12), inset 0 -2px 0 rgba(0, 0, 0, 0.3), 2px 0 3px rgba(0, 0, 0, 0.4),
+    0 10px 12px -8px rgba(0, 0, 0, 0.7);
   cursor: pointer;
   transform-origin: bottom center;
-  transition: transform var(--pk-duration-2) var(--pk-ease);
+  transition: transform var(--pk-duration-3) var(--pk-ease), box-shadow var(--pk-duration-3) var(--pk-ease),
+    filter var(--pk-duration-3) var(--pk-ease);
 }
 .pk-spine:hover,
 .pk-spine:focus-visible {
-  transform: translateY(-14px) rotate(-2deg);
+  transform: translateY(-16px) rotate(-3deg);
+  filter: brightness(1.12);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.12), 2px 0 3px rgba(0, 0, 0, 0.4), 0 22px 26px -10px rgba(0, 0, 0, 0.6),
+    0 0 22px rgba(226, 176, 74, 0.35);
 }
 .pk-spine__title {
   display: block;
-  max-height: calc(var(--spine-h) - 40px);
-  margin: var(--pk-space-3) 0;
+  max-height: calc(var(--spine-h) - 52px);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   writing-mode: vertical-rl;
   transform: rotate(180deg);
-  font: 600 0.78rem / 1.2 var(--pk-font-display);
+  font: 600 0.76rem / 1.2 var(--pk-font-display);
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.55), 0 -1px 0 rgba(255, 255, 255, 0.08);
 }
+.pk-spine__title:lang(kn) {
+  font-family: "Noto Serif Kannada", var(--pk-font-display);
+}
+/* Status: a ribbon bookmark peeks out of the top while you read; a gold seal once finished. */
 .pk-spine::after {
   content: "";
   position: absolute;
-  bottom: 8px;
-  left: 50%;
-  width: 6px;
-  height: 6px;
-  margin-left: -3px;
-  border-radius: 50%;
-  background: transparent;
+  pointer-events: none;
 }
 .pk-spine--reading::after {
-  background: #fff;
+  top: -9px;
+  right: 22%;
+  width: 6px;
+  height: 22px;
+  background: linear-gradient(90deg, #7d1824, #b52a3c 50%, #7d1824);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.2);
 }
 .pk-spine--done::after {
-  background: #86efac;
+  bottom: 24px;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff3c4, var(--foil) 60%);
+  box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.25), 0 0 6px rgba(243, 212, 138, 0.6);
 }
 .pk-spine__fav {
   position: absolute;
-  top: 6px;
+  top: 24px;
   left: 50%;
-  width: 8px;
-  height: 8px;
-  margin-left: -4px;
-  background: #fde68a;
+  width: 9px;
+  height: 9px;
+  margin-left: -4.5px;
+  background: linear-gradient(135deg, #fff3c4, var(--foil));
   clip-path: polygon(50% 0, 62% 36%, 100% 38%, 70% 60%, 80% 100%, 50% 76%, 20% 100%, 30% 60%, 0 38%, 38% 36%);
 }
 

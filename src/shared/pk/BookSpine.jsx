@@ -19,7 +19,9 @@ function BookSpine({ book, onOpen, label, scale = 1 }) {
   const className = `pk-spine pk-spine--${book.status}`;
   const content = (
     <>
-      <span className="pk-spine__title">{book.title}</span>
+      <span className="pk-spine__title" lang={/[ಀ-೿]/.test(book.title || "") ? "kn" : undefined}>
+        {book.title}
+      </span>
       {book.favorite && <span className="pk-spine__fav" aria-hidden="true" />}
     </>
   );

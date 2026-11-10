@@ -41,17 +41,29 @@
   display: flex;
   align-items: flex-end;
   gap: 3px;
-  height: 138px;
-  padding: var(--pk-space-4) var(--pk-space-4) 0;
+  height: 148px;
+  padding: var(--pk-space-5) var(--pk-space-4) 0;
   overflow: hidden;
+  background: radial-gradient(80% 70% at 50% 0%, rgba(226, 176, 74, 0.22), transparent 70%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.5), transparent 26px), linear-gradient(180deg, #2f2017, #1d130d);
 }
 .pk-shelfcard .pk-spine {
   pointer-events: none;
-  border-top-width: 5px;
+  background-size: auto, 100% 14px, 100% 14px, auto, auto;
+}
+.pk-shelfcard .pk-spine:nth-child(4) {
+  rotate: -5deg;
+  margin-left: 4px;
 }
 .pk-shelfcard .pk-spine__title {
   font-size: 0.6rem;
-  margin: var(--pk-space-2) 0;
+  max-height: calc(var(--spine-h) - 36px);
+}
+.pk-shelfcard .pk-spine__fav {
+  top: 16px;
+}
+.pk-shelfcard .pk-spine--done::after {
+  bottom: 16px;
 }
 .pk-shelfcard:hover .pk-spine,
 .pk-shelfcard:focus-visible .pk-spine {
@@ -66,8 +78,9 @@
 
 /* The wooden plank under them. */
 .pk-shelfcard__plank {
-  height: 12px;
-  background: linear-gradient(to bottom, #a4713f, #8a5a2b 35%, #5e3b1a 80%, #3f2710);
+  height: 14px;
+  background: linear-gradient(to bottom, #c99560, #a87440 15%, #8a5a2b 40%, #6a4220 80%, #2e1b0c);
+  box-shadow: 0 6px 12px -4px rgba(0, 0, 0, 0.35);
 }
 .pk-shelfcard__info {
   display: flex;

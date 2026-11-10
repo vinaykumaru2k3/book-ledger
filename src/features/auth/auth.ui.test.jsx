@@ -110,7 +110,7 @@ describe("LandingPage", () => {
     const onEnter = vi.fn();
     wrap(<LandingPage onEnter={onEnter} />);
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
-    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Your personal library,thoughtfully cataloged.");
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Every book you read becomes a star.");
     expect(screen.getAllByRole("heading", { level: 3 })).toHaveLength(4);
 
     fireEvent.click(screen.getByRole("button", { name: /Enter the Reading Room/ }));
@@ -119,11 +119,23 @@ describe("LandingPage", () => {
     expect(onEnter).toHaveBeenCalledTimes(3);
   });
 
-  it("describes the sample shelf to assistive tech instead of reading every spine", () => {
+  it("describes the 3D book as one image and hides the decorative scenery", () => {
+    const { container } = wrap(<LandingPage onEnter={() => {}} />);
+    expect(screen.getByRole("img", { name: "An open leather-bound book with a page turning" })).toBeTruthy();
+    expect(container.querySelector(".pk-marquee").getAttribute("aria-hidden")).toBe("true");
+    expect(container.querySelector(".pk-glyphfield").getAttribute("aria-hidden")).toBe("true");
+    container.querySelectorAll(".pk-demo").forEach((demo) => expect(demo.getAttribute("aria-hidden")).toBe("true"));
+  });
+
+  it("gives screen readers the scroll-lit statement as one sentence", () => {
     wrap(<LandingPage onEnter={() => {}} />);
-    const shelf = screen.getByRole("img", { name: "A shelf of sample books" });
-    expect(shelf).toBeTruthy();
-    expect(shelf.querySelectorAll(".pk-spine")).toHaveLength(8);
+    expect(screen.getByText(/Every book you finish becomes a star\. Over the years/)).toBeTruthy();
+  });
+
+  it("links to the features from the hero", () => {
+    wrap(<LandingPage onEnter={() => {}} />);
+    expect(screen.getByRole("link", { name: /See what's inside/ }).getAttribute("href")).toBe("#features");
+    expect(document.getElementById("features")).toBeTruthy();
   });
 
   it("has a skip link and a current-year footer", () => {
