@@ -161,3 +161,14 @@ export function shelvesOf(books) {
   books.forEach((book) => (book.shelves || []).forEach((s) => names.add(s)));
   return Array.from(names).sort();
 }
+
+/** Books finished in `year`, grouped by month (12 arrays, January first). */
+export function finishedByMonth(books, year = new Date().getFullYear()) {
+  const months = Array.from({ length: 12 }, () => []);
+  books.forEach((book) => {
+    if (book.status !== "done" || !book.finishedAt) return;
+    const date = new Date(book.finishedAt);
+    if (date.getFullYear() === year) months[date.getMonth()].push(book);
+  });
+  return months;
+}

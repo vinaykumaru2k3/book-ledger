@@ -31,7 +31,7 @@
 /* ---- Layout ------------------------------------------------------------ */
 .pk-shell {
   display: grid;
-  grid-template-columns: 96px minmax(0, 1fr);
+  grid-template-columns: auto minmax(0, 1fr);
   min-height: 100vh;
   background: var(--pk-bg);
   color: var(--pk-ink);
@@ -45,21 +45,414 @@
   padding: 0 clamp(16px, 3vw, 40px) var(--pk-space-8);
 }
 
-/* ---- Desktop rail ------------------------------------------------------ */
+/* ---- Desktop sidebar: "the night shelf" ---------------------------------
+ * A dark, faintly starry panel beside the paper-coloured pages, carrying the
+ * landing page's night sky into the app. Expanded 264px, collapsed 80px.
+ */
 .pk-rail {
+  --rail-cream: #efe9de;
+  --rail-cream-2: rgba(239, 233, 222, 0.72);
+  --rail-cream-3: rgba(239, 233, 222, 0.48);
+  --rail-line: rgba(239, 233, 222, 0.08);
+  --rail-hover: rgba(239, 233, 222, 0.05);
+  --rail-gold: #ecc77a;
   position: sticky;
   top: 0;
+  z-index: var(--pk-z-nav);
+  display: flex;
+  flex-direction: column;
+  width: 264px;
   height: 100vh;
+  background:
+    radial-gradient(1px 1px at 18% 12%, rgba(239, 233, 222, 0.55), transparent),
+    radial-gradient(1px 1px at 72% 22%, rgba(239, 233, 222, 0.4), transparent),
+    radial-gradient(1.4px 1.4px at 44% 38%, rgba(236, 199, 122, 0.5), transparent),
+    radial-gradient(1px 1px at 86% 54%, rgba(239, 233, 222, 0.35), transparent),
+    radial-gradient(1px 1px at 12% 66%, rgba(239, 233, 222, 0.4), transparent),
+    radial-gradient(1.2px 1.2px at 62% 78%, rgba(239, 233, 222, 0.45), transparent),
+    radial-gradient(1px 1px at 30% 90%, rgba(236, 199, 122, 0.4), transparent),
+    radial-gradient(80% 40% at 50% 0%, rgba(64, 84, 150, 0.22), transparent 70%),
+    linear-gradient(180deg, #0f1526, #0c0f17 55%, #0b0d12);
+  color: var(--rail-cream);
+  border-right: 1px solid rgba(0, 0, 0, 0.4);
+  transition: width 260ms var(--pk-ease);
+}
+.pk-rail--collapsed {
+  width: 80px;
+}
+.pk-rail a:focus-visible,
+.pk-rail button:focus-visible {
+  outline: 2px solid var(--rail-gold);
+  outline-offset: 2px;
+}
+/* Text that hides (but stays readable to assistive tech) when collapsed. */
+.pk-rail--collapsed .pk-rail__text {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+/* Brand and collapse toggle. */
+.pk-rail__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--pk-space-2);
+  padding: 18px 12px 10px 20px;
+}
+.pk-rail--collapsed .pk-rail__head {
+  flex-direction: column;
+  padding: 18px 0 6px;
+}
+.pk-rail__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  color: var(--rail-cream);
+  text-decoration: none;
+  font: 600 1.25rem var(--pk-font-display);
+}
+.pk-rail__toggle {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--rail-cream-3);
+  cursor: pointer;
+  transition: background-color 160ms var(--pk-ease), color 160ms var(--pk-ease);
+}
+.pk-rail__toggle:hover {
+  background: var(--rail-hover);
+  color: var(--rail-cream);
+}
+
+.pk-rail__scroll {
+  flex: 1;
+  min-height: 0;
+  padding: 0 12px 12px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(239, 233, 222, 0.15) transparent;
+}
+
+/* Navigation groups. */
+.pk-rail__nav {
+  position: relative;
+}
+.pk-rail__label {
+  margin: 18px 12px 6px;
+  color: var(--rail-cream-3);
+  font: 600 0.66rem var(--pk-font-ui);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.pk-rail--collapsed .pk-rail__group + .pk-rail__group {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--rail-line);
+}
+.pk-rail__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pk-rail__link {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+  padding: 0 10px 0 30px;
+  border-radius: 12px;
+  color: var(--rail-cream-2);
+  text-decoration: none;
+  font: 500 0.9rem var(--pk-font-ui);
+  transition: color 160ms var(--pk-ease), background-color 160ms var(--pk-ease);
+}
+.pk-rail__link:hover {
+  background: var(--rail-hover);
+  color: var(--rail-cream);
+}
+.pk-rail__link--active,
+.pk-rail__link--active:hover {
+  background: transparent;
+  color: #fff;
+}
+.pk-rail__link--active svg {
+  color: var(--rail-gold);
+}
+.pk-rail--collapsed .pk-rail__link {
+  justify-content: center;
+  width: 52px;
+  min-height: 46px;
+  margin: 0 auto;
+  padding: 0;
+}
+.pk-rail__linkText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pk-rail__count {
+  padding: 1px 8px;
+  border-radius: var(--pk-radius-pill);
+  background: rgba(239, 233, 222, 0.07);
+  color: var(--rail-cream-3);
+  font: 600 0.72rem var(--pk-font-ui);
+  font-variant-numeric: tabular-nums;
+}
+/* The highlight that glides to the current page, with its gold star. */
+.pk-rail__marker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-radius: 12px;
+  background: rgba(239, 233, 222, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(239, 233, 222, 0.07);
+  pointer-events: none;
+  transition: transform 320ms cubic-bezier(0.3, 0.8, 0.3, 1), height 320ms var(--pk-ease);
+}
+.pk-rail--collapsed .pk-rail__marker {
+  left: 2px;
+  right: 2px;
+}
+.pk-rail__markerStar {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  width: 11px;
+  height: 11px;
+  margin-top: -5.5px;
+  fill: var(--rail-gold);
+  animation: pk-rail-twinkle 3.2s ease-in-out infinite;
+}
+.pk-rail--collapsed .pk-rail__markerStar {
+  top: 7px;
+  left: 6px;
+  width: 8px;
+  height: 8px;
+  margin-top: 0;
+}
+@keyframes pk-rail-twinkle {
+  50% {
+    opacity: 0.55;
+    transform: scale(0.8);
+  }
+}
+
+/* Reading now. */
+.pk-rail__section {
+  margin-top: 14px;
+}
+.pk-rail__reading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pk-rail__book {
+  display: grid;
+  grid-template-columns: 7px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 10px 8px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--rail-cream);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 160ms var(--pk-ease);
+}
+.pk-rail__book:hover {
+  background: var(--rail-hover);
+}
+.pk-rail__spine {
+  width: 7px;
+  height: 30px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--cover-b), var(--cover-a));
+  box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.3);
+}
+.pk-rail__bookText {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.pk-rail__bookTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 600 0.84rem / 1.2 var(--pk-font-display);
+}
+.pk-rail__progress {
+  position: relative;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: rgba(239, 233, 222, 0.1);
+}
+.pk-rail__progress i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 2px;
+  background: var(--rail-gold);
+}
+.pk-rail__percent {
+  color: var(--rail-cream-3);
+  font: 600 0.7rem var(--pk-font-ui);
+  font-variant-numeric: tabular-nums;
+}
+.pk-rail__empty {
+  margin: 0 12px;
+  color: var(--rail-cream-3);
+  font: italic 400 0.82rem / 1.5 var(--pk-font-display);
+}
+
+/* This year in stars: finished books as stars, one column per month. */
+.pk-rail__year {
+  display: block;
+  margin-top: 18px;
+  padding: 2px 12px 12px;
+  border: 1px solid var(--rail-line);
+  border-radius: 14px;
+  background: rgba(239, 233, 222, 0.02);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 160ms var(--pk-ease), background-color 160ms var(--pk-ease);
+}
+.pk-rail__year:hover {
+  border-color: rgba(239, 233, 222, 0.18);
+  background: rgba(239, 233, 222, 0.04);
+}
+.pk-rail__year .pk-rail__label {
+  display: block;
+  margin: 12px 0 10px;
+}
+.pk-rail__months {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 2px;
+}
+.pk-rail__month {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--pk-space-4);
-  padding: var(--pk-space-4) 0;
-  background: var(--pk-surface);
-  border-right: 1px solid var(--pk-line);
-  z-index: var(--pk-z-nav);
+  gap: 5px;
 }
-.pk-rail a:focus-visible,
+.pk-rail__monthStars {
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 3px;
+  height: 40px;
+}
+.pk-rail__month:nth-child(odd) .pk-rail__monthStars {
+  padding-bottom: 3px;
+}
+.pk-rail__dot {
+  width: 9px;
+  height: 9px;
+  fill: var(--rail-gold);
+}
+.pk-rail__monthLetter {
+  color: var(--rail-cream-3);
+  font: italic 600 0.62rem var(--pk-font-display);
+}
+.pk-rail__yearCount {
+  display: block;
+  margin-top: 10px;
+  color: var(--rail-cream-2);
+  font: 500 0.76rem var(--pk-font-ui);
+}
+
+/* Account. */
+.pk-rail__foot {
+  padding: 10px 12px 14px;
+  border-top: 1px solid var(--rail-line);
+}
+.pk-rail--collapsed .pk-rail__foot {
+  display: flex;
+  justify-content: center;
+}
+.pk-rail .pk-avatar-btn.pk-account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  height: auto;
+  padding: 8px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--rail-cream);
+  text-align: left;
+  cursor: pointer;
+}
+.pk-rail .pk-avatar-btn.pk-account:hover {
+  background: var(--rail-hover);
+}
+.pk-rail .pk-avatar {
+  flex: none;
+  background: rgba(236, 199, 122, 0.16);
+  color: var(--rail-gold);
+}
+.pk-account__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+.pk-account__name,
+.pk-account__email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pk-account__name {
+  font: 600 0.86rem var(--pk-font-ui);
+}
+.pk-account__email {
+  color: var(--rail-cream-3);
+  font: 400 0.74rem var(--pk-font-ui);
+}
+.pk-account__chev {
+  flex: none;
+  color: var(--rail-cream-3);
+}
+.pk-rail .pk-menu {
+  width: 100%;
+}
+.pk-rail--collapsed .pk-menu {
+  width: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pk-rail,
+  .pk-rail__marker {
+    transition: none;
+  }
+}
+
 .pk-tabbar a:focus-visible,
 .pk-tab-link:focus-visible,
 .pk-tabbar__add:focus-visible,
@@ -70,54 +463,6 @@
 .pk-public a:focus-visible {
   outline: 3px solid var(--pk-focus);
   outline-offset: 2px;
-}
-.pk-rail__brand {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--pk-space-1);
-  color: var(--pk-ink);
-  text-decoration: none;
-  font: 600 var(--pk-text-sm) / 1 var(--pk-font-display);
-}
-.pk-rail__list {
-  flex: 1;
-  width: 100%;
-  margin: 0;
-  padding: 0 var(--pk-space-2);
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: var(--pk-space-1);
-  overflow-y: auto;
-}
-.pk-rail__link {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: var(--pk-space-3) var(--pk-space-1);
-  border-radius: var(--pk-radius-md);
-  color: var(--pk-ink-2);
-  text-decoration: none;
-  text-align: center;
-  font: 600 0.6875rem / 1.25 var(--pk-font-ui);
-  overflow-wrap: break-word;
-  transition: background-color var(--pk-duration-1) var(--pk-ease), color var(--pk-duration-1) var(--pk-ease);
-}
-.pk-rail__link:hover {
-  background: var(--pk-surface-sunken);
-  color: var(--pk-ink);
-}
-.pk-rail__link--active {
-  background: var(--pk-accent-soft);
-  color: var(--pk-accent);
-}
-.pk-rail__foot {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--pk-space-3);
 }
 
 /* ---- Menu (account) ---------------------------------------------------- */

@@ -73,7 +73,7 @@ those hooks and never create their own Firestore subscriptions.
 - `App.jsx` – the gate: loading → public page → landing → sign-in → workspace. Owns the route (`usePathRoute`).
 - `Workspace.jsx` – signed-in layout: `NavRail` (desktop) / `TabBar` (phone) + `PageHeader` + the page for the
   route + command palette + global dialogs. Pages fade in on every navigation.
-- `shell/` – `NavRail`, `TabBar` (+ "More" sheet), `AccountMenu`, `CommandPalette`, `PublicShell`, `NavLink`
+- `shell/` – `NavRail` (the dark desktop sidebar: grouped links with a gliding active marker, reading-now list, this year's finished books as stars by month via `finishedByMonth`, account row; collapses to an icon rail, remembered in localStorage), `TabBar` (+ "More" sheet), `AccountMenu`, `CommandPalette`, `PublicShell`, `NavLink`
   (a real `<a href>` so middle-click and "open in new tab" work), `useCommandHotkey` (`/` and Ctrl/Cmd+K).
 - `views.js` – **registry of pages** (lazy component, `public`/`bare`/`fullBleed` flags). Headings come from the
   dictionary under `view.<id>.kicker|title`.
