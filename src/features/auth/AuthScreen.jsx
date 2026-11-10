@@ -8,9 +8,9 @@ import AuthCard from "./AuthCard";
 
 const LINES = ["auth.line1", "auth.line2", "auth.line3"];
 const STACK = [
-  ["Middlemarch", "George Eliot"],
-  ["Dune", "Frank Herbert"],
-  ["Persuasion", "Jane Austen"],
+  ["ಕರ್ವಾಲೋ", "ಪೂರ್ಣಚಂದ್ರ ತೇಜಸ್ವಿ"],
+  ["Cien años de soledad", "Gabriel García Márquez"],
+  ["ノルウェイの森", "村上春樹"],
 ];
 
 /**

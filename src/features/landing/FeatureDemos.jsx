@@ -34,9 +34,9 @@ export function SyncDemo({ t }) {
   );
 }
 
-const QUERY = "hobbit";
+const QUERY = "karvalo";
 
-/** Types a title and finds the book. */
+/** Types a title in Latin letters and finds the book in its own script, plus its translation. */
 export function SearchDemo({ live, t }) {
   const [typed, setTyped] = useState(prefersReducedMotion() ? QUERY.length : 0);
 
@@ -65,15 +65,15 @@ export function SearchDemo({ live, t }) {
         <div className="pk-demo__result">
           <span className="pk-demo__thumb" />
           <span>
-            <strong>The Hobbit</strong>
-            <small>J. R. R. Tolkien · 1937</small>
+            <strong lang="kn">ಕರ್ವಾಲೋ</strong>
+            <small lang="kn">ಪೂರ್ಣಚಂದ್ರ ತೇಜಸ್ವಿ · 1980</small>
           </span>
         </div>
         <div className="pk-demo__result pk-demo__result--dim">
           <span className="pk-demo__thumb pk-demo__thumb--b" />
           <span>
-            <strong>The Hobbit: Illustrated Edition</strong>
-            <small>J. R. R. Tolkien · 2013</small>
+            <strong>Carvalho</strong>
+            <small>English translation</small>
           </span>
         </div>
       </div>

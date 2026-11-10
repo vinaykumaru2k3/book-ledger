@@ -259,4 +259,4 @@ Classical anchors (Pampa, Ranna…) · movement timeline view (your P2) · audio
 
 ## Decision log
 
-- **2026-11-10:** The Kannada UI language switch was removed at the owner's request; the app is English only (`en.js`). The Kannada Explorer placeholder stays, visible only in development builds (`KANNADA_EXPLORER_ENABLED`), until track K is picked up again.
+- **2026-11-10:** The Kannada UI translation (language switch) was removed at the owner's request; the interface is English only (`en.js`). Books themselves can be in any language; that is core to the product. The Kannada Explorer placeholder stays, visible only in development builds (`KANNADA_EXPLORER_ENABLED`), until track K is picked up again.

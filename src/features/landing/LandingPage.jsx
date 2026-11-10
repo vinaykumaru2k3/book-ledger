@@ -58,7 +58,7 @@ function LandingPage({ onEnter }) {
     <>
       <BookOpen size={14} />
       <span>
-        <b>Middlemarch</b>
+        <b lang="kn">ಕರ್ವಾಲೋ</b>
         <i className="pk-chip__bar" style={{ "--p": "64%" }} />
       </span>
     </>,
@@ -68,7 +68,7 @@ function LandingPage({ onEnter }) {
     </>,
     <>
       <Plus size={14} />
-      <span>{t("landing.demo.added", { title: "Dune" })}</span>
+      <span>{t("landing.demo.added", { title: "ノルウェイの森" })}</span>
     </>,
   ];
 

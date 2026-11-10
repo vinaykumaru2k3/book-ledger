@@ -1,26 +1,26 @@
 import React from "react";
 import MiniCover from "../../shared/pk/MiniCover";
 
-// Sample covers (decorative only).
+// Sample covers (decorative only): books from many languages, as a real library would hold.
 const ROW_A = [
+  ["ಕರ್ವಾಲೋ", "ಪೂರ್ಣಚಂದ್ರ ತೇಜಸ್ವಿ"],
   ["Middlemarch", "George Eliot"],
-  ["Dune", "Frank Herbert"],
-  ["Beloved", "Toni Morrison"],
-  ["Emma", "Jane Austen"],
-  ["The Hobbit", "J. R. R. Tolkien"],
-  ["Things Fall Apart", "Chinua Achebe"],
-  ["Jane Eyre", "Charlotte Brontë"],
-  ["The Overstory", "Richard Powers"],
+  ["Cien años de soledad", "Gabriel García Márquez"],
+  ["गोदान", "प्रेमचंद"],
+  ["ノルウェイの森", "村上春樹"],
+  ["ಮಲೆಗಳಲ್ಲಿ ಮದುಮಗಳು", "ಕುವೆಂಪು"],
+  ["L'Étranger", "Albert Camus"],
+  ["পথের পাঁচালী", "বিভূতিভূষণ বন্দ্যোপাধ্যায়"],
 ];
 const ROW_B = [
-  ["1984", "George Orwell"],
-  ["Persuasion", "Jane Austen"],
-  ["Kim", "Rudyard Kipling"],
-  ["Frankenstein", "Mary Shelley"],
-  ["Moby-Dick", "Herman Melville"],
-  ["The Remains of the Day", "Kazuo Ishiguro"],
-  ["Rebecca", "Daphne du Maurier"],
-  ["Little Women", "Louisa May Alcott"],
+  ["Анна Каренина", "Лев Толстой"],
+  ["பொன்னியின் செல்வன்", "கல்கி"],
+  ["Dune", "Frank Herbert"],
+  ["ಸಂಸ್ಕಾರ", "ಯು. ಆರ್. ಅನಂತಮೂರ್ತಿ"],
+  ["Der Process", "Franz Kafka"],
+  ["红楼梦", "曹雪芹"],
+  ["Things Fall Apart", "Chinua Achebe"],
+  ["ಪರ್ವ", "ಎಸ್. ಎಲ್. ಭೈರಪ್ಪ"],
 ];
 
 function Row({ books, reverse }) {

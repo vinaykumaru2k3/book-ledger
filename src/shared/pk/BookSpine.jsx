@@ -1,5 +1,6 @@
 import React from "react";
 import { getCoverStyle } from "../lib/cover";
+import { langOf } from "../lib/script";
 
 // A spine's size follows the book: thicker for more pages, within sensible limits.
 export const spineHeight = (pages) => 150 + (Math.min(Math.max(pages || 0, 0), 700) / 700) * 56;
@@ -19,7 +20,7 @@ function BookSpine({ book, onOpen, label, scale = 1 }) {
   const className = `pk-spine pk-spine--${book.status}`;
   const content = (
     <>
-      <span className="pk-spine__title" lang={/[ಀ-೿]/.test(book.title || "") ? "kn" : undefined}>
+      <span className="pk-spine__title" lang={langOf(book.title)}>
         {book.title}
       </span>
       {book.favorite && <span className="pk-spine__fav" aria-hidden="true" />}
