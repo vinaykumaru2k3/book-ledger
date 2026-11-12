@@ -24,11 +24,11 @@ describe("palettes", () => {
 
 describe("resolveTheme", () => {
   it("returns a known theme as is", () => {
-    expect(resolveTheme("nord", false)).toBe("nord");
+    expect(resolveTheme("oxblood", false)).toBe("oxblood");
   });
   it("follows the device for system", () => {
     expect(resolveTheme("system", false)).toBe("pustaka");
-    expect(resolveTheme("system", true)).toBe("catppuccin-mocha");
+    expect(resolveTheme("system", true)).toBe("noir");
   });
   it("falls back to the default for unknown values", () => {
     expect(resolveTheme("nope", true)).toBe("pustaka");

@@ -35,7 +35,7 @@ export function themeVariables(p) {
     "--pk-cream-3": `rgba(${triplet(p.cream)}, 0.6)`,
     "--pk-cream-rgb": triplet(p.cream),
     "--pk-night-line": mix(p.night3, p.cream, 0.12),
-    "--pk-night-sky": `radial-gradient(60% 90% at 100% 0%, rgba(${triplet(p.accent)}, 0.34), transparent 70%), radial-gradient(55% 85% at 0% 100%, rgba(${triplet(p.blue)}, 0.3), transparent 70%), linear-gradient(135deg, ${p.night2}, ${p.night} 70%)`,
+    "--pk-night-sky": `radial-gradient(60% 90% at 100% 0%, rgba(${triplet(p.accent)}, 0.34), transparent 70%), radial-gradient(55% 85% at 0% 100%, rgba(${triplet(p.gilt)}, 0.12), transparent 70%), linear-gradient(135deg, ${p.night2}, ${p.night} 70%)`,
 
     "--pk-accent": p.accent,
     "--pk-accent-hover": mix(p.accent, toward, dark ? 0.16 : 0.18),

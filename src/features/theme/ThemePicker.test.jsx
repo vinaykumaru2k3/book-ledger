@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const saveThemePref = vi.fn(() => Promise.resolve());
 vi.mock("../../services/preferences", () => ({
-  loadThemePref: vi.fn(() => Promise.resolve("nord")),
+  loadThemePref: vi.fn(() => Promise.resolve("oxblood")),
   saveThemePref: (...args) => saveThemePref(...args),
 }));
 vi.mock("../../app/AppContext", () => ({ useAuth: () => ({ user: { uid: "u1" } }) }));
@@ -34,33 +34,33 @@ describe("ThemePicker", () => {
 
   it("adopts the theme saved on the account", async () => {
     setup();
-    await vi.waitFor(() => expect(document.documentElement.dataset.theme).toBe("nord"));
-    expect(window.localStorage.getItem("pustaka:theme")).toBe("nord");
+    await vi.waitFor(() => expect(document.documentElement.dataset.theme).toBe("oxblood"));
+    expect(window.localStorage.getItem("pustaka:theme")).toBe("oxblood");
   });
 
   it("previews on hover, reverts on leave and saves on click", async () => {
     setup();
-    await vi.waitFor(() => expect(document.documentElement.dataset.theme).toBe("nord"));
+    await vi.waitFor(() => expect(document.documentElement.dataset.theme).toBe("oxblood"));
     fireEvent.click(screen.getByRole("button", { name: "Theme" }));
 
-    fireEvent.mouseEnter(screen.getByRole("radio", { name: /Dracula/ }));
-    expect(document.documentElement.dataset.theme).toBe("dracula");
+    fireEvent.mouseEnter(screen.getByRole("radio", { name: /Midnight Sapphire/ }));
+    expect(document.documentElement.dataset.theme).toBe("midnight-sapphire");
     fireEvent.mouseLeave(screen.getByRole("radiogroup"));
-    expect(document.documentElement.dataset.theme).toBe("nord");
-    fireEvent.click(screen.getByRole("radio", { name: /Gruvbox/ }));
+    expect(document.documentElement.dataset.theme).toBe("oxblood");
+    fireEvent.click(screen.getByRole("radio", { name: /Royal Amethyst/ }));
 
-    expect(document.documentElement.dataset.theme).toBe("gruvbox");
-    expect(saveThemePref).toHaveBeenCalledWith("u1", "gruvbox");
+    expect(document.documentElement.dataset.theme).toBe("royal-amethyst");
+    expect(saveThemePref).toHaveBeenCalledWith("u1", "royal-amethyst");
     expect(screen.queryByRole("radiogroup")).toBeNull();
   });
 
   it("closes with Escape and drops the preview", async () => {
     setup();
-    await vi.waitFor(() => expect(document.documentElement.dataset.theme).toBe("nord"));
+    await vi.waitFor(() => expect(document.documentElement.dataset.theme).toBe("oxblood"));
     fireEvent.click(screen.getByRole("button", { name: "Theme" }));
-    fireEvent.mouseEnter(screen.getByRole("radio", { name: /Dracula/ }));
+    fireEvent.mouseEnter(screen.getByRole("radio", { name: /Midnight Sapphire/ }));
     fireEvent.keyDown(screen.getByRole("radiogroup"), { key: "Escape" });
     expect(screen.queryByRole("radiogroup")).toBeNull();
-    expect(document.documentElement.dataset.theme).toBe("nord");
+    expect(document.documentElement.dataset.theme).toBe("oxblood");
   });
 });
