@@ -59,7 +59,7 @@ export function kannadaToLatin(text) {
 
 /**
  * The consonant skeleton of a title in any spelling: "Mookajjiya Kanasugalu",
- * "mukajjiya kanasugaḷu" and ಮೂಕಜ್ಜಿಯ ಕನಸುಗಳು all give "mkjknsgl".
+ * "mukajjiya kanasugaḷu" and ಮೂಕಜ್ಜಿಯ ಕನಸುಗಳು all give "nkjknsgl".
  */
 export function soundKey(text) {
   return kannadaToLatin(text)
@@ -72,7 +72,7 @@ export function soundKey(text) {
     .replace(/q/g, "k")
     .replace(/x/g, "ks")
     .replace(/c(?!h)/g, "k")
-    .replace(/([bcdfgjklmnpqrstvxz])h/g, "$1") // aspirates: "th" and "t", "dh" and "d"
+    .replace(/h/g, "") // aspirates ("th", "t") and endings ("Ganeshaiah", ಗಣೇಶಯ್ಯ) are spelled either way
     .replace(/[aeiouy]/g, "")
     .replace(/m/g, "n") // the anusvara is written m or n
     .replace(/(.)\1+/g, "$1");

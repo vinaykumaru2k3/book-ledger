@@ -23,6 +23,7 @@ export function withGoogleKey(url) {
 }
 
 import { soundKey } from "../domain/soundKey";
+import { toKannada } from "./transliterate";
 import { isWikidataId, searchWikidataBooks, wikipediaIntro } from "./wikidataBooks";
 
 const isOpenLibraryWork = (id) => String(id).startsWith("/works/");
@@ -84,39 +85,98 @@ export function titleRelevance(title, query) {
   return 0;
 }
 
-/**
- * Searches for books. `type` is "all" | "title" | "author" | "genre".
- *
- * Title searches also ask Wikidata, which knows a work by all its names, so a
- * Kannada novel typed in English letters ("Mookajjiya kanasugalu") is found
- * under its Kannada title. Those works come first; catalogue results whose
- * title answers the query come next, then the rest. Resolves to an array of
- * volumes; throws with a readable message only when every source failed.
- */
-export async function searchVolumes(query, type = "all") {
-  const text = query.trim();
+/** True when a result answers the query by its title or its author, in any script or spelling. */
+export function answersQuery(volume, query) {
+  const info = volume?.volumeInfo || {};
+  if (titleRelevance(info.title, query) > 0) return true;
+  const key = soundKey(normalizeTitle(String(query || "")));
+  return key.length >= 3 && (info.authors || []).some((name) => soundKey(normalizeTitle(name)).includes(key));
+}
+
+/** Wikidata works and catalogue results for one spelling of the query. */
+async function searchOnce(text, type) {
   const askWikidata = type === "all" || type === "title";
   const [works, catalogue] = await Promise.allSettled([
     askWikidata ? searchWikidataBooks(text) : Promise.resolve([]),
     searchCatalogues(text, type),
   ]);
-  if (catalogue.status === "rejected" && (works.status === "rejected" || !works.value.length)) throw catalogue.reason;
+  return {
+    works: works.status === "fulfilled" ? works.value : [],
+    catalogue: catalogue.status === "fulfilled" ? catalogue.value : [],
+    error: catalogue.status === "rejected" ? catalogue.reason : null,
+  };
+}
 
-  const found = works.status === "fulfilled" ? works.value : [];
-  const rest = catalogue.status === "fulfilled" ? catalogue.value : [];
-  const seen = new Set(found.flatMap((v) => [v.volumeInfo.title, ...String(v.volumeInfo.description).split(" · ").slice(0, 1)].map(soundKey)));
-  const ranked = askWikidata
-    ? rest
-        .map((volume, index) => ({ volume, index, score: titleRelevance(volume.volumeInfo?.title, text) }))
-        .sort((x, y) => y.score - x.score || x.index - y.index)
-        .map((r) => r.volume)
-    : rest;
-  // Leave out catalogue copies of a work Wikidata already gave, unless they bring a cover it lacks.
-  const extra = ranked.filter((v) => {
-    const duplicate = seen.has(soundKey(v.volumeInfo?.title || ""));
-    return !duplicate || (v.volumeInfo?.imageLinks && !found.some((w) => w.volumeInfo.imageLinks));
+const interleave = (a, b) => Array.from({ length: Math.max(a.length, b.length) }, (_, i) => [a[i], b[i]]).flat().filter(Boolean);
+
+/**
+ * Searches for books. `type` is "all" | "title" | "author" | "genre".
+ *
+ * Title searches also ask Wikidata, which knows a work by all its names, so a
+ * Kannada novel typed in English letters ("Mookajjiya kanasugalu") is found
+ * under its Kannada title. Many Kannada books are catalogued only in Kannada
+ * script, so when English letters find nothing that answers the query, the
+ * search runs again in Kannada ("padmapaani" → ಪದ್ಮಪಾಣಿ); author searches
+ * always do. Wikidata works come first, then catalogue results that answer
+ * the query, then the rest. Throws a readable error only when every source failed.
+ */
+export async function searchVolumes(query, type = "all") {
+  const text = query.trim();
+  const kannada = type === "genre" ? Promise.resolve("") : toKannada(text);
+  const first = await searchOnce(text, type);
+  let works = first.works;
+  let catalogue = first.catalogue;
+  let error = first.error;
+
+  const answered = works.length > 0 || catalogue.some((v) => answersQuery(v, text));
+  if (!answered || type === "author") {
+    const spelled = await kannada;
+    if (spelled) {
+      const second = await searchOnce(spelled, type);
+      const fits = second.catalogue.filter((v) => answersQuery(v, text) || answersQuery(v, spelled));
+      works = [...works, ...second.works];
+      catalogue = type === "author" ? interleave(fits, catalogue) : [...fits, ...catalogue];
+      if (!second.error) error = null;
+    }
+  }
+  if (error && !works.length && !catalogue.length) throw error;
+
+  // One entry per work and per catalogue id.
+  const ids = new Set();
+  works = works.filter((v) => !ids.has(v.id) && ids.add(v.id));
+  catalogue = catalogue.filter((v) => !ids.has(v.id) && ids.add(v.id));
+
+  const ranked =
+    type === "author"
+      ? catalogue
+      : catalogue
+          .map((volume, index) => ({ volume, index, score: titleRelevance(volume.volumeInfo?.title, text) }))
+          .sort((x, y) => y.score - x.score || x.index - y.index)
+          .map((r) => r.volume);
+
+  // A catalogue copy of a Wikidata work fills what Wikidata lacks (author,
+  // cover, pages) and is then left out of the list.
+  const keyOf = (v) => soundKey(v.volumeInfo?.title || "");
+  const completed = works.map((work) => {
+    const copies = ranked.filter((v) => keyOf(v) === keyOf(work));
+    if (!copies.length) return work;
+    const info = { ...work.volumeInfo };
+    const meta = { ...work.wikidata };
+    const withAuthor = copies.find((v) => v.volumeInfo?.authors?.length);
+    const withCover = copies.find((v) => v.volumeInfo?.imageLinks);
+    const withPages = copies.find((v) => v.volumeInfo?.pageCount);
+    if (!info.authors?.length && withAuthor) info.authors = withAuthor.volumeInfo.authors;
+    if (!info.publishedDate && withAuthor?.volumeInfo.publishedDate) info.publishedDate = withAuthor.volumeInfo.publishedDate;
+    if (!info.pageCount && withPages) info.pageCount = withPages.volumeInfo.pageCount;
+    if (!info.imageLinks && withCover) {
+      info.imageLinks = withCover.volumeInfo.imageLinks;
+      meta.coverSource = isOpenLibraryWork(withCover.id) ? "openlibrary" : "google";
+    }
+    return { ...work, volumeInfo: info, wikidata: meta };
   });
-  return [...found, ...extra].slice(0, 10);
+  const workKeys = new Set(completed.flatMap((v) => [v.volumeInfo.title, String(v.volumeInfo.description).split(" · ")[0]].map(soundKey)));
+  const extra = ranked.filter((v) => !workKeys.has(keyOf(v)));
+  return [...completed, ...extra].slice(0, 10);
 }
 
 /* ------------------------- single-book details ------------------------- */
@@ -217,7 +277,7 @@ export async function buildFormFromVolume(volume) {
       const intro = await wikipediaIntro(volume.wikidata);
       if (intro) form.description = intro.slice(0, MAX_DESCRIPTION);
     }
-    if (form.coverUrl) form.coverSource = "wikipedia";
+    if (form.coverUrl) form.coverSource = volume.wikidata?.coverSource || "wikipedia";
     return form;
   }
   const fromOpenLibrary = isOpenLibraryWork(volume.id);

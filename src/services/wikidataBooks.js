@@ -39,6 +39,9 @@ const WORK_TYPES = new Set([
 const BOOKISH = /novel|book|poem|poetry|epic|play by|short stor|literary|anthology|ಕಾದಂಬರಿ|ಕೃತಿ|ಪುಸ್ತಕ|ಕವನ|ಕಾವ್ಯ|ನಾಟಕ/i;
 const NOT_A_BOOK = /film|movie|ಚಲನಚಿತ್ರ|ಸಿನಿಮಾ|disambiguation|ದ್ವಂದ್ವ|television|serial|album|song/i;
 
+// Wikipedia categories that file a page as a book: "ಪುಸ್ತಕಗಳು", "ಕಾದಂಬರಿಗಳು", "1968 novels"...
+const BOOK_CATEGORY = /ಪುಸ್ತಕ|ಕಾದಂಬರಿ|ಕೃತಿ|ಕಥಾ ?ಸಂಕಲನ|ಕವನ ?ಸಂಕಲನ|novels|books|short story collections|poetry collections/i;
+
 export const isWikidataId = (id) => String(id || "").startsWith(WIKIDATA_PREFIX);
 
 async function getJson(url) {
@@ -125,6 +128,102 @@ export async function authorNamesOf(works) {
   return Object.values(authors).flatMap((a) => [label(a, "en"), label(a, "kn")]).filter(Boolean);
 }
 
+/**
+ * Many Kannada books on Wikidata are bare: no type, no description, only a
+ * Wikipedia page. Those whose page is filed under a books category count as books.
+ */
+async function filedAsBooks(entities) {
+  const books = new Set();
+  for (const lang of ["kn", "en"]) {
+    const pairs = entities.filter((e) => e.sitelinks?.[`${lang}wiki`] && !books.has(e.id)).map((e) => [e.id, e.sitelinks[`${lang}wiki`].title]);
+    if (!pairs.length) continue;
+    const params = new URLSearchParams({
+      action: "query",
+      format: "json",
+      origin: "*",
+      prop: "categories",
+      clshow: "!hidden",
+      cllimit: "max",
+      redirects: "1",
+      titles: pairs.map(([, title]) => title).join("|"),
+    });
+    try {
+      const data = await getJson(`https://${lang}.wikipedia.org/w/api.php?${params}`);
+      const renamed = Object.fromEntries([...(data?.query?.normalized || []), ...(data?.query?.redirects || [])].map((r) => [r.to, r.from]));
+      Object.values(data?.query?.pages || {}).forEach((page) => {
+        if (!(page.categories || []).some((c) => BOOK_CATEGORY.test(c.title))) return;
+        const asked = renamed[page.title] || page.title;
+        pairs.filter(([, title]) => title === asked || title === page.title).forEach(([qid]) => books.add(qid));
+      });
+    } catch {
+      /* that Wikipedia is unreachable: the item stays unconfirmed */
+    }
+  }
+  return books;
+}
+
+const isBare = (entity, description) =>
+  Boolean(entity) && entity.missing === undefined && !ids(entity, "P31").length && !description && Boolean(entity.sitelinks?.knwiki || entity.sitelinks?.enwiki);
+
+/* ---------- authors named in the Wikipedia introduction ---------- */
+
+const WROTE = /\s*(?:ಬರೆದ|ರಚಿಸಿದ|ರಚಿಸಿರುವ|ಬರೆದಿರುವ|ರಚನೆಯ)/;
+const HONORIFIC_WORD = /^(?:ಅವರು|ರವರು|ಅವರ|ರವರ)$/;
+const HONORIFIC_END = /(?:ರವರು|ಅವರು|ರವರ|ಅವರ|ರು)$/;
+const TITLE_WORD = /^(?:ಡಾ\.?|ಶ್ರೀ|ಪ್ರೊ\.?|Dr\.?)$/;
+
+/**
+ * The author a Kannada Wikipedia introduction names: "ಡಾ. ಕೆ.ಎನ್.ಗಣೇಶಯ್ಯರವರು
+ * ಬರೆದ…" gives "ಕೆ.ಎನ್.ಗಣೇಶಯ್ಯ". "" when the sentence does not say who wrote it.
+ */
+export function authorFromIntro(text, title = "") {
+  const intro = String(text || "").split("\n")[0];
+  const match = intro.match(WROTE);
+  if (!match) return "";
+  const titleWords = new Set(String(title).split(/\s+/));
+  const words = intro
+    .slice(0, match.index)
+    .split(/\s+/)
+    .filter(Boolean)
+    .filter((w) => !HONORIFIC_WORD.test(w));
+  const name = [];
+  for (let i = words.length - 1; i >= 0 && name.length < 3; i -= 1) {
+    const word = words[i];
+    if (titleWords.has(word) || /[,;:()]$/.test(word)) break;
+    if (TITLE_WORD.test(word)) break;
+    name.unshift(word);
+  }
+  if (!name.length) return "";
+  const last = name.length - 1;
+  if ([...name[last]].length > 4) name[last] = name[last].replace(HONORIFIC_END, "");
+  return name.join(" ").replace(/^[.\s]+|[,\s]+$/g, "");
+}
+
+/** Introductions of the works' Kannada Wikipedia pages, by Wikidata id. */
+async function kannadaIntros(entities) {
+  const pairs = entities.filter((e) => e.sitelinks?.knwiki).map((e) => [e.id, e.sitelinks.knwiki.title]);
+  if (!pairs.length) return {};
+  const params = new URLSearchParams({
+    action: "query",
+    format: "json",
+    origin: "*",
+    prop: "extracts",
+    exintro: "1",
+    explaintext: "1",
+    exlimit: "max",
+    redirects: "1",
+    titles: pairs.map(([, title]) => title).join("|"),
+  });
+  const data = await getJson(`https://kn.wikipedia.org/w/api.php?${params}`);
+  const renamed = Object.fromEntries([...(data?.query?.normalized || []), ...(data?.query?.redirects || [])].map((r) => [r.to, r.from]));
+  const intros = {};
+  Object.values(data?.query?.pages || {}).forEach((page) => {
+    const asked = renamed[page.title] || page.title;
+    pairs.filter(([, title]) => title === asked || title === page.title).forEach(([qid]) => (intros[qid] = page.extract || ""));
+  });
+  return intros;
+}
+
 /* ---------- covers from the work's Wikipedia pages ---------- */
 
 const PORTRAIT = (t) => t?.source && t.width >= 80 && t.height >= t.width * 1.15;
@@ -182,7 +281,7 @@ const pages = (entity) => {
   return amount > 0 ? amount : "";
 };
 
-function volumeFromWork(entity, description, authors, cover) {
+function volumeFromWork(entity, description, authors, cover, introAuthor = "") {
   const kannada = isKannadaWork(entity);
   const primary = kannada ? "kn" : "en";
   const other = kannada ? "en" : "kn";
@@ -191,6 +290,7 @@ function volumeFromWork(entity, description, authors, cover) {
   const authorNames = ids(entity, "P50")
     .map((qid) => label(authors[qid], primary) || label(authors[qid], other))
     .filter(Boolean);
+  if (!authorNames.length && introAuthor) authorNames.push(introAuthor);
   const blurb = [otherTitle && otherTitle !== title ? otherTitle : "", description].filter(Boolean).join(" · ");
   return {
     id: `${WIKIDATA_PREFIX}${entity.id}`,
@@ -225,21 +325,26 @@ export async function searchWikidataBooks(query, { limit = 5 } = {}) {
   const hits = (await searchItems(text, 15)).filter((h) => !NOT_A_BOOK.test(h.description || ""));
   if (!hits.length) return [];
   const entities = await getEntities(hits.map((h) => h.id));
+  const bare = hits.filter((h) => isBare(entities[h.id], h.description || "")).map((h) => entities[h.id]);
+  const confirmed = bare.length ? await filedAsBooks(bare.slice(0, 10)) : new Set();
   const works = hits
-    .filter((h) => isWork(entities[h.id], h.description || ""))
+    .filter((h) => isWork(entities[h.id], h.description || "") || confirmed.has(h.id))
     .slice(0, limit)
     .map((h) => ({ entity: entities[h.id], description: h.description || "" }));
   if (!works.length) return [];
 
   const authorIds = [...new Set(works.flatMap(({ entity }) => ids(entity, "P50")))];
-  const [authors, covers] = await Promise.all([
+  const authorless = works.map((w) => w.entity).filter((e) => !ids(e, "P50").length);
+  const [authors, covers, intros] = await Promise.all([
     getEntities(authorIds, "labels").catch(() => ({})),
     wikipediaCovers(works.map((w) => w.entity)).catch(() => ({})),
+    kannadaIntros(authorless).catch(() => ({})),
   ]);
   return works.map(({ entity, description }) => {
     const names = ids(entity, "P50").flatMap((qid) => [label(authors[qid], "en"), label(authors[qid], "kn")]);
     const cover = (covers[entity.id] || []).find((c) => !looksLikeAuthorPhoto(c.url, names));
-    return volumeFromWork(entity, description, authors, cover?.url);
+    const introAuthor = authorFromIntro(intros[entity.id], label(entity, "kn"));
+    return volumeFromWork(entity, description, authors, cover?.url, introAuthor);
   });
 }
 
