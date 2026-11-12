@@ -36,7 +36,7 @@
     repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.014) 0 2px, transparent 2px 9px),
     linear-gradient(180deg, #2f2017, #1d130d);
   box-shadow: inset 0 0 0 12px #4b301a, inset 0 0 0 13px rgba(255, 220, 160, 0.14), inset 0 0 70px rgba(0, 0, 0, 0.55),
-    0 30px 60px -30px rgba(45, 24, 40, 0.6);
+    0 30px 60px -30px rgba(var(--pk-shadow-rgb), 0.6);
 }
 .pk-case__crown {
   height: 6px;
@@ -288,7 +288,7 @@
 .pk-builder__item--on .pk-builder__check {
   border-color: var(--pk-accent);
   background: var(--pk-accent);
-  color: #fff;
+  color: var(--pk-on-accent);
 }
 .pk-builder__empty {
   color: var(--pk-ink-3);
@@ -362,7 +362,7 @@
   cursor: pointer;
 }
 .pk-shelfhero__add:hover {
-  background: #fff;
+  background: var(--pk-surface-raised);
 }
 .pk-shelfhero__add:focus-visible,
 .pk-shelfhero .pk-shelf-menu:focus-visible {

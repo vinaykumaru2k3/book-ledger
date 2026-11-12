@@ -11,6 +11,7 @@
     "test:watch": "vitest",
     "emulators": "npx firebase-tools@13 emulators:start --only auth,firestore --project book-ledger-2a2e4",
     "seed": "node scripts/seed-emulator.mjs",
+    "themes": "node scripts/build-themes.mjs",
     "dev:emulated": "vite --mode emulated"
   },
   "dependencies": {

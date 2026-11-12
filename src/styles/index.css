@@ -3,6 +3,7 @@
  * this list in the same order. Each file is named for the area it styles.
  */
 @import "./design-tokens.css";
+@import "./themes.css";
 @import "./tokens.css";
 @import "./base.css";
 @import "./buttons.css";
@@ -29,4 +30,5 @@
 @import "./pk-details.css";
 @import "./pk-forms.css";
 @import "./pk-landing.css";
+@import "./pk-theme.css";
 @import "./pk-dev.css";

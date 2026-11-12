@@ -30,7 +30,7 @@
     radial-gradient(1.2px 1.2px at 82% 84%, rgba(var(--pk-cream-rgb), 0.45), transparent),
     radial-gradient(1px 1px at 94% 36%, rgba(var(--pk-gilt-rgb), 0.5), transparent),
     radial-gradient(60% 90% at 88% 0%, rgba(var(--pk-accent-rgb), 0.5), transparent 70%),
-    radial-gradient(55% 80% at 0% 100%, rgba(93, 44, 115, 0.45), transparent 70%),
+    radial-gradient(55% 80% at 0% 100%, rgba(var(--pk-amethyst-rgb), 0.45), transparent 70%),
     linear-gradient(135deg, var(--pk-night-2), var(--pk-night) 60%, var(--pk-night));
   color: var(--cream);
   box-shadow: 0 30px 60px -30px rgba(var(--pk-night-rgb), 0.55);
@@ -167,7 +167,7 @@
   transition: background-color 160ms var(--pk-ease);
 }
 .pk-dbtn:hover {
-  background: #fff;
+  background: var(--pk-surface-raised);
 }
 .pk-dbtn svg {
   transition: transform 160ms var(--pk-ease);
@@ -277,7 +277,7 @@
   border: 1px solid var(--pk-line);
   border-radius: 22px;
   background: var(--pk-surface);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 18px 30px -24px rgba(45, 24, 40, 0.35);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 18px 30px -24px rgba(var(--pk-shadow-rgb), 0.35);
   opacity: 0;
   transform: translateY(14px);
   transition: opacity 600ms var(--pk-ease), transform 600ms var(--pk-ease), box-shadow 200ms var(--pk-ease);

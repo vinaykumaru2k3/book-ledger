@@ -1,7 +1,5 @@
 /* Design tokens (colours, type, shadows, radii) */
 :root {
-  color-scheme: light;
-
   /* ── Background layers — each step is clearly lighter ── */
   /* Legacy names, now pointing at the "gilt and jewel" palette in design-tokens.css. */
   --bg-app:              var(--pk-bg);
@@ -37,9 +35,9 @@
   --font-serif: 'Playfair Display', Georgia, Cambria, "Times New Roman", Times, serif;
 
   /* ── Shadows ── */
-  --shadow-sm: 0 1px 3px rgba(62, 54, 46, 0.06);
-  --shadow-md: 0 4px 12px rgba(62, 54, 46, 0.08);
-  --shadow-lg: 0 12px 32px rgba(62, 54, 46, 0.12);
+  --shadow-sm: 0 1px 3px rgba(var(--pk-shadow-rgb), 0.08);
+  --shadow-md: 0 4px 12px rgba(var(--pk-shadow-rgb), 0.1);
+  --shadow-lg: 0 12px 32px rgba(var(--pk-shadow-rgb), 0.16);
 
   --radius-sm: 0px;
   --radius-md: 0px;

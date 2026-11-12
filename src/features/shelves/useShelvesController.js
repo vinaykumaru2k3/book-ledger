@@ -8,13 +8,13 @@ import { useMemo } from "react";
 
 // The palette's jewel tones (design-tokens.css), one per shelf.
 const SHELF_COLORS = [
-  "#7c1838", // garnet
-  "#0f5f6c", // peacock
-  "#27408a", // sapphire
-  "#8c5e10", // gilt
-  "#17644f", // emerald
-  "#5d2c73", // amethyst
-  "#a85a26", // copper
+  "var(--pk-garnet-bright)",
+  "var(--pk-peacock)",
+  "var(--pk-sapphire)",
+  "var(--pk-gold)",
+  "var(--pk-emerald)",
+  "var(--pk-amethyst)",
+  "var(--pk-copper)",
 ];
 
 /** Stable look for a shelf (an accent colour), derived from its name. */

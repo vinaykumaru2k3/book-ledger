@@ -19,7 +19,7 @@
   z-index: calc(var(--pk-z-dialog) + 10);
   padding: var(--pk-space-2) var(--pk-space-4);
   background: var(--pk-ink);
-  color: #fff;
+  color: var(--pk-bg);
   border-radius: var(--pk-radius-md);
   font: 600 var(--pk-text-sm) var(--pk-font-ui);
   transform: translateY(-200%);
@@ -78,7 +78,7 @@
     radial-gradient(1px 1px at 30% 90%, rgba(var(--pk-gilt-rgb), 0.4), transparent),
     radial-gradient(90% 40% at 50% 0%, rgba(var(--pk-sapphire-rgb), 0.42), transparent 70%),
     radial-gradient(110% 35% at 0% 100%, rgba(var(--pk-accent-rgb), 0.32), transparent 70%),
-    linear-gradient(180deg, var(--pk-night-2), var(--pk-night) 55%, #080b1a);
+    linear-gradient(180deg, var(--pk-night-2), var(--pk-night) 55%, var(--pk-night));
   color: var(--rail-cream);
   /* A gilt hairline where the night panel meets the page. */
   border-right: 1px solid rgba(var(--pk-gilt-rgb), 0.16);
@@ -197,7 +197,7 @@
 .pk-rail__link--active,
 .pk-rail__link--active:hover {
   background: transparent;
-  color: #fff;
+  color: var(--pk-cream);
 }
 .pk-rail__link--active svg {
   color: var(--rail-gold);
@@ -936,7 +936,7 @@
     padding-bottom: env(safe-area-inset-bottom, 0px);
     background: var(--pk-surface-raised);
     border-top: 1px solid var(--pk-line);
-    box-shadow: 0 -4px 16px rgba(45, 24, 40, 0.08);
+    box-shadow: 0 -4px 16px rgba(var(--pk-shadow-rgb), 0.08);
   }
   .pk-tabbar ul {
     display: flex;

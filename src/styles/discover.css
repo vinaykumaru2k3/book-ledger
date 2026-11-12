@@ -111,8 +111,8 @@
 .rec-reason-badge {
   align-self: flex-start;
   padding: 4px 8px;
-  background-color: rgba(180, 83, 9, 0.06); /* amber tint */
-  border: 1px solid rgba(217, 119, 6, 0.15);
+  background-color: rgba(var(--pk-gold-rgb), 0.06); /* amber tint */
+  border: 1px solid rgba(var(--pk-gold-rgb), 0.15);
   border-radius: var(--radius-sm);
   font-size: 0.65rem;
   font-weight: 700;
@@ -123,7 +123,7 @@
   flex-direction: column;
   gap: 2px;
   margin-bottom: 12px;
-  border-color: rgba(180, 83, 9, 0.12);
+  border-color: rgba(var(--pk-gold-rgb), 0.12);
 }
 
 .inspiring-title {
@@ -171,16 +171,16 @@
   box-shadow:
     0 16px 40px rgba(0, 0, 0, 0.2),
     0 4px 12px rgba(0, 0, 0, 0.12),
-    0 0 0 1px rgba(217, 119, 6, 0.12) inset;
+    0 0 0 1px rgba(var(--pk-gold-rgb), 0.12) inset;
   z-index: 3;
 }
 
 .rec-card:hover,
 .top-chart-card:hover {
   box-shadow:
-    0 16px 40px rgba(62, 54, 46, 0.1),
-    0 4px 12px rgba(62, 54, 46, 0.06),
-    0 0 0 1px rgba(180, 83, 9, 0.1) inset;
+    0 16px 40px rgba(var(--pk-shadow-rgb), 0.1),
+    0 4px 12px rgba(var(--pk-shadow-rgb), 0.06),
+    0 0 0 1px rgba(var(--pk-gold-rgb), 0.1) inset;
 }
 
 .rec-card .book-main,
@@ -195,7 +195,7 @@
 .chart-rank-badge {
   background: linear-gradient(135deg, var(--accent-emerald), var(--accent-amber)) !important;
   box-shadow:
-    0 3px 10px rgba(217, 119, 6, 0.35),
+    0 3px 10px rgba(var(--pk-gold-rgb), 0.35),
     0 0 0 2px var(--bg-card) !important;
   border-radius: 8px !important;
   padding: 4px 10px !important;
@@ -208,8 +208,8 @@
 .rec-reason-badge {
   align-self: flex-start;
   padding: 4px 10px;
-  background: linear-gradient(90deg, rgba(180, 83, 9, 0.08), rgba(217, 119, 6, 0.06));
-  border: 1px solid rgba(217, 119, 6, 0.18);
+  background: linear-gradient(90deg, rgba(var(--pk-gold-rgb), 0.08), rgba(var(--pk-gold-rgb), 0.06));
+  border: 1px solid rgba(var(--pk-gold-rgb), 0.18);
   border-radius: 8px;
   font-size: 0.6rem;
   font-weight: 700;
@@ -221,7 +221,7 @@
   gap: 2px;
   margin-bottom: 10px;
   backdrop-filter: blur(4px);
-  border-color: rgba(180, 83, 9, 0.15);
+  border-color: rgba(var(--pk-gold-rgb), 0.15);
 }
 
 .inspiring-title {
@@ -260,11 +260,11 @@
 .rec-actions .button.primary {
   background: linear-gradient(135deg, var(--accent-emerald), var(--accent-amber));
   border: none;
-  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.3);
+  box-shadow: 0 2px 8px rgba(var(--pk-gold-rgb), 0.3);
 }
 .rec-actions .button.primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.4);
+  box-shadow: 0 4px 14px rgba(var(--pk-gold-rgb), 0.4);
 }
 
 .rec-actions .button.ghost {
@@ -330,10 +330,10 @@
 }
 
 .genre-select-tab.active {
-  color: #ffffff;
+  color: var(--pk-on-accent);
   background-color: var(--accent-emerald);
   border-color: var(--accent-emerald);
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.28);
+  box-shadow: 0 2px 8px rgba(var(--pk-emerald-rgb), 0.28);
 }
 
 .genre-select-tab.active::after {
@@ -349,7 +349,7 @@
   top: 12px;
   left: 12px;
   background: linear-gradient(135deg, var(--accent-emerald), var(--accent-amber));
-  color: #fff;
+  color: var(--pk-on-accent);
   font-size: 0.65rem;
   font-weight: 700;
   padding: 4px 10px;
@@ -359,14 +359,14 @@
   gap: 4px;
   z-index: 5;
   box-shadow:
-    0 3px 10px rgba(217, 119, 6, 0.35),
+    0 3px 10px rgba(var(--pk-gold-rgb), 0.35),
     0 0 0 2px var(--bg-card);
 }
 
 /* Success status button styling for TopCharts */
 .button.success {
-  background-color: rgba(16, 185, 129, 0.1);
+  background-color: rgba(var(--pk-emerald-rgb), 0.1);
   color: var(--accent-emerald);
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(var(--pk-emerald-rgb), 0.2);
   cursor: default;
 }

@@ -108,7 +108,7 @@
   background: var(--pk-warning-soft);
   border: 1px solid color-mix(in srgb, var(--pk-warning) 35%, transparent);
   border-radius: var(--pk-radius-md);
-  color: #5d4200;
+  color: var(--pk-ink);
   font: 400 var(--pk-text-sm) / var(--pk-leading-body) var(--pk-font-ui);
 }
 .pk-alert svg {

@@ -85,7 +85,7 @@
 }
 .pk-searchbox:focus-within {
   border-color: var(--pk-focus);
-  box-shadow: 0 0 0 3px rgba(47, 79, 196, 0.18);
+  box-shadow: 0 0 0 3px rgba(var(--pk-focus-rgb), 0.18);
 }
 .pk-searchbox input {
   flex: 1;
@@ -244,19 +244,19 @@
   bottom: -10px;
   height: 14px;
   border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(45, 24, 40, 0.28), transparent);
+  background: radial-gradient(closest-side, rgba(var(--pk-shadow-rgb), 0.28), transparent);
   transition: transform var(--pk-duration-3) var(--pk-ease), opacity var(--pk-duration-3) var(--pk-ease);
 }
 .pk-tile__cover .pk-cover {
   width: 100%;
   transform-origin: left center;
-  box-shadow: 6px 10px 22px -10px rgba(45, 24, 40, 0.45);
+  box-shadow: 6px 10px 22px -10px rgba(var(--pk-shadow-rgb), 0.45);
   transition: transform var(--pk-duration-3) var(--pk-ease), box-shadow var(--pk-duration-3) var(--pk-ease);
 }
 .pk-tile:hover .pk-cover,
 .pk-tile:focus-within .pk-cover {
   transform: translateY(-8px) rotateY(-12deg);
-  box-shadow: 14px 22px 30px -12px rgba(45, 24, 40, 0.5);
+  box-shadow: 14px 22px 30px -12px rgba(var(--pk-shadow-rgb), 0.5);
 }
 .pk-tile:hover .pk-tile__cover::after {
   transform: scaleX(0.85);
@@ -313,7 +313,7 @@
   display: flex;
   gap: 2px;
   padding: 2px;
-  background: rgba(251, 247, 238, 0.95);
+  background: rgba(var(--pk-surface-rgb), 0.95);
   border: 1px solid var(--pk-line);
   border-radius: var(--pk-radius-md);
   box-shadow: var(--pk-shadow-1);

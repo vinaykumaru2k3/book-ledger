@@ -80,7 +80,7 @@
 }
 .pk-btn--danger {
   background: var(--pk-danger);
-  color: #fff;
+  color: var(--pk-surface-raised);
 }
 .pk-btn--danger:hover:not(:disabled) {
   filter: brightness(0.92);
@@ -378,7 +378,7 @@ textarea.pk-field__control {
   border-radius: 3px 8px 8px 3px;
   overflow: hidden;
   background: linear-gradient(145deg, var(--cover-a), color-mix(in srgb, var(--cover-a) 70%, var(--cover-b)));
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 4px 6px 14px rgba(45, 24, 40, 0.28), 1px 1px 0 rgba(45, 24, 40, 0.18);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 4px 6px 14px rgba(var(--pk-shadow-rgb), 0.28), 1px 1px 0 rgba(var(--pk-shadow-rgb), 0.18);
 }
 .pk-cover--sm {
   width: 56px;

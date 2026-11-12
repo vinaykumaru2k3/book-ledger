@@ -60,6 +60,10 @@ export default {
   "view.kannada.kicker": "Literary Map",
   "view.kannada.title": "Kannada Explorer",
 
+  "theme.label": "Theme",
+  "theme.system": "System",
+  "theme.systemHint": "Follows your device, light or dark",
+
   "command.open": "Search or jump to…",
   "command.placeholder": "Search books or jump to a page…",
   "command.empty": "Nothing matches that",

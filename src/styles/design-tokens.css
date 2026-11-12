@@ -1,76 +1,18 @@
 /*
- * Design tokens for the "Reading Room" redesign.
+ * Design tokens for the "Reading Room" redesign (type, space, radius, motion; colours come from themes.css).
  *
  * Every new component reads these `--pk-*` variables and nothing else, so the
  * look of the app can be tuned here. The old `--bg-*` / `--text-*` tokens in
  * tokens.css stay until the last legacy page is migrated (plan.md, phase R10).
  */
 :root {
-  /* ---- Colour: "gilt and jewel" ----------------------------------------
-   * A fine bindery: vellum pages and aubergine ink, midnight-sapphire night
-   * panels, garnet leather, gilt tooling, and a set of jewel tones for
-   * statuses, covers, shelves and charts. Every colour in the app comes from
-   * here; `*-rgb` triplets are for translucent uses: rgba(var(--pk-gilt-rgb), 0.4). */
-
-  /* Paper and ink */
-  --pk-bg: #f6f0e4; /* vellum page */
-  --pk-surface: #fcf8f0; /* cards, panels */
-  --pk-surface-raised: #fffdf8; /* menus, dialogs */
-  --pk-surface-sunken: #eee5d2; /* inputs, wells */
-  --pk-ink: #1b1524; /* aubergine black: primary text */
-  --pk-ink-2: #4d4357; /* secondary text */
-  --pk-ink-3: #675c70; /* muted text (5.4:1 on --pk-bg, 4.9:1 on wells) */
-  --pk-ink-rgb: 27, 21, 36;
-  --pk-line: rgba(27, 21, 36, 0.11);
-  --pk-line-strong: rgba(27, 21, 36, 0.22);
-
-  /* Night: the sidebar, heroes, landing and sign-in */
-  --pk-night: #0a0f22; /* midnight sapphire */
-  --pk-night-2: #121a38;
-  --pk-night-3: #1c2650;
-  --pk-night-rgb: 10, 15, 34;
-  --pk-cream: #f4ebd9; /* text on night */
-  --pk-cream-2: rgba(244, 235, 217, 0.74); /* secondary text on night */
-  --pk-cream-3: rgba(244, 235, 217, 0.52); /* muted text on night */
-  --pk-cream-rgb: 244, 235, 217;
-  --pk-night-line: #2a3462; /* borders on night */
-  --pk-night-sky: radial-gradient(60% 90% at 100% 0%, rgba(124, 24, 56, 0.38), transparent 70%),
-    radial-gradient(55% 85% at 0% 100%, rgba(35, 57, 122, 0.45), transparent 70%), linear-gradient(135deg, #141c3d, #0a0f22 60%, #080b1a);
-
-  /* Garnet: the primary accent (buttons, links, selection) */
-  --pk-accent: #7c1838;
-  --pk-accent-hover: #63112c;
-  --pk-accent-soft: #f5e1e7;
-  --pk-accent-rgb: 124, 24, 56;
-  --pk-on-accent: #ffffff;
-
-  /* Gilt: stars, ratings, highlights */
-  --pk-gilt: #e4c47f; /* on night */
-  --pk-gilt-2: #c9a052; /* deeper gilt on night */
-  --pk-gilt-rgb: 228, 196, 127;
-  --pk-gold: #8c5e10; /* gilt text on paper (4.9:1) */
-  --pk-gold-soft: #f6e9c8;
-  --pk-gilt-sheen: linear-gradient(100deg, #a87a2a, #e4c47f 45%, #b8893a 70%, #e9cf94);
-
-  /* Jewels: statuses, covers, shelves, charts */
-  --pk-sapphire: #27408a;
-  --pk-sapphire-rgb: 39, 64, 138;
-  --pk-emerald: #17644f;
-  --pk-emerald-bright: #3fa57f; /* on night */
-  --pk-amethyst: #5d2c73;
-  --pk-copper: #a85a26;
-  --pk-peacock: #0f5f6c;
+  /* ---- Colour ------------------------------------------------------------
+   * Colours are not set here: every theme (see src/features/theme/palettes.js)
+   * is generated into themes.css, which defines the `--pk-*` colour variables
+   * (paper, ink, night, accent, gilt, jewels, shadows). `*-rgb` triplets are for
+   * translucent uses: rgba(var(--pk-gilt-rgb), 0.4). Only aliases live here. */
   --pk-garnet: var(--pk-accent);
-  --pk-garnet-bright: #a8294f; /* hearts, the reading ribbon's sheen */
-
   --pk-success: var(--pk-emerald);
-  --pk-success-soft: #dcece4;
-  --pk-warning: #8f5d0a;
-  --pk-warning-soft: #f6eac6;
-  --pk-danger: #a3232c;
-  --pk-danger-soft: #f6dadb;
-
-  --pk-focus: #2f4fc4; /* sapphire focus ring: distinct from the garnet accent */
 
   /* ---- Typography ------------------------------------------------------
    * Kannada glyphs are not in the Latin fonts, so each stack falls back to a
@@ -105,11 +47,6 @@
   --pk-radius-md: 10px;
   --pk-radius-lg: 16px;
   --pk-radius-pill: 999px;
-
-  /* Shadows carry a little aubergine, so they read as depth rather than dirt. */
-  --pk-shadow-1: 0 1px 2px rgba(45, 24, 40, 0.08), 0 1px 1px rgba(45, 24, 40, 0.04);
-  --pk-shadow-2: 0 6px 18px rgba(45, 24, 40, 0.1), 0 1px 3px rgba(45, 24, 40, 0.06);
-  --pk-shadow-3: 0 22px 50px rgba(45, 24, 40, 0.2), 0 4px 12px rgba(45, 24, 40, 0.08);
 
   /* ---- Motion: one curve, four speeds ---------------------------------- */
   --pk-ease: cubic-bezier(0.2, 0.8, 0.2, 1);

@@ -41,9 +41,9 @@
   border-color: var(--accent-emerald);
   background-color: var(--bg-card-hover);
   box-shadow:
-    0 16px 40px rgba(62, 54, 46, 0.12),
-    0 4px 12px rgba(62, 54, 46, 0.08),
-    0 0 0 1px rgba(180, 83, 9, 0.12) inset;
+    0 16px 40px rgba(var(--pk-shadow-rgb), 0.12),
+    0 4px 12px rgba(var(--pk-shadow-rgb), 0.08),
+    0 0 0 1px rgba(var(--pk-gold-rgb), 0.12) inset;
   z-index: 5;
 }
 
@@ -129,8 +129,8 @@
 .book-card:hover .cover {
   transform: perspective(800px) rotateY(-16deg) translateZ(10px) translateY(-4px);
   box-shadow:
-    12px 14px 32px rgba(62, 54, 46, 0.2),
-    20px 24px 48px rgba(62, 54, 46, 0.12),
+    12px 14px 32px rgba(var(--pk-shadow-rgb), 0.2),
+    20px 24px 48px rgba(var(--pk-shadow-rgb), 0.12),
     inset -2px 0 6px rgba(0, 0, 0, 0.08);
 }
 
@@ -215,7 +215,7 @@
 }
 .book-card:hover .tag-badge {
   border-color: var(--accent-emerald);
-  background-color: rgba(217, 119, 6, 0.1);
+  background-color: rgba(var(--pk-gold-rgb), 0.1);
   color: var(--accent-emerald);
 }
 
@@ -255,8 +255,8 @@
   border-color: var(--accent-emerald);
   background-color: var(--bg-card-hover);
   box-shadow:
-    0 8px 24px rgba(62, 54, 46, 0.08),
-    0 0 0 1px rgba(180, 83, 9, 0.08) inset;
+    0 8px 24px rgba(var(--pk-shadow-rgb), 0.08),
+    0 0 0 1px rgba(var(--pk-gold-rgb), 0.08) inset;
 }
 
 .book-card.row .cover-wrapper {

@@ -186,7 +186,7 @@ export default function ConstellationGraph() {
         onDoubleClick={handleDoubleClick}
         style={{ width: "100%", height: "100%", display: "block" }}
       >
-        <rect width={VIEW.width} height={VIEW.height} fill="#0a0f22" />
+        <rect width={VIEW.width} height={VIEW.height} fill="var(--pk-night)" />
 
         <g
           transform={`translate(${VIEW.width / 2}, ${VIEW.height / 2}) scale(${camera.zoom}) translate(${-camera.x}, ${-camera.y})`}
@@ -200,7 +200,7 @@ export default function ConstellationGraph() {
                 y1={link.source.y}
                 x2={link.target.x}
                 y2={link.target.y}
-                stroke={lit ? link.source.color : "#2a3462"}
+                stroke={lit ? link.source.color : "var(--pk-star-link)"}
                 strokeWidth={lit ? 1.5 : 0.5}
                 strokeOpacity={lit ? 1 : 0.4}
               />
@@ -220,7 +220,7 @@ export default function ConstellationGraph() {
                     cy={node.y}
                     r={node.radius + 2}
                     fill="none"
-                    stroke={isSelected ? "#fff" : node.color}
+                    stroke={isSelected ? "var(--pk-cream)" : node.color}
                     strokeWidth={1.5}
                   />
                 )}
@@ -229,7 +229,7 @@ export default function ConstellationGraph() {
                   cy={node.y}
                   r={node.radius}
                   fill={node.color}
-                  stroke={isHovered || isSelected ? "#fff" : "none"}
+                  stroke={isHovered || isSelected ? "var(--pk-cream)" : "none"}
                   strokeWidth={1.5}
                 />
                 {(isHovered || isSelected) && (
@@ -237,7 +237,7 @@ export default function ConstellationGraph() {
                     x={node.x}
                     y={node.y + node.radius + 12}
                     textAnchor="middle"
-                    fill="#f4ebd9"
+                    fill="var(--pk-cream)"
                     fontSize={11}
                     fontFamily="system-ui"
                   >

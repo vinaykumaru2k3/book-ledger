@@ -3,6 +3,7 @@ import { ArrowLeft, Plus, Search } from "lucide-react";
 import Button from "../shared/pk/Button";
 import { useLanguage } from "../shared/i18n/LanguageContext";
 import StatsStrip from "../features/library/StatsStrip";
+import ThemePicker from "../features/theme/ThemePicker";
 import NavLink from "./shell/NavLink";
 
 /**
@@ -33,6 +34,7 @@ function PageHeader({ kicker, title, stats, showStats, onOpenCommand, onAdd, ext
             <span>{t("command.open")}</span>
             <kbd aria-hidden="true">/</kbd>
           </button>
+          <ThemePicker />
           <Button variant="primary" icon={Plus} className="pk-header__add" onClick={onAdd}>
             {t("action.addBook")}
           </Button>

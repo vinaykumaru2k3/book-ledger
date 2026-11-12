@@ -22,7 +22,7 @@ function NodeInspector({ node, connections, onClose, onSelectBook }) {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "#9a93ad",
+                color: "var(--pk-cream-3)",
                 fontSize: "0.7rem",
               }}
             >

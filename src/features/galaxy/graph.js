@@ -1,16 +1,14 @@
-import { STATUSES } from "../../domain/status";
 
 export const GALAXY_COLORS = {
-  done: "#3fa57f",      // Emerald
-  reading: "#e4c47f",   // Gilt
-  want: "#7d97e6",      // Sapphire, lit for the night sky
-  abandoned: "#7b7896", // Dusk
-  favorite: "#d65f86",  // Garnet glow
+  done: "var(--pk-star-done)",
+  reading: "var(--pk-star-reading)",
+  want: "var(--pk-star-want)",
+  abandoned: "var(--pk-star-dusk)",
+  favorite: "var(--pk-star-favorite)",
 };
 
 export function getNodeColor(book) {
   if (book.favorite) return GALAXY_COLORS.favorite;
-  if (STATUSES[book.status]?.color) return STATUSES[book.status].color;
   return GALAXY_COLORS[book.status] || GALAXY_COLORS.want;
 }
 

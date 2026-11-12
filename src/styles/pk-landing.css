@@ -7,8 +7,8 @@
 .pk-landing,
 .pk-auth {
   --night: var(--pk-night);
-  --night-2: #12151c;
-  --night-3: #191d26;
+  --night-2: var(--pk-night-2);
+  --night-3: var(--pk-night-3);
   --cream: var(--pk-cream);
   --cream-2: rgba(var(--pk-cream-rgb), 0.74);
   --cream-3: rgba(var(--pk-cream-rgb), 0.52);
@@ -20,9 +20,9 @@
   --glass: rgba(var(--pk-cream-rgb), 0.04);
   /* The night sky: deep blue at the top settling into ink, with a faint band of distant light. */
   --sky: radial-gradient(60% 45% at 78% 18%, rgba(var(--pk-sapphire-rgb), 0.22), transparent 70%),
-    radial-gradient(45% 35% at 12% 85%, rgba(110, 50, 70, 0.14), transparent 70%),
-    linear-gradient(115deg, transparent 30%, rgba(150, 160, 210, 0.05) 45%, rgba(150, 160, 210, 0.07) 52%, transparent 68%),
-    linear-gradient(180deg, #0e1424 0%, #0c0f18 45%, var(--night) 100%);
+    radial-gradient(45% 35% at 12% 85%, rgba(var(--pk-accent-rgb), 0.14), transparent 70%),
+    linear-gradient(115deg, transparent 30%, rgba(var(--pk-cream-rgb), 0.05) 45%, rgba(var(--pk-cream-rgb), 0.07) 52%, transparent 68%),
+    linear-gradient(180deg, var(--pk-night-2) 0%, var(--pk-night) 45%, var(--night) 100%);
 
   min-height: 100vh;
   overflow-x: clip;
@@ -65,7 +65,7 @@
   font-weight: 600;
 }
 .pk-solidbtn:hover {
-  background: #ffffff;
+  background: var(--pk-gilt);
 }
 .pk-solidbtn svg {
   transition: transform 160ms var(--pk-ease);
@@ -925,8 +925,8 @@
   gap: 4px;
   padding: 4px 10px;
   border-radius: var(--pk-radius-pill);
-  background: rgba(16, 185, 129, 0.14);
-  color: #6ee7b7;
+  background: rgba(var(--pk-emerald-rgb), 0.18);
+  color: var(--pk-emerald-bright);
   font: 700 0.72rem var(--pk-font-ui);
   opacity: 0;
 }
@@ -1415,7 +1415,7 @@
   padding: clamp(24px, 4vw, 36px);
   border: 1px solid var(--line-2);
   border-radius: 24px;
-  background: rgba(18, 21, 28, 0.88);
+  background: rgba(var(--pk-night-rgb), 0.88);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   color: var(--cream);
@@ -1526,7 +1526,7 @@
   color: var(--night);
 }
 .pk-authcard__form .pk-btn--primary:hover:not(:disabled) {
-  background: #ffffff;
+  background: var(--pk-accent-hover);
 }
 .pk-authcard__password {
   position: relative;
@@ -1560,16 +1560,16 @@
   font: 500 var(--pk-text-sm) / var(--pk-leading-body) var(--pk-font-ui);
 }
 .pk-authcard__error {
-  border: 1px solid rgba(248, 113, 113, 0.35);
-  background: rgba(248, 113, 113, 0.1);
-  color: #fca5a5;
+  border: 1px solid rgba(var(--pk-danger-rgb), 0.45);
+  background: rgba(var(--pk-danger-rgb), 0.14);
+  color: var(--pk-garnet-bright);
 }
 .pk-authcard__sent {
   gap: var(--pk-space-3);
   padding: var(--pk-space-4);
-  border: 1px solid rgba(110, 231, 183, 0.3);
-  background: rgba(16, 185, 129, 0.1);
-  color: #a7f3d0;
+  border: 1px solid rgba(var(--pk-emerald-rgb), 0.4);
+  background: rgba(var(--pk-emerald-rgb), 0.14);
+  color: var(--pk-emerald-bright);
 }
 .pk-authcard__error svg,
 .pk-authcard__sent svg {
@@ -1646,7 +1646,7 @@
   background: var(--pk-warning-soft);
   border: 1px solid color-mix(in srgb, var(--pk-warning) 35%, transparent);
   border-radius: var(--pk-radius-md);
-  color: #5d4200;
+  color: var(--pk-ink);
   font: 400 var(--pk-text-sm) / var(--pk-leading-body) var(--pk-font-ui);
 }
 .pk-verify strong {

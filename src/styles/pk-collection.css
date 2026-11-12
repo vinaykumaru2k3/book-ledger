@@ -140,7 +140,7 @@
 .pk-toolbar .pk-searchbox:focus-within,
 .pk-toolbar .pk-selectbox:has(select:focus-visible) {
   border-color: var(--pk-focus);
-  box-shadow: 0 0 0 3px rgba(47, 79, 196, 0.18);
+  box-shadow: 0 0 0 3px rgba(var(--pk-focus-rgb), 0.18);
 }
 .pk-toolbar .pk-selectbox {
   display: flex;
@@ -301,7 +301,7 @@
   z-index: 2;
   width: 26px;
   height: 26px;
-  background: rgba(255, 255, 255, 0.92);
+  background: var(--pk-surface-raised);
   color: var(--pk-garnet-bright);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
   transition: transform var(--pk-duration-3) var(--pk-ease);
@@ -361,7 +361,7 @@
 }
 .pk-row .pk-cover--sm {
   width: 38px;
-  box-shadow: 2px 4px 10px -4px rgba(45, 24, 40, 0.45);
+  box-shadow: 2px 4px 10px -4px rgba(var(--pk-shadow-rgb), 0.45);
 }
 .pk-row__title {
   font-size: 1.02rem;
@@ -387,7 +387,7 @@
   height: 8px;
   border-radius: 50%;
   background: var(--pk-gold);
-  box-shadow: 0 0 0 3px rgba(201, 149, 47, 0.16);
+  box-shadow: 0 0 0 3px rgba(var(--pk-gold-rgb), 0.16);
 }
 .pk-row__dot--reading {
   background: var(--pk-accent);
@@ -395,7 +395,7 @@
 }
 .pk-row__dot--done {
   background: var(--pk-emerald);
-  box-shadow: 0 0 0 3px rgba(47, 125, 99, 0.15);
+  box-shadow: 0 0 0 3px rgba(var(--pk-emerald-rgb), 0.15);
 }
 .pk-row__muted {
   color: var(--pk-line-strong);

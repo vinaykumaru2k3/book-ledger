@@ -2,6 +2,7 @@ import React, { Suspense, lazy, useState } from "react";
 import LoadingScreen from "../shared/ui/LoadingScreen";
 import LandingPage from "../features/landing/LandingPage";
 import AuthScreen from "../features/auth/AuthScreen";
+import { ThemeProvider } from "../features/theme/ThemeContext";
 import { AppProvider, useAuth } from "./AppContext";
 import { isPublicView } from "./routes";
 import { usePathRoute } from "./usePathRoute";
@@ -56,7 +57,9 @@ function AppGate() {
 export default function App() {
   return (
     <AppProvider>
-      <AppGate />
+      <ThemeProvider>
+        <AppGate />
+      </ThemeProvider>
     </AppProvider>
   );
 }
