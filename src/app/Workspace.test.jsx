@@ -137,7 +137,7 @@ describe("navigation", () => {
     const insights = within(document.querySelector(".pk-rail")).getByRole("link", { name: /Insights/ });
     expect(insights.getAttribute("href")).toBe("/analytics");
     fireEvent.click(insights);
-    expect(await screen.findByText("Total Books Completed", {}, LAZY)).toBeTruthy();
+    expect(await screen.findByRole("group", { name: "Report period" }, LAZY)).toBeTruthy();
     expect(window.location.pathname).toBe("/analytics");
     expect(screen.queryByLabelText("Shelf stats summary")).toBeNull();
   });

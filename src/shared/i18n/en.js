@@ -52,7 +52,7 @@ export default {
   "view.topbooks.kicker": "Popular Charts",
   "view.topbooks.title": "Discover Top Books",
   "view.analytics.kicker": "Reading Insights",
-  "view.analytics.title": "Library Analytics",
+  "view.analytics.title": "Your Reading, Measured",
   "view.shelves.kicker": "Library Dashboard",
   "view.shelves.title": "Custom Shelves",
   "view.galaxy.kicker": "Constellation Graph",

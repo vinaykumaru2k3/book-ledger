@@ -14,7 +14,7 @@ import { shelfFromRoute } from "../domain/library";
 export const PAGES = {
   recommendations: { Component: lazy(() => import("../features/discover/Recommendations")), bare: true },
   topbooks: { Component: lazy(() => import("../features/discover/TopCharts")), bare: true },
-  analytics: { Component: lazy(() => import("../features/insights/Analytics")) },
+  analytics: { Component: lazy(() => import("../features/insights/Analytics")), bare: true },
   shelves: { Component: lazy(() => import("../features/shelves/ShelvesDashboard")), bare: true },
   galaxy: {
     Component: lazy(() => import("../features/galaxy/ConstellationGraph")),
