@@ -117,6 +117,8 @@ export function normalizeBook(raw, { stamp = false, previous } = {}) {
     // or "removed" when the user cleared it, so automatic lookups leave it alone.
     coverSource: raw.coverSource ? String(raw.coverSource) : "",
     coverCheckedAt: raw.coverCheckedAt || null,
+    // Which version of the cover search last looked; a better search looks again.
+    coverCheckVersion: Number(raw.coverCheckVersion) || 0,
     sourceKey: raw.sourceKey || "",
     favorite: Boolean(raw.favorite),
     shelves: toStringList(raw.shelves),

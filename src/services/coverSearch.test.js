@@ -7,6 +7,7 @@ import {
   needsCover,
   resetCoverSearch,
   titleMatches,
+  titleSoundsLike,
 } from "./coverSearch";
 
 const json = (body, status = 200) => Promise.resolve({ ok: status < 400, status, json: () => Promise.resolve(body) });
@@ -41,6 +42,14 @@ describe("title matching", () => {
     expect(titleMatches("ಎಸ್. ಎಲ್. ಭೈರಪ್ಪ", "ಪರ್ವ")).toBe(false);
     expect(titleMatches("", "Dune")).toBe(false);
   });
+
+  it("matches catalogue titles spelled another way or printed in both scripts", () => {
+    expect(titleSoundsLike("ಕಾನೂರು ಹೆಗ್ಗಡಿತಿ", "ಕಾನೂರು ಹೆಗ್ಗಡತಿ")).toBe(true);
+    expect(titleSoundsLike("Kanooru Heggadathi", "ಕಾನೂರು ಹೆಗ್ಗಡತಿ")).toBe(true);
+    expect(titleSoundsLike("ಕೊಳಲು Kolalu", "ಕೊಳಲು")).toBe(true);
+    expect(titleSoundsLike("ಪಕ್ಷಿಕಾಶಿ Pakshikashi", "ಕೊಳಲು")).toBe(false);
+    expect(titleSoundsLike("Children of Dune", "Dune")).toBe(false);
+  });
 });
 
 describe("needsCover", () => {
@@ -51,8 +60,12 @@ describe("needsCover", () => {
     expect(needsCover({ title: "Parva", coverSource: "removed" }, now)).toBe(false);
   });
   it("retries a miss after 30 days", () => {
-    expect(needsCover({ title: "Parva", coverCheckedAt: "2026-11-01T00:00:00Z" }, now)).toBe(false);
-    expect(needsCover({ title: "Parva", coverCheckedAt: "2026-09-01T00:00:00Z" }, now)).toBe(true);
+    expect(needsCover({ title: "Parva", coverCheckedAt: "2026-11-01T00:00:00Z", coverCheckVersion: 2 }, now)).toBe(false);
+    expect(needsCover({ title: "Parva", coverCheckedAt: "2026-09-01T00:00:00Z", coverCheckVersion: 2 }, now)).toBe(true);
+  });
+  it("retries at once a miss from an older, weaker search", () => {
+    expect(needsCover({ title: "Parva", coverCheckedAt: "2026-11-11T00:00:00Z" }, now)).toBe(true);
+    expect(needsCover({ title: "Parva", coverCheckedAt: "2026-11-11T00:00:00Z", coverCheckVersion: 1 }, now)).toBe(true);
   });
 });
 
@@ -72,7 +85,35 @@ describe("findBestCover", () => {
       url: "https://w/parva.jpg",
       source: "wikipedia",
     });
-    expect(fetch.mock.calls[0][0]).toContain("kn.wikipedia.org");
+    expect(fetch.mock.calls.some(([url]) => url.includes("kn.wikipedia.org"))).toBe(true);
+  });
+
+  it("finds the work on Wikidata under another spelling and skips the author's photo", async () => {
+    const work = {
+      id: "Q55615667",
+      labels: { kn: { value: "ಕಾನೂರು ಹೆಗ್ಗಡತಿ" }, en: { value: "Kanuru Heggaditi" } },
+      claims: { P31: [{ mainsnak: { datavalue: { value: { id: "Q7725634" } } } }], P50: [{ mainsnak: { datavalue: { value: { id: "Q3351108" } } } }] },
+      sitelinks: { knwiki: { title: "ಕಾನೂರು ಹೆಗ್ಗಡತಿ" }, enwiki: { title: "Kanuru Heggaditi" } },
+    };
+    const kuvempu = { id: "Q3351108", labels: { en: { value: "Kuvempu" }, kn: { value: "ಕುವೆಂಪು" } } };
+    const portrait = (source) => ({ thumbnail: { source, width: 300, height: 450 } });
+    route({
+      "wikidata.org": (url) => {
+        const action = url.searchParams.get("action");
+        if (action === "wbsearchentities") {
+          return json({ search: url.searchParams.get("search") === "ಕುವೆಂಪು" ? [{ id: "Q3351108", description: "poet" }] : [] });
+        }
+        if (action === "query") return json({ query: { search: [{ title: "Q55615667" }] } });
+        const asked = url.searchParams.get("ids").split("|");
+        return json({ entities: Object.fromEntries([work, kuvempu].filter((e) => asked.includes(e.id)).map((e) => [e.id, e])) });
+      },
+      "kn.wikipedia.org": () => json(wikiPages({ title: "ಕಾನೂರು ಹೆಗ್ಗಡತಿ", ...portrait("https://w/commons/Kuvempu.jpg") })),
+      "en.wikipedia.org": () => json(wikiPages({ title: "Kanuru Heggaditi", ...portrait("https://w/en/Kanuru-Heggaditi-Novel.jpg") })),
+    });
+    await expect(findBestCover({ title: "ಕಾನೂರು ಹೆಗ್ಗಡಿತಿ", author: "ಕುವೆಂಪು" }, { verify: accept })).resolves.toEqual({
+      url: "https://w/en/Kanuru-Heggaditi-Novel.jpg",
+      source: "wikipedia",
+    });
   });
 
   it("uses the English page when the Kannada page has no image", async () => {
@@ -95,6 +136,7 @@ describe("findBestCover", () => {
     const verify = vi.fn((url) => Promise.resolve(!url.includes("/42-")));
     const found = await findBestCover({ title: "Dune", author: "Frank Herbert" }, { verify });
     expect(verify).toHaveBeenCalledWith("https://covers.openlibrary.org/b/id/42-L.jpg");
+    expect(fetch.mock.calls.some(([url]) => url.includes("wikidata.org"))).toBe(true);
     expect(found).toEqual({ url: "https://books.google.com/x?id=1&zoom=2", source: "google" });
   });
 
@@ -112,6 +154,20 @@ describe("findBestCover", () => {
     const calls = fetch.mock.calls.length;
     await expect(findBestCover({ title: "Unknown" }, { verify: accept })).resolves.toBeNull();
     expect(fetch.mock.calls.length).toBe(calls);
+  });
+
+  it("looks through the author's books on Google when the title is spelled differently", async () => {
+    route({
+      "wikipedia.org": () => json(wikiPages()),
+      "openlibrary.org": () => json({ docs: [] }),
+      "googleapis.com": (url) =>
+        json(
+          url.searchParams.get("q").startsWith("inauthor:")
+            ? { items: [{ volumeInfo: { title: "ಪಕ್ಷಿಕಾಶಿ Pakshikashi", imageLinks: { thumbnail: "https://books.google.com/p?id=1" } } }, { volumeInfo: { title: "ಕೊಳಲು Kolalu", imageLinks: { thumbnail: "https://books.google.com/k?id=2" } } }] }
+            : { items: [] },
+        ),
+    });
+    await expect(findBestCover({ title: "ಕೊಳಲು", author: "ಕುವೆಂಪು" }, { verify: accept })).resolves.toEqual({ url: "https://books.google.com/k?id=2&zoom=2", source: "google" });
   });
 
   it("treats Google's exhausted quota as a miss but an unreachable Wikipedia as incomplete", async () => {

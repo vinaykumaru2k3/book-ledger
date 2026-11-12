@@ -205,6 +205,7 @@ describe("automatic covers", () => {
     covers.find.mockResolvedValue(null);
     await setup([coverless()]);
     await waitFor(() => expect(setDocMock).toHaveBeenCalled(), { timeout: 4000 });
+    expect(writes()[0]).toMatchObject({ coverCheckVersion: 2 });
     expect(writes()[0]).toHaveProperty("coverCheckedAt");
     expect(writes()[0]).not.toHaveProperty("coverUrl");
   });
@@ -222,7 +223,7 @@ describe("automatic covers", () => {
     covers.enabled = true;
     await setup([
       coverless({ id: "removed", coverSource: "removed" }),
-      coverless({ id: "recent", title: "Emma", coverCheckedAt: new Date().toISOString() }),
+      coverless({ id: "recent", title: "Emma", coverCheckedAt: new Date().toISOString(), coverCheckVersion: 2 }),
     ]);
     await new Promise((resolve) => setTimeout(resolve, 1500));
     expect(covers.find).not.toHaveBeenCalled();

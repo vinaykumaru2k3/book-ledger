@@ -72,7 +72,7 @@ async function fetchEnrichData(book) {
   let pages = 0;
 
   try {
-    if (book.sourceKey && !book.sourceKey.startsWith("/works/")) {
+    if (book.sourceKey && !book.sourceKey.startsWith("/works/") && !book.sourceKey.startsWith("wd:")) {
       const data = await fetchJson(
         withGoogleKey(`https://www.googleapis.com/books/v1/volumes/${encodeURIComponent(book.sourceKey)}`)
       );

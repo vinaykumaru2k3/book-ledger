@@ -21,7 +21,7 @@ import { db } from "../../services/firebase";
 import { changedFields, contentKey, createBookFromForm, findNewBooks, normalizeBook, parseLedger } from "../../domain/book";
 import { findDuplicate } from "../../domain/library";
 import { awaitAck } from "../../shared/lib/awaitAck";
-import { CoverSearchIncomplete, findBestCover, needsCover } from "../../services/coverSearch";
+import { COVER_SEARCH_VERSION, CoverSearchIncomplete, findBestCover, needsCover } from "../../services/coverSearch";
 import { buildUpdates, lookupDetails, needsEnrichment } from "../../services/enrichment";
 
 const BATCH_LIMIT = 400; // Firestore allows 500 operations per batch
@@ -229,6 +229,7 @@ export function useBooksController(user, notify) {
           try {
             const cover = await findBestCover(next);
             updates.coverCheckedAt = new Date().toISOString();
+            updates.coverCheckVersion = COVER_SEARCH_VERSION;
             if (cover) Object.assign(updates, { coverUrl: cover.url, coverSource: cover.source });
           } catch (err) {
             // A source was unreachable: leave the book unstamped so a later session retries.

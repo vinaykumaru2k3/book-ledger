@@ -22,6 +22,9 @@ export function withGoogleKey(url) {
   return GOOGLE_KEY ? `${url}${url.includes("?") ? "&" : "?"}key=${encodeURIComponent(GOOGLE_KEY)}` : url;
 }
 
+import { soundKey } from "../domain/soundKey";
+import { isWikidataId, searchWikidataBooks, wikipediaIntro } from "./wikidataBooks";
+
 const isOpenLibraryWork = (id) => String(id).startsWith("/works/");
 
 async function getJson(url) {
@@ -49,13 +52,8 @@ function volumeFromOpenLibraryDoc(doc) {
   };
 }
 
-/**
- * Searches for books. `type` is "all" | "title" | "author" | "genre".
- * Falls back to Open Library when Google Books rate-limits (HTTP 429).
- * Resolves to an array of volumes; throws with a readable message on failure.
- */
-export async function searchVolumes(query, type = "all") {
-  const text = query.trim();
+/** Google Books, or Open Library when Google rate-limits (HTTP 429). */
+async function searchCatalogues(text, type) {
   const googleQuery = `${GOOGLE_PREFIX[type] || ""}${text}`;
   const response = await fetch(withGoogleKey(`${GOOGLE_VOLUMES}?q=${encodeURIComponent(googleQuery)}&maxResults=8`));
 
@@ -72,6 +70,53 @@ export async function searchVolumes(query, type = "all") {
   if (!response.ok) throw new Error(`Google Books API returned status ${response.status}`);
   const data = await response.json();
   return data.items || [];
+}
+
+/** How closely a result's title answers the query: 2 same title, 1 contains it, 0 otherwise. */
+export function titleRelevance(title, query) {
+  const a = normalizeTitle(String(title || ""));
+  const b = normalizeTitle(String(query || ""));
+  if (!a || !b) return 0;
+  const keyA = soundKey(a);
+  const keyB = soundKey(b);
+  if (a === b || (keyB.length >= 3 && keyA === keyB)) return 2;
+  if (a.includes(b) || (keyB.length >= 3 && keyA.includes(keyB))) return 1;
+  return 0;
+}
+
+/**
+ * Searches for books. `type` is "all" | "title" | "author" | "genre".
+ *
+ * Title searches also ask Wikidata, which knows a work by all its names, so a
+ * Kannada novel typed in English letters ("Mookajjiya kanasugalu") is found
+ * under its Kannada title. Those works come first; catalogue results whose
+ * title answers the query come next, then the rest. Resolves to an array of
+ * volumes; throws with a readable message only when every source failed.
+ */
+export async function searchVolumes(query, type = "all") {
+  const text = query.trim();
+  const askWikidata = type === "all" || type === "title";
+  const [works, catalogue] = await Promise.allSettled([
+    askWikidata ? searchWikidataBooks(text) : Promise.resolve([]),
+    searchCatalogues(text, type),
+  ]);
+  if (catalogue.status === "rejected" && (works.status === "rejected" || !works.value.length)) throw catalogue.reason;
+
+  const found = works.status === "fulfilled" ? works.value : [];
+  const rest = catalogue.status === "fulfilled" ? catalogue.value : [];
+  const seen = new Set(found.flatMap((v) => [v.volumeInfo.title, ...String(v.volumeInfo.description).split(" · ").slice(0, 1)].map(soundKey)));
+  const ranked = askWikidata
+    ? rest
+        .map((volume, index) => ({ volume, index, score: titleRelevance(volume.volumeInfo?.title, text) }))
+        .sort((x, y) => y.score - x.score || x.index - y.index)
+        .map((r) => r.volume)
+    : rest;
+  // Leave out catalogue copies of a work Wikidata already gave, unless they bring a cover it lacks.
+  const extra = ranked.filter((v) => {
+    const duplicate = seen.has(soundKey(v.volumeInfo?.title || ""));
+    return !duplicate || (v.volumeInfo?.imageLinks && !found.some((w) => w.volumeInfo.imageLinks));
+  });
+  return [...found, ...extra].slice(0, 10);
 }
 
 /* ------------------------- single-book details ------------------------- */
@@ -103,6 +148,7 @@ export async function fetchOpenLibraryDescription(workKey) {
 /** Upgrades a Google thumbnail to https, drops the page-curl effect and asks for a larger image. */
 export function sharpenCoverUrl(url) {
   if (!url) return "";
+  if (!/books\.google|googleapis|googleusercontent/.test(url)) return url.replace(/^http:\/\//, "https://");
   let next = url.replace(/^http:\/\//, "https://").replace(/&edge=curl/g, "").replace(/&zoom=\d/, "&zoom=2");
   if (!next.includes("zoom=")) next += `${next.includes("?") ? "&" : "?"}zoom=2`;
   return next;
@@ -162,6 +208,18 @@ async function fillGapsFromOpenLibrary(form) {
  * record (search results are abbreviated), then fills any gaps from Open Library.
  */
 export async function buildFormFromVolume(volume) {
+  if (isWikidataId(volume.id)) {
+    // Wikidata's facts are about this very work: keep them, and take the
+    // description from its Wikipedia page rather than a catalogue guess.
+    const form = formFromVolume(volume);
+    form.description = "";
+    if (volume.wikidata) {
+      const intro = await wikipediaIntro(volume.wikidata);
+      if (intro) form.description = intro.slice(0, MAX_DESCRIPTION);
+    }
+    if (form.coverUrl) form.coverSource = "wikipedia";
+    return form;
+  }
   const fromOpenLibrary = isOpenLibraryWork(volume.id);
   const full = fromOpenLibrary ? null : await fetchGoogleVolume(volume.id);
   let form = formFromVolume(full || volume);

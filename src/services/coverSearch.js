@@ -12,7 +12,9 @@
  * Free of React and Firestore: the controller decides when to look and saves.
  */
 
+import { soundsAlike } from "../domain/soundKey";
 import { normalizeTitle, sharpenCoverUrl, withGoogleKey } from "./bookApi";
+import { authorNamesOf, findWorks, looksLikeAuthorPhoto, wikipediaCovers } from "./wikidataBooks";
 
 const CACHE_STORAGE_KEY = "pusthaka-cover-cache";
 const RECHECK_AFTER_MS = 30 * 24 * 60 * 60 * 1000;
@@ -20,6 +22,12 @@ const VERIFY_TIMEOUT_MS = 8000;
 const MAX_TRIES_PER_SOURCE = 4;
 
 export const COVER_SOURCES = ["wikipedia", "openlibrary", "google"];
+
+/**
+ * Raised when the search gets better, so books it missed are looked at again
+ * instead of waiting 30 days. 2: Wikidata, spelling variants, author lists on Google.
+ */
+export const COVER_SEARCH_VERSION = 2;
 
 const KANNADA = /[ಀ-೿]/;
 
@@ -62,7 +70,8 @@ export function needsCover(book, now = Date.now()) {
   if (!book || book.coverUrl || book.coverSource === "removed") return false;
   if (!book.title || book.title === "Untitled") return false;
   const checked = book.coverCheckedAt ? Date.parse(book.coverCheckedAt) : NaN;
-  return Number.isNaN(checked) || now - checked > RECHECK_AFTER_MS;
+  if (Number.isNaN(checked) || (Number(book.coverCheckVersion) || 1) < COVER_SEARCH_VERSION) return true;
+  return now - checked > RECHECK_AFTER_MS;
 }
 
 /** The core of a title: no "(novel)"-style qualifier, no subtitle, no leading article. */
@@ -76,6 +85,24 @@ export function coreTitle(title) {
 export function titleMatches(candidate, bookTitle) {
   const a = coreTitle(candidate);
   return Boolean(a) && a === coreTitle(bookTitle);
+}
+
+const KANNADA_RUN = /[ಀ-೿][ಀ-೿\s.,'-]*/g;
+
+/**
+ * A looser match for catalogue titles: the same title, the same title spelled
+ * another way (Kanooru, Kanuru; ಹೆಗ್ಗಡಿತಿ, ಹೆಗ್ಗಡತಿ), or one half of a title
+ * printed in both scripts ("ಕೊಳಲು Kolalu").
+ */
+export function titleSoundsLike(candidate, bookTitle) {
+  if (titleMatches(candidate, bookTitle)) return true;
+  const a = coreTitle(candidate);
+  const b = coreTitle(bookTitle);
+  if (soundsAlike(a, b)) return true;
+  const kannada = (String(candidate || "").match(KANNADA_RUN) || []).join(" ").trim();
+  const latin = String(candidate || "").replace(KANNADA_RUN, " ").trim();
+  if (!kannada || !latin) return false;
+  return [kannada, latin].some((half) => titleMatches(half, bookTitle) || soundsAlike(coreTitle(half), b));
 }
 
 async function getJson(url) {
@@ -119,19 +146,45 @@ function bookPages(data, title) {
     .sort((a, b) => (A_BOOK.test(qualifier(b.title)) - A_BOOK.test(qualifier(a.title))) || (a.index || 0) - (b.index || 0));
 }
 
+const notAuthor = (book) => (page) => !looksLikeAuthorPhoto(page.thumbnail?.source, [book.author || ""]);
 const wikiCandidate = (page) => ({ url: page.thumbnail.source, source: "wikipedia", label: `Wikipedia · ${page.title}` });
 
 /**
- * At most three calls: the title, then the title with "novel" ("ಕಾದಂಬರಿ"), then,
- * for a Kannada page without an image, its English counterpart.
+ * The book's own Wikidata item knows its Kannada and English Wikipedia pages,
+ * whatever the spelling of the title in the library. Covers from both pages.
+ */
+async function wikidataCandidates(book) {
+  const works = await findWorks(book, titleMatches);
+  if (!works.length) return [];
+  const chosen = works.slice(0, 3);
+  const [covers, authors] = await Promise.all([wikipediaCovers(chosen), authorNamesOf(chosen).catch(() => [])]);
+  const names = [...authors, book.author || ""];
+  return chosen.flatMap((w) =>
+    (covers[w.id] || [])
+      .filter((c) => !looksLikeAuthorPhoto(c.url, names))
+      .map((c) => ({ url: c.url, source: "wikipedia", label: `Wikipedia · ${c.page}` })),
+  );
+}
+
+/**
+ * First the book's Wikidata item. Failing that, at most three calls: the title,
+ * then the title with "novel" ("ಕಾದಂಬರಿ"), then, for a Kannada page without an
+ * image, its English counterpart.
  */
 async function wikipediaCandidates(book) {
+  let fromWikidata = [];
+  try {
+    fromWikidata = await wikidataCandidates(book);
+  } catch {
+    /* Wikidata unreachable: Wikipedia's own search still answers */
+  }
+  if (fromWikidata.length) return fromWikidata;
   const title = book.title.trim();
   const lang = KANNADA.test(title) ? "kn" : "en";
   const englishTitles = new Set();
   for (const query of [title, `${title} ${lang === "kn" ? "ಕಾದಂಬರಿ" : "novel"}`]) {
     const pages = bookPages(await getJson(wikipediaSearchUrl(lang, query)), title);
-    const withImage = pages.filter((p) => p.thumbnail?.source);
+    const withImage = pages.filter((p) => p.thumbnail?.source).filter(notAuthor(book));
     if (withImage.length) return withImage.map(wikiCandidate);
     pages.forEach((p) => p.langlinks?.[0]?.["*"] && englishTitles.add(p.langlinks[0]["*"]));
     if (pages.length) break; // the page exists but has no image: searching again will not help
@@ -141,6 +194,7 @@ async function wikipediaCandidates(book) {
   const data = await getJson(`https://en.wikipedia.org/w/api.php?${params}`);
   return Object.values(data?.query?.pages || {})
     .filter((p) => p.thumbnail?.source && !NOT_A_BOOK.test(qualifier(p.title)))
+    .filter(notAuthor(book))
     .map(wikiCandidate);
 }
 
@@ -155,7 +209,7 @@ async function openLibraryCandidates(book) {
     const params = new URLSearchParams({ title: book.title, limit: "10", fields: "title,author_name,cover_i" });
     if (withAuthor && book.author) params.set("author", book.author);
     const data = await getJson(`https://openlibrary.org/search.json?${params}`);
-    return (data?.docs || []).filter((d) => d.cover_i && titleMatches(d.title, book.title));
+    return (data?.docs || []).filter((d) => d.cover_i && titleSoundsLike(d.title, book.title));
   };
   let docs = await search(true);
   if (!docs.length && book.author) docs = await search(false);
@@ -175,12 +229,16 @@ async function googleCandidates(book) {
   const isbn = cleanIsbn(book.isbn);
   const queries = [];
   if (isbn) queries.push(`isbn:${isbn}`);
-  queries.push(`intitle:"${book.title}"${book.author ? ` inauthor:"${book.author}"` : ""}`);
+  const author = String(book.author || "").split(",")[0].trim();
+  queries.push(`intitle:"${book.title}"${author ? ` inauthor:"${author}"` : ""}`);
+  // Spelled differently in the catalogue: look through the author's books instead.
+  if (author) queries.push(`inauthor:"${author}"`);
   const out = [];
   for (const q of queries) {
     let data;
     try {
-      data = await getJson(withGoogleKey(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=10`));
+      const max = q.startsWith("inauthor:") ? 40 : 10;
+      data = await getJson(withGoogleKey(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=${max}`));
     } catch (error) {
       if (error.status === 429) googleBlocked = true;
       throw error;
@@ -189,7 +247,7 @@ async function googleCandidates(book) {
       const info = item.volumeInfo || {};
       const link = info.imageLinks?.thumbnail || info.imageLinks?.smallThumbnail;
       if (!link) return;
-      if (!q.startsWith("isbn:") && !titleMatches(info.title, book.title)) return;
+      if (!q.startsWith("isbn:") && !titleSoundsLike(info.title, book.title)) return;
       out.push({ url: sharpenCoverUrl(link), source: "google", label: `Google Books · ${info.title || ""}`.trim() });
     });
     if (out.length) break;
