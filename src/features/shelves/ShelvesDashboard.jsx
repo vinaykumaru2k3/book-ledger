@@ -77,8 +77,9 @@ function ShelvesDashboard({ navigate }) {
   const loose = books.length - shelvedCount;
 
   const builder = building && <ShelfBuilder onClose={() => setBuilding(false)} onSaved={(name) => navigate(shelfRoute(name))} />;
-  const newShelf = (
-    <Button variant="primary" icon={Plus} onClick={() => setBuilding(true)}>
+  // Next to the header's solid "Add Book" this is secondary; as the only action on an empty page it is primary.
+  const newShelf = (variant) => (
+    <Button variant={variant} icon={Plus} onClick={() => setBuilding(true)}>
       {t("shelfBuilder.new")}
     </Button>
   );
@@ -86,7 +87,7 @@ function ShelvesDashboard({ navigate }) {
   if (uniqueShelves.length === 0) {
     return (
       <>
-        <EmptyState icon={FolderOpen} title={t("shelves.emptyTitle")} action={books.length ? newShelf : null}>
+        <EmptyState icon={FolderOpen} title={t("shelves.emptyTitle")} action={books.length ? newShelf("primary") : null}>
           {t("shelves.emptyBody")}
         </EmptyState>
         {builder}
@@ -108,7 +109,7 @@ function ShelvesDashboard({ navigate }) {
             </>
           )}
         </p>
-        {newShelf}
+        {newShelf("secondary")}
       </div>
 
       <div className="pk-case">

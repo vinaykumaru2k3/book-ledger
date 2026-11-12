@@ -574,12 +574,22 @@
 .pk-header {
   padding-top: var(--pk-space-6);
 }
+/* Title left, actions right, on ONE row on every page. The actions never drop
+ * under the title (that made the buttons jump around from page to page); the
+ * title wraps instead, and the search trigger shrinks to an icon when tight. */
 .pk-header__top {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: var(--pk-space-4);
+}
+.pk-header__titles {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.pk-header__actions {
+  flex: none;
 }
 .pk-kicker {
   font: 700 var(--pk-text-xs) / 1 var(--pk-font-ui);
@@ -626,6 +636,23 @@
   background: var(--pk-surface-sunken);
   color: var(--pk-ink-2);
   font: 600 var(--pk-text-xs) var(--pk-font-ui);
+}
+/* Desktop widths where the content column is narrow: icon-only trigger. */
+@media (min-width: 900px) and (max-width: 1279px) {
+  .pk-search-trigger {
+    justify-content: center;
+    width: 44px;
+    padding: 0;
+  }
+  .pk-search-trigger > span,
+  .pk-search-trigger kbd {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
 }
 .pk-library-tabs {
   margin: var(--pk-space-5) 0 var(--pk-space-4);
@@ -878,6 +905,9 @@
   }
   .pk-header__add {
     display: none; /* the tab bar's centre button adds a book */
+  }
+  .pk-header__top {
+    flex-wrap: wrap; /* phones: the search field takes a full row under the title */
   }
   .pk-header__actions {
     width: 100%;
