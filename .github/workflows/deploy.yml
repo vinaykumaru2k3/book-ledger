@@ -27,6 +27,10 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+        env:
+          # Optional. Add a repository secret named GOOGLE_BOOKS_API_KEY to give
+          # Google Books lookups their own daily quota; empty when unset.
+          VITE_GOOGLE_BOOKS_API_KEY: ${{ secrets.GOOGLE_BOOKS_API_KEY }}
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:

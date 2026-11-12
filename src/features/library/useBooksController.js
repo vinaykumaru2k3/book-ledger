@@ -21,11 +21,12 @@ import { db } from "../../services/firebase";
 import { changedFields, contentKey, createBookFromForm, findNewBooks, normalizeBook, parseLedger } from "../../domain/book";
 import { findDuplicate } from "../../domain/library";
 import { awaitAck } from "../../shared/lib/awaitAck";
+import { CoverSearchIncomplete, findBestCover, needsCover } from "../../services/coverSearch";
 import { buildUpdates, lookupDetails, needsEnrichment } from "../../services/enrichment";
 
 const BATCH_LIMIT = 400; // Firestore allows 500 operations per batch
 const MAX_IMPORT_BOOKS = 5000;
-const ENRICH_DELAY_MS = 800; // gentle on the public APIs
+const ENRICH_DELAY_MS = 1200; // gentle on the public APIs (Wikipedia rate-limits bursts)
 const OFFLINE_NOTE = "Saved on this device. It will sync when you are back online.";
 
 export function useBooksController(user, notify) {
@@ -210,7 +211,7 @@ export function useBooksController(user, notify) {
   // attempt finishes without changing `books`.
   useEffect(() => {
     if (!user || booksLoading || enrichingRef.current) return undefined;
-    const next = books.find((b) => !attemptedRef.current.has(b.id) && needsEnrichment(b));
+    const next = books.find((b) => !attemptedRef.current.has(b.id) && (needsEnrichment(b) || needsCover(b)));
     if (!next) return undefined;
 
     const timer = setTimeout(async () => {
@@ -218,11 +219,27 @@ export function useBooksController(user, notify) {
       enrichingRef.current = true;
       attemptedRef.current.add(next.id);
       try {
-        const data = await lookupDetails(next);
+        const updates = {};
+        if (needsEnrichment(next)) {
+          const data = await lookupDetails(next);
+          const latest = booksRef.current.find((b) => b.id === next.id);
+          if (data && latest) Object.assign(updates, buildUpdates(latest, data));
+        }
+        if (needsCover(next)) {
+          try {
+            const cover = await findBestCover(next);
+            updates.coverCheckedAt = new Date().toISOString();
+            if (cover) Object.assign(updates, { coverUrl: cover.url, coverSource: cover.source });
+          } catch (err) {
+            // A source was unreachable: leave the book unstamped so a later session retries.
+            if (!(err instanceof CoverSearchIncomplete)) throw err;
+          }
+        }
         const latest = booksRef.current.find((b) => b.id === next.id);
-        if (data && latest && userIdRef.current === startedFor) {
-          const updates = buildUpdates(latest, data);
-          if (Object.keys(updates).length) await updateBook(latest.id, updates);
+        // Never overwrite a cover the user set while we were looking.
+        if (latest?.coverUrl) ["coverUrl", "coverSource"].forEach((k) => delete updates[k]);
+        if (latest && userIdRef.current === startedFor && Object.keys(updates).length) {
+          await updateBook(latest.id, updates);
         }
       } catch (err) {
         console.error(`[Enrich] failed for "${next.title}":`, err);

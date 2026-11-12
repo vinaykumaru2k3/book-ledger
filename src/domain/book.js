@@ -113,6 +113,10 @@ export function normalizeBook(raw, { stamp = false, previous } = {}) {
     isbn: raw.isbn ? String(raw.isbn) : "",
     coverId: raw.coverId || null,
     coverUrl: raw.coverUrl || "",
+    // Where the cover came from ("wikipedia", "openlibrary", "google", "manual"),
+    // or "removed" when the user cleared it, so automatic lookups leave it alone.
+    coverSource: raw.coverSource ? String(raw.coverSource) : "",
+    coverCheckedAt: raw.coverCheckedAt || null,
     sourceKey: raw.sourceKey || "",
     favorite: Boolean(raw.favorite),
     shelves: toStringList(raw.shelves),
@@ -203,6 +207,7 @@ export function formFromBook(book) {
     isbn: book.isbn,
     coverId: book.coverId,
     coverUrl: book.coverUrl,
+    coverSource: book.coverSource || "",
     sourceKey: book.sourceKey,
     shelves: book.shelves || [],
   };
@@ -210,7 +215,10 @@ export function formFromBook(book) {
 
 /** Builds a book to save from the edit form, preserving fields the form lacks. */
 export function createBookFromForm(form, existing = null) {
-  return normalizeBook({ ...(existing || {}), ...form }, { stamp: true, previous: existing || undefined });
+  const merged = { ...(existing || {}), ...form };
+  // Clearing a cover is a choice: mark it so automatic lookups do not bring it back.
+  if (existing?.coverUrl && !String(merged.coverUrl || "").trim()) merged.coverSource = "removed";
+  return normalizeBook(merged, { stamp: true, previous: existing || undefined });
 }
 
 /**

@@ -4,6 +4,7 @@ import Field from "../../../shared/pk/Field";
 import RatingStars from "../../../shared/pk/RatingStars";
 import { STATUSES } from "../../../domain/status";
 import { useLanguage } from "../../../shared/i18n/LanguageContext";
+import CoverPicker from "./CoverPicker";
 import ShelfPicker from "./ShelfPicker";
 
 /**
@@ -64,7 +65,19 @@ function BookFormFields({ form, patch, shelfOptions, editing, focusTitle }) {
           <ShelfPicker available={shelfOptions} selected={form.shelves || []} onChange={(shelves) => patch({ shelves })} />
           <Field label={t("form.description")} as="textarea" rows={4} {...text("description")} placeholder={t("form.descriptionPlaceholder")} />
           <Field label={t("form.notes")} as="textarea" rows={3} {...text("notes")} placeholder={t("form.notesPlaceholder")} />
-          <Field label={t("form.cover")} {...text("coverUrl")} placeholder="https://example.com/cover.jpg" />
+          <div className="pk-form__coverfield">
+            <Field
+              label={t("form.cover")}
+              value={form.coverUrl ?? ""}
+              onChange={(event) => patch({ coverUrl: event.target.value, coverSource: "manual" })}
+              placeholder="https://example.com/cover.jpg"
+            />
+            <CoverPicker
+              book={{ title: form.title || "", author: form.author || "", isbn: form.isbn || "" }}
+              value={form.coverUrl || ""}
+              onPick={(coverUrl, coverSource) => patch({ coverUrl, coverSource })}
+            />
+          </div>
         </div>
       </details>
     </>

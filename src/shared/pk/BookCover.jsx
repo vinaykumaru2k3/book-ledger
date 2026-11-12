@@ -7,9 +7,10 @@ import { getCoverStyle, getInitials } from "../lib/cover";
  * fails to load). size: "sm" | "md" | "lg", or "fluid" to fill its container (2:3).
  */
 function BookCover({ book, size = "md", className = "" }) {
-  const [failed, setFailed] = useState(false);
+  // Remember which URL failed, so a new cover gets its own chance to load.
+  const [failedUrl, setFailedUrl] = useState("");
   const title = book?.title || "";
-  const showImage = book?.coverUrl && !failed;
+  const showImage = book?.coverUrl && failedUrl !== book.coverUrl;
 
   return (
     <div
@@ -18,7 +19,7 @@ function BookCover({ book, size = "md", className = "" }) {
       data-cover-id={book?.id}
     >
       {showImage ? (
-        <img src={book.coverUrl} alt={title ? `Cover of ${title}` : "Book cover"} loading="lazy" onError={() => setFailed(true)} />
+        <img src={book.coverUrl} alt={title ? `Cover of ${title}` : "Book cover"} loading="lazy" onError={() => setFailedUrl(book.coverUrl)} />
       ) : (
         <div className="pk-cover__jacket" aria-hidden="true">
           <span className="pk-cover__initials">{getInitials(title)}</span>

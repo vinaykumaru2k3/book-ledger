@@ -13,6 +13,15 @@ const OPEN_LIBRARY_COVERS = "https://covers.openlibrary.org/b/id";
 const SEARCH_FIELDS = "key,title,author_name,number_of_pages_median,first_publish_year,subject,cover_i,isbn";
 const MAX_DESCRIPTION = 2000;
 
+// Optional Google Books API key (gives this app its own daily quota). Without
+// one, requests share Google's keyless quota, which often runs out.
+const GOOGLE_KEY = import.meta.env?.VITE_GOOGLE_BOOKS_API_KEY || "";
+
+/** Adds the API key to a Google Books URL when one is configured. */
+export function withGoogleKey(url) {
+  return GOOGLE_KEY ? `${url}${url.includes("?") ? "&" : "?"}key=${encodeURIComponent(GOOGLE_KEY)}` : url;
+}
+
 const isOpenLibraryWork = (id) => String(id).startsWith("/works/");
 
 async function getJson(url) {
@@ -48,7 +57,7 @@ function volumeFromOpenLibraryDoc(doc) {
 export async function searchVolumes(query, type = "all") {
   const text = query.trim();
   const googleQuery = `${GOOGLE_PREFIX[type] || ""}${text}`;
-  const response = await fetch(`${GOOGLE_VOLUMES}?q=${encodeURIComponent(googleQuery)}&maxResults=8`);
+  const response = await fetch(withGoogleKey(`${GOOGLE_VOLUMES}?q=${encodeURIComponent(googleQuery)}&maxResults=8`));
 
   if (response.status === 429) {
     const param = OPEN_LIBRARY_PARAM[type] || "q";
@@ -69,7 +78,7 @@ export async function searchVolumes(query, type = "all") {
 
 export async function fetchGoogleVolume(volumeId) {
   try {
-    return await getJson(`${GOOGLE_VOLUMES}/${encodeURIComponent(volumeId)}`);
+    return await getJson(withGoogleKey(`${GOOGLE_VOLUMES}/${encodeURIComponent(volumeId)}`));
   } catch (e) {
     console.error("Failed to fetch Google Books volume:", e);
     return null;
@@ -91,10 +100,10 @@ export async function fetchOpenLibraryDescription(workKey) {
 
 /* ------------------------------ book forms ------------------------------ */
 
-/** Upgrades a Google thumbnail to https and asks for a larger image. */
-function sharpenCoverUrl(url) {
+/** Upgrades a Google thumbnail to https, drops the page-curl effect and asks for a larger image. */
+export function sharpenCoverUrl(url) {
   if (!url) return "";
-  let next = url.replace(/^http:\/\//, "https://").replace(/&zoom=\d/, "&zoom=2");
+  let next = url.replace(/^http:\/\//, "https://").replace(/&edge=curl/g, "").replace(/&zoom=\d/, "&zoom=2");
   if (!next.includes("zoom=")) next += `${next.includes("?") ? "&" : "?"}zoom=2`;
   return next;
 }

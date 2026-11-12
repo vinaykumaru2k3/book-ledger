@@ -26,6 +26,17 @@ vi.mock("../../services/enrichment", () => ({
   lookupDetails: async () => null,
   needsEnrichment: () => false,
 }));
+// Real needsCover / CoverSearchIncomplete; only the network search is faked. Off unless a test turns it on.
+const covers = { enabled: false, find: vi.fn() };
+vi.mock("../../services/coverSearch", async (importOriginal) => {
+  const real = await importOriginal();
+  return {
+    ...real,
+    needsCover: (book) => covers.enabled && real.needsCover(book),
+    findBestCover: (...args) => covers.find(...args),
+  };
+});
+const { CoverSearchIncomplete } = await import("../../services/coverSearch");
 
 const { useBooksController } = await import("./useBooksController");
 
@@ -42,6 +53,7 @@ async function setup(docs = [stored()]) {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  covers.enabled = false;
   setDocMock.mockResolvedValue(undefined);
   deleteDocMock.mockResolvedValue(undefined);
 });
@@ -172,5 +184,47 @@ describe("saving without hanging or losing the outcome", () => {
     deleteDocMock.mockRejectedValue(new Error("nope"));
     await act(() => result.current.deleteBook({ id: "d1" }));
     expect(notify).toHaveBeenLastCalledWith("Failed to delete book.", "error");
+  });
+});
+
+describe("automatic covers", () => {
+  const coverless = (extra) => stored({ coverUrl: "", ...extra });
+  const writes = () => setDocMock.mock.calls.map((call) => call[1]);
+
+  it("saves the cover found online, with its source and when it was checked", async () => {
+    covers.enabled = true;
+    covers.find.mockResolvedValue({ url: "https://upload.wikimedia.org/parva.jpg", source: "wikipedia" });
+    await setup([coverless()]);
+    await waitFor(() => expect(setDocMock).toHaveBeenCalled(), { timeout: 4000 });
+    expect(writes()[0]).toMatchObject({ coverUrl: "https://upload.wikimedia.org/parva.jpg", coverSource: "wikipedia" });
+    expect(Date.parse(writes()[0].coverCheckedAt)).not.toBeNaN();
+  });
+
+  it("stamps a miss so the book is not searched again every visit", async () => {
+    covers.enabled = true;
+    covers.find.mockResolvedValue(null);
+    await setup([coverless()]);
+    await waitFor(() => expect(setDocMock).toHaveBeenCalled(), { timeout: 4000 });
+    expect(writes()[0]).toHaveProperty("coverCheckedAt");
+    expect(writes()[0]).not.toHaveProperty("coverUrl");
+  });
+
+  it("writes nothing when a source could not be reached, so a later visit retries", async () => {
+    covers.enabled = true;
+    covers.find.mockRejectedValue(new CoverSearchIncomplete());
+    await setup([coverless()]);
+    await waitFor(() => expect(covers.find).toHaveBeenCalled(), { timeout: 4000 });
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(setDocMock).not.toHaveBeenCalled();
+  });
+
+  it("leaves alone a book whose cover the reader removed, or that was checked recently", async () => {
+    covers.enabled = true;
+    await setup([
+      coverless({ id: "removed", coverSource: "removed" }),
+      coverless({ id: "recent", title: "Emma", coverCheckedAt: new Date().toISOString() }),
+    ]);
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    expect(covers.find).not.toHaveBeenCalled();
   });
 });

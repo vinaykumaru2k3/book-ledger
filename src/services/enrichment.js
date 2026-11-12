@@ -10,6 +10,8 @@
  * when to run it and how to save the result.
  */
 
+import { withGoogleKey } from "./bookApi";
+
 const CACHE_STORAGE_KEY = "pusthaka-enrich-cache";
 const detailsCache = new Map(); // key -> { tags, pages }
 const inflight = new Map(); // key -> Promise, dedupes concurrent lookups
@@ -72,7 +74,7 @@ async function fetchEnrichData(book) {
   try {
     if (book.sourceKey && !book.sourceKey.startsWith("/works/")) {
       const data = await fetchJson(
-        `https://www.googleapis.com/books/v1/volumes/${encodeURIComponent(book.sourceKey)}`
+        withGoogleKey(`https://www.googleapis.com/books/v1/volumes/${encodeURIComponent(book.sourceKey)}`)
       );
       categories = data?.volumeInfo?.categories || [];
       pages = data?.volumeInfo?.pageCount || 0;
@@ -81,7 +83,7 @@ async function fetchEnrichData(book) {
     if (!categories.length || !pages) {
       const q = book.isbn ? `isbn:${book.isbn}` : `${book.title}${book.author ? ` ${book.author}` : ""}`;
       const data = await fetchJson(
-        `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=1`
+        withGoogleKey(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&maxResults=1`)
       );
       const info = data?.items?.[0]?.volumeInfo;
       if (info) {

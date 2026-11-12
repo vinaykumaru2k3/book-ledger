@@ -83,6 +83,17 @@ describe("createBookFromForm", () => {
     const book = createBookFromForm({ title: "New" }, existing);
     expect(book).toMatchObject({ id: "b1", title: "New", favorite: true, addedAt: 5 });
   });
+
+  it("keeps where the cover came from and when it was checked", () => {
+    const existing = normalizeBook({ id: "b1", title: "Parva", coverUrl: "https://x/p.jpg", coverSource: "wikipedia", coverCheckedAt: "2026-11-01T00:00:00.000Z" });
+    expect(createBookFromForm({ title: "Parva" }, existing)).toMatchObject({ coverSource: "wikipedia", coverCheckedAt: "2026-11-01T00:00:00.000Z" });
+  });
+
+  it("marks a cleared cover as removed so it is not looked up again", () => {
+    const existing = normalizeBook({ id: "b1", title: "Parva", coverUrl: "https://x/p.jpg", coverSource: "wikipedia" });
+    expect(createBookFromForm({ title: "Parva", coverUrl: "" }, existing)).toMatchObject({ coverUrl: "", coverSource: "removed" });
+    expect(createBookFromForm({ title: "New", coverUrl: "" }).coverSource).toBe("");
+  });
 });
 
 describe("import", () => {

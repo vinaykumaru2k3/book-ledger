@@ -265,3 +265,73 @@
   outline: 3px solid var(--pk-focus);
   outline-offset: 2px;
 }
+
+/* Cover URL field and the "Find cover online" picker. */
+.pk-form__coverfield {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pk-space-3);
+}
+.pk-coverpicker {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pk-space-3);
+}
+.pk-coverpicker__empty {
+  margin: 0;
+  color: var(--pk-ink-3);
+  font: 400 var(--pk-text-sm) var(--pk-font-ui);
+}
+.pk-coverpicker__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: var(--pk-space-3);
+  width: 100%;
+}
+.pk-coverpicker__option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--pk-space-1);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--pk-ink-3);
+  text-align: left;
+  cursor: pointer;
+}
+.pk-coverpicker__option img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border: 2px solid transparent;
+  border-radius: var(--pk-radius-sm);
+  background: var(--pk-surface-sunken);
+  box-shadow: var(--pk-shadow-1);
+}
+.pk-coverpicker__option:hover img {
+  border-color: var(--pk-line-strong);
+}
+.pk-coverpicker__option[aria-pressed="true"] img {
+  border-color: var(--pk-accent);
+}
+.pk-coverpicker__option:focus-visible {
+  outline: 3px solid var(--pk-focus);
+  outline-offset: 2px;
+  border-radius: var(--pk-radius-sm);
+}
+.pk-coverpicker__source {
+  font: 500 var(--pk-text-xs) var(--pk-font-ui);
+}
+.pk-coverpicker__check {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: inline-flex;
+  padding: 3px;
+  border-radius: var(--pk-radius-pill);
+  background: var(--pk-accent);
+  color: var(--pk-on-accent);
+}
