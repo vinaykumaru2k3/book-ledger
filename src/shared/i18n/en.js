@@ -81,6 +81,7 @@ export default {
   "library.search.label": "Filter library",
   "library.search.placeholder": "Filter by title, author, tags, notes...",
   "library.sort.label": "Sort books",
+  "library.sort.prefix": "Sort",
   "library.loading": "Loading your library…",
 
   "sort.recent": "Recently added",

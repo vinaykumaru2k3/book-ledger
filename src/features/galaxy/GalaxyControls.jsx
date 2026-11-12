@@ -1,5 +1,5 @@
 import React from "react";
-import { Search } from "lucide-react";
+import { ChevronDown, RotateCcw, Search } from "lucide-react";
 import { STATUSES } from "../../domain/status";
 
 /** Search box, clustering mode and status filter chips above the graph. */
@@ -10,7 +10,7 @@ function GalaxyControls({ books, query, onQuery, clusterBy, onClusterBy, statusF
       className={statusFilter === key ? "galaxy-filter active" : "galaxy-filter"}
       onClick={() => onStatusFilter(key)}
     >
-      {label} ({count})
+      {label} <span className="galaxy-filter__count">{count}</span>
     </button>
   );
 
@@ -18,7 +18,7 @@ function GalaxyControls({ books, query, onQuery, clusterBy, onClusterBy, statusF
     <>
       <div className="galaxy-toolbar">
         <div className="galaxy-search">
-          <Search size={14} />
+          <Search size={16} aria-hidden="true" />
           <input
             type="text"
             placeholder="Search books..."
@@ -29,18 +29,22 @@ function GalaxyControls({ books, query, onQuery, clusterBy, onClusterBy, statusF
         </div>
 
         <div className="galaxy-controls">
-          <select
-            value={clusterBy}
-            onChange={(event) => onClusterBy(event.target.value)}
-            className="galaxy-select"
-            aria-label="Cluster by"
-          >
-            <option value="none">No Cluster</option>
-            <option value="status">By Status</option>
-            <option value="author">By Author</option>
-          </select>
+          <div className="galaxy-selectwrap">
+            <select
+              value={clusterBy}
+              onChange={(event) => onClusterBy(event.target.value)}
+              className="galaxy-select"
+              aria-label="Cluster by"
+            >
+              <option value="none">No Cluster</option>
+              <option value="status">By Status</option>
+              <option value="author">By Author</option>
+            </select>
+            <ChevronDown size={16} aria-hidden="true" />
+          </div>
 
-          <button onClick={onResetCamera} className="galaxy-btn">
+          <button type="button" onClick={onResetCamera} className="galaxy-btn">
+            <RotateCcw size={15} aria-hidden="true" />
             Reset
           </button>
         </div>

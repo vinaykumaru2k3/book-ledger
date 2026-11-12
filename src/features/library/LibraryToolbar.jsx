@@ -24,6 +24,7 @@ function LibraryToolbar({ lib }) {
         value={lib.sortBy}
         onChange={lib.setSortBy}
         label={t("library.sort.label")}
+        prefix={t("library.sort.prefix")}
         options={SORT_OPTIONS.map(({ value }) => ({ value, label: t(`sort.${value}`) }))}
       />
       <Segmented

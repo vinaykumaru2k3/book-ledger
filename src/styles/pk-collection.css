@@ -104,61 +104,71 @@
   transition: transform 320ms cubic-bezier(0.3, 0.8, 0.3, 1), width 320ms var(--pk-ease);
 }
 
-/* ---- Command bar: search, sort and layout in one sticky strip ------------------------- */
+/* ---- Command bar: search, sort and layout ----------------------------------------------
+ * Three pills at one height (46px), the same family as the header's search
+ * button. The bar sticks to the top while you scroll, on a soft vellum fade
+ * so covers don't show through between the pills. */
 .pk-toolbar {
   position: sticky;
-  top: 10px;
+  top: 8px;
   z-index: 5;
+  isolation: isolate;
   flex-wrap: nowrap;
-  gap: 0;
+  gap: var(--pk-space-3);
   margin-bottom: var(--pk-space-6);
-  padding: 5px;
-  border: 1px solid var(--pk-line);
-  border-radius: 16px;
-  background: color-mix(in srgb, var(--pk-surface-raised) 88%, transparent);
-  box-shadow: 0 10px 24px -18px rgba(45, 24, 40, 0.45);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
-.pk-toolbar > * + * {
-  position: relative;
-  margin-left: 6px;
-  padding-left: 6px;
-}
-.pk-toolbar > * + *::before {
+.pk-toolbar::before {
   content: "";
   position: absolute;
-  left: 0;
-  top: 22%;
-  bottom: 22%;
-  width: 1px;
-  background: var(--pk-line);
+  inset: -8px -14px;
+  z-index: -1;
+  background: linear-gradient(var(--pk-bg) 60%, color-mix(in srgb, var(--pk-bg) 0%, transparent));
+  pointer-events: none;
+}
+.pk-toolbar .pk-searchbox,
+.pk-toolbar .pk-selectbox,
+.pk-toolbar .pk-seg {
+  min-height: 46px;
+  border: 1px solid var(--pk-line-strong);
+  border-radius: var(--pk-radius-pill);
+  background: var(--pk-surface-raised);
+  box-shadow: var(--pk-shadow-1);
 }
 .pk-toolbar .pk-searchbox {
-  min-height: 42px;
-  border: 0;
-  border-radius: 11px;
-  background: transparent;
-  box-shadow: none;
+  padding: 0 var(--pk-space-4);
 }
-.pk-toolbar .pk-searchbox:focus-within {
-  background: var(--pk-surface);
-  box-shadow: inset 0 0 0 2px rgba(29, 78, 216, 0.35);
+.pk-toolbar .pk-searchbox:focus-within,
+.pk-toolbar .pk-selectbox:has(select:focus-visible) {
+  border-color: var(--pk-focus);
+  box-shadow: 0 0 0 3px rgba(47, 79, 196, 0.18);
+}
+.pk-toolbar .pk-selectbox {
+  display: flex;
+  align-items: center;
+  color: var(--pk-ink-3);
+}
+.pk-toolbar .pk-selectbox:hover {
+  border-color: var(--pk-ink-3);
+}
+.pk-selectbox__prefix {
+  padding-left: var(--pk-space-4);
+  font: 700 var(--pk-text-xs) / 1 var(--pk-font-ui);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--pk-ink-3);
 }
 .pk-toolbar .pk-selectbox select {
-  min-height: 42px;
+  min-height: 44px;
+  padding: 0 var(--pk-space-6) 0 var(--pk-space-2);
   border: 0;
-  border-radius: 11px;
+  border-radius: var(--pk-radius-pill);
   background: transparent;
-  color: var(--pk-ink-2);
-  font-weight: 600;
-}
-.pk-toolbar .pk-selectbox select:hover {
-  background: rgba(var(--pk-ink-rgb), 0.04);
   color: var(--pk-ink);
+  font-weight: 600;
+  outline: none;
 }
 
-/* Layout switch with a sliding thumb. */
+/* Layout switch: a garnet thumb slides under the chosen layout. */
 .pk-seg {
   position: relative;
   isolation: isolate;
@@ -174,8 +184,8 @@
   z-index: -1;
   width: calc((100% - 6px) / var(--seg-count));
   border-radius: 9px;
-  background: var(--pk-surface-raised);
-  box-shadow: 0 1px 2px rgba(var(--pk-ink-rgb), 0.12), 0 2px 8px -2px rgba(var(--pk-ink-rgb), 0.12);
+  background: var(--pk-accent);
+  box-shadow: 0 1px 2px rgba(var(--pk-ink-rgb), 0.18);
   transform: translateX(calc(var(--seg-index) * 100%));
   transition: transform 260ms cubic-bezier(0.3, 0.8, 0.3, 1);
 }
@@ -187,8 +197,18 @@
 }
 .pk-seg__btn--active {
   background: transparent;
-  color: var(--pk-ink);
+  color: var(--pk-on-accent);
   box-shadow: none;
+}
+.pk-toolbar .pk-seg {
+  padding: 3px;
+}
+.pk-toolbar .pk-seg__thumb,
+.pk-toolbar .pk-seg__btn {
+  border-radius: var(--pk-radius-pill);
+}
+.pk-toolbar .pk-seg__btn {
+  height: 38px;
 }
 
 /* ---- Status line under covers and in list rows -------------------------------------- */
@@ -404,22 +424,16 @@
   .pk-toolbar {
     flex-wrap: wrap;
     top: 6px;
-    gap: 4px;
+    gap: var(--pk-space-2);
   }
   .pk-toolbar__search {
     flex: 1 1 100%;
-  }
-  .pk-toolbar > * + * {
-    margin-left: 0;
-    padding-left: 0;
-  }
-  .pk-toolbar > * + *::before {
-    display: none;
   }
   .pk-toolbar .pk-selectbox {
     flex: 1;
   }
   .pk-toolbar .pk-selectbox select {
+    flex: 1;
     width: 100%;
   }
   .pk-rows__head {

@@ -10,107 +10,166 @@
   overflow: hidden;
 }
 
+/* Controls above the graph: the same pill family as the Library's command bar,
+ * drawn for the night panel (search grows, cluster + reset on the right, then a
+ * row of status chips). */
 .galaxy-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 16px;
+  padding: 14px 18px 8px;
   background: var(--pk-night);
-  border-bottom: 1px solid var(--pk-night-3);
   z-index: 10;
 }
 
 .galaxy-controls {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .galaxy-search {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  position: relative;
+  flex: 1 1 18rem;
+  max-width: 26rem;
 }
 
 .galaxy-search svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
   color: var(--pk-cream-3);
-  flex-shrink: 0;
+  pointer-events: none;
 }
 
 .galaxy-search input {
-  width: 180px;
-  height: 30px;
-  padding: 0 10px 0 32px;
-  background: var(--pk-night-3);
+  width: 100%;
+  height: 40px;
+  padding: 0 14px 0 38px;
+  background: rgba(var(--pk-cream-rgb), 0.06);
   border: 1px solid var(--pk-night-line);
-  border-radius: 4px;
-  font-size: 0.8rem;
+  border-radius: var(--pk-radius-pill);
+  font: 400 var(--pk-text-sm) var(--pk-font-ui);
   color: var(--pk-cream);
+}
+
+.galaxy-search input:hover {
+  border-color: rgba(var(--pk-gilt-rgb), 0.4);
 }
 
 .galaxy-search input:focus {
   outline: none;
-  border-color: var(--pk-gilt-2);
+  border-color: var(--pk-gilt);
+  box-shadow: 0 0 0 3px rgba(var(--pk-gilt-rgb), 0.2);
 }
 
 .galaxy-search input::placeholder {
   color: var(--pk-cream-3);
 }
 
+.galaxy-selectwrap {
+  position: relative;
+}
+
+.galaxy-selectwrap svg {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--pk-cream-3);
+  pointer-events: none;
+}
+
 .galaxy-select {
-  height: 30px;
-  padding: 0 28px 0 10px;
-  background: var(--pk-night-3);
+  appearance: none;
+  height: 40px;
+  padding: 0 34px 0 16px;
+  background: rgba(var(--pk-cream-rgb), 0.06);
   border: 1px solid var(--pk-night-line);
-  border-radius: 4px;
-  font-size: 0.8rem;
+  border-radius: var(--pk-radius-pill);
+  font: 500 var(--pk-text-sm) var(--pk-font-ui);
   color: var(--pk-cream);
   cursor: pointer;
 }
 
+.galaxy-select option {
+  background: var(--pk-night-2);
+  color: var(--pk-cream);
+}
+
+.galaxy-select:hover {
+  border-color: rgba(var(--pk-gilt-rgb), 0.4);
+}
+
+.galaxy-select:focus-visible,
+.galaxy-btn:focus-visible,
+.galaxy-filter:focus-visible {
+  outline: 2px solid var(--pk-gilt);
+  outline-offset: 2px;
+}
+
 .galaxy-btn {
-  height: 30px;
-  padding: 0 12px;
-  background: var(--pk-night-3);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  background: transparent;
   border: 1px solid var(--pk-night-line);
-  border-radius: 4px;
-  font-size: 0.75rem;
+  border-radius: var(--pk-radius-pill);
+  font: 500 var(--pk-text-sm) var(--pk-font-ui);
   color: var(--pk-cream-2);
   cursor: pointer;
 }
 
 .galaxy-btn:hover {
-  background: var(--pk-night-line);
+  border-color: rgba(var(--pk-gilt-rgb), 0.4);
+  background: rgba(var(--pk-cream-rgb), 0.06);
   color: var(--pk-cream);
 }
 
 .galaxy-filters {
   display: flex;
-  gap: 6px;
-  padding: 8px 16px;
+  gap: 8px;
+  padding: 8px 18px 14px;
   background: var(--pk-night);
   border-bottom: 1px solid var(--pk-night-3);
 }
 
 .galaxy-filter {
-  padding: 4px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 0 14px;
   background: transparent;
   border: 1px solid var(--pk-night-line);
-  border-radius: 4px;
-  font-size: 0.75rem;
+  border-radius: var(--pk-radius-pill);
+  font: 500 var(--pk-text-sm) var(--pk-font-ui);
   color: var(--pk-cream-2);
   cursor: pointer;
 }
 
+.galaxy-filter__count {
+  font-size: var(--pk-text-xs);
+  font-weight: 700;
+  color: var(--pk-cream-3);
+}
+
 .galaxy-filter:hover {
-  background: var(--pk-night-3);
+  background: rgba(var(--pk-cream-rgb), 0.06);
   color: var(--pk-cream);
 }
 
 .galaxy-filter.active {
-  background: var(--pk-gilt-2);
-  border-color: var(--pk-gilt-2);
-  color: #000;
+  background: var(--pk-gilt);
+  border-color: var(--pk-gilt);
+  color: var(--pk-night);
+}
+
+.galaxy-filter.active .galaxy-filter__count {
+  color: rgba(var(--pk-night-rgb), 0.7);
 }
 
 .galaxy-canvas {
