@@ -797,6 +797,13 @@
   color: var(--pk-ink);
   font: 400 var(--pk-text-lg) var(--pk-font-ui);
 }
+/* The palette has its own focus cue (the highlighted row); no boxed ring on the field. */
+.pk-palette__search input:focus,
+.pk-palette__search input:focus-visible {
+  border: 0 !important;
+  box-shadow: none;
+  outline: none;
+}
 .pk-palette__list {
   padding: var(--pk-space-2);
   overflow-y: auto;

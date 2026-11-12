@@ -1,5 +1,4 @@
 import React, { useMemo } from "react";
-import { Sparkles } from "lucide-react";
 import Button from "../../../shared/pk/Button";
 import Dialog from "../../../shared/pk/Dialog";
 import { findDuplicate, shelvesOf } from "../../../domain/library";
@@ -50,7 +49,7 @@ function BookFormModal() {
           <Button variant="ghost" onClick={onClose}>
             {t("action.cancel")}
           </Button>
-          <Button variant="primary" type="submit" form={FORM_ID} icon={Sparkles}>
+          <Button variant="primary" type="submit" form={FORM_ID}>
             {editing ? t("form.saveChanges") : t("form.save")}
           </Button>
         </>
