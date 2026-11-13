@@ -69,7 +69,7 @@ export async function searchItems(query, limit = 12) {
 }
 
 /** Full entities (labels in English and Kannada, claims, Wikipedia page titles). */
-async function getEntities(qids, props = "labels|claims|sitelinks|aliases") {
+export async function getEntities(qids, props = "labels|claims|sitelinks|aliases") {
   if (!qids.length) return {};
   const data = await api({
     action: "wbgetentities",
