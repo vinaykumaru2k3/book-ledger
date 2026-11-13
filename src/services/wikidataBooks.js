@@ -69,14 +69,14 @@ export async function searchItems(query, limit = 12) {
 }
 
 /** Full entities (labels in English and Kannada, claims, Wikipedia page titles). */
-export async function getEntities(qids, props = "labels|claims|sitelinks|aliases") {
+export async function getEntities(qids, props = "labels|claims|sitelinks|aliases", { languages = "en|kn", sites = "knwiki|enwiki" } = {}) {
   if (!qids.length) return {};
   const data = await api({
     action: "wbgetentities",
     ids: qids.slice(0, 50).join("|"),
     props,
-    languages: "en|kn",
-    sitefilter: "knwiki|enwiki",
+    languages,
+    sitefilter: sites,
   });
   return data?.entities || {};
 }
@@ -395,28 +395,63 @@ export async function findWorks(book, sameTitle) {
   return byAuthor.strength >= byTitle.strength && byAuthor.works.length ? byAuthor.works : byTitle.works;
 }
 
+/** The plain-text introduction of one Wikipedia page, or "". */
+async function wikipediaExtract(lang, title) {
+  const params = new URLSearchParams({
+    action: "query",
+    format: "json",
+    origin: "*",
+    prop: "extracts",
+    exintro: "1",
+    explaintext: "1",
+    redirects: "1",
+    titles: title,
+  });
+  const data = await getJson(`https://${lang}.wikipedia.org/w/api.php?${params}`);
+  return Object.values(data?.query?.pages || {})[0]?.extract?.trim() || "";
+}
+
 /** A short introduction to the work from its Wikipedia page, in the book's language first. */
 export async function wikipediaIntro({ knwiki, enwiki, kannada }) {
   const order = kannada ? [["kn", knwiki], ["en", enwiki]] : [["en", enwiki], ["kn", knwiki]];
   for (const [lang, title] of order) {
     if (!title) continue;
     try {
-      const params = new URLSearchParams({
-        action: "query",
-        format: "json",
-        origin: "*",
-        prop: "extracts",
-        exintro: "1",
-        explaintext: "1",
-        redirects: "1",
-        titles: title,
-      });
-      const data = await getJson(`https://${lang}.wikipedia.org/w/api.php?${params}`);
-      const text = Object.values(data?.query?.pages || {})[0]?.extract?.trim();
+      const text = await wikipediaExtract(lang, title);
       if (text) return text;
     } catch {
       /* try the other language */
     }
   }
   return "";
+}
+
+const introCache = new Map();
+
+/**
+ * The Wikipedia introduction of a Wikidata item, from the first of `langs`
+ * that has a page: `{ text, lang, title, url }`, or null. Read live and kept
+ * only for this visit (never stored), so it is always credited to Wikipedia.
+ */
+export async function itemIntro(qid, langs = ["en"]) {
+  const order = [...new Set(langs.filter((l) => /^[a-z-]{2,12}$/.test(l)))];
+  const key = `${qid}|${order.join(",")}`;
+  if (introCache.has(key)) return introCache.get(key);
+  const entity = (await getEntities([qid], "sitelinks", { languages: "en", sites: order.map((l) => `${l}wiki`).join("|") }))[qid];
+  let result = null;
+  for (const lang of order) {
+    const title = entity?.sitelinks?.[`${lang}wiki`]?.title;
+    if (!title) continue;
+    try {
+      const text = await wikipediaExtract(lang, title);
+      if (text) {
+        result = { text, lang, title, url: `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, "_"))}` };
+        break;
+      }
+    } catch {
+      /* try the next language */
+    }
+  }
+  introCache.set(key, result);
+  return result;
 }

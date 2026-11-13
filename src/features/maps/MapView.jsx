@@ -6,10 +6,12 @@ import Button from "../../shared/pk/Button";
 import Dialog from "../../shared/pk/Dialog";
 import EmptyState from "../../shared/pk/EmptyState";
 import Skeleton from "../../shared/pk/Skeleton";
+import Tabs from "../../shared/pk/Tabs";
 import { MapIcon } from "../../shared/pk/NavIcons";
 import { useLanguage } from "../../shared/i18n/LanguageContext";
 import { visibleGraph } from "../../domain/literaryMap";
 import { deleteMap, updateMapMeta, useMapDocument } from "./useMapsController";
+import MapGraphView from "./MapGraphView";
 import MapListView from "./MapListView";
 import { scopeLabel } from "./mapText";
 
@@ -23,6 +25,21 @@ function MapView({ mapId, section, sub, user, navigate }) {
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const shown = useMemo(() => (graph ? visibleGraph(graph) : null), [graph]);
+  const view = section === "list" ? "list" : "graph";
+  const [selectedId, setSelectedId] = useState(section === "node" ? sub : null);
+  const [listFocus, setListFocus] = useState(null);
+
+  // Choosing a node on the graph names it in the address bar (so the link can be shared)
+  // without a new history entry for every click.
+  const select = (id) => {
+    setSelectedId(id);
+    window.history.replaceState(null, "", id ? `/maps/${mapId}/node/${encodeURIComponent(id)}` : `/maps/${mapId}`);
+  };
+  const showView = (next) => navigate(next === "list" ? `/maps/${mapId}/list` : selectedId ? `/maps/${mapId}/node/${encodeURIComponent(selectedId)}` : `/maps/${mapId}`);
+  const showInList = (node) => {
+    setListFocus(node.id);
+    navigate(`/maps/${mapId}/list`);
+  };
 
   const back = (
     <button type="button" className="pk-map-back" onClick={() => navigate("/maps")}>
@@ -123,14 +140,39 @@ function MapView({ mapId, section, sub, user, navigate }) {
         </div>
       </header>
 
-      <MapListView
-        graph={shown}
-        scope={meta.scope}
-        books={user ? books : []}
-        canAdd={Boolean(user)}
-        onAddBook={addBook}
-        focusId={section === "node" ? sub : undefined}
-      />
+      <div className="pk-map__views">
+        <Tabs
+          label={t("maps.view.label")}
+          value={view}
+          onChange={showView}
+          tabs={[
+            { id: "graph", label: t("maps.view.graph") },
+            { id: "list", label: t("maps.view.list") },
+          ]}
+        />
+      </div>
+
+      {view === "graph" ? (
+        <MapGraphView
+          graph={shown}
+          scope={meta.scope}
+          books={user ? books : []}
+          canAdd={Boolean(user)}
+          onAddBook={addBook}
+          selectedId={selectedId}
+          onSelect={select}
+          onShowInList={showInList}
+        />
+      ) : (
+        <MapListView
+          graph={shown}
+          scope={meta.scope}
+          books={user ? books : []}
+          canAdd={Boolean(user)}
+          onAddBook={addBook}
+          focusId={listFocus || selectedId || undefined}
+        />
+      )}
 
       {confirmDelete && (
         <Dialog

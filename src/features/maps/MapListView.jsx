@@ -26,7 +26,7 @@ export function NodeName({ node, lang }) {
 }
 
 /** A node's links in plain sentences, grouped by what they say ("influenced: A, B"). */
-function NodeLinks({ graph, node, lang, onJump }) {
+export function NodeLinks({ graph, node, lang, onJump }) {
   const { t } = useLanguage();
   const groups = useMemo(() => {
     const map = new Map();
