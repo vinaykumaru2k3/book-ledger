@@ -13,7 +13,7 @@ import NavLink from "./NavLink";
 const STORAGE_KEY = "pustaka:rail-collapsed";
 const GROUPS = [
   { id: "books", labelKey: "nav.groupBooks", ids: ["all", "shelves"] },
-  { id: "discover", labelKey: "nav.discover", ids: ["recommendations", "topbooks", "kannada"] },
+  { id: "discover", labelKey: "nav.discover", ids: ["recommendations", "topbooks", "maps", "kannada"] },
   { id: "reflect", labelKey: "nav.groupReflect", ids: ["analytics", "galaxy"] },
 ];
 const MONTH_INITIALS = ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"];
