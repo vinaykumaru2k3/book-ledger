@@ -95,6 +95,17 @@ export const GalaxyIcon = navIcon("GalaxyIcon", (
   </>
 ));
 
+/** Literary maps: a folded map with a route joining three places, one of them the sparkle. */
+export const MapIcon = navIcon("MapIcon", (
+  <>
+    <path d="M3 5.5 8.5 3.5l7 2.5 5.5-2v14.5l-5.5 2-7-2.5L3 20Z" />
+    <path d="M8.5 3.5v14.5M15.5 6v14.5" opacity="0.45" />
+    <path d="M6 15.5c2-1.8 3.5-2 5.5-.8s3.4.6 4.6-1.6" strokeWidth="1.2" strokeDasharray="1.6 1.6" />
+    <circle cx="6" cy="15.5" r="1.1" fill="currentColor" />
+    <path d={sparkle(17.5, 10.5, 2.6)} fill="currentColor" strokeWidth="0.8" />
+  </>
+));
+
 /** Kannada Explorer: the Kannada letter "ka" in a page corner. */
 export const ScriptIcon = navIcon("ScriptIcon", (
   <>

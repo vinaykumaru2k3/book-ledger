@@ -25,5 +25,100 @@ service cloud.firestore {
         allow create, update: if isOwner(userId) && isValidBook(request.resource.data);
       }
     }
+
+    /* ------------------------------ Literary maps ------------------------------ */
+
+    // Admins are set by hand in the Firebase console (admins/{uid}); nobody can write them from the app.
+    function isAdmin() {
+      return request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function isValidMapMeta(m) {
+      return m.keys().hasOnly(['ownerId', 'ownerName', 'title', 'description', 'scope', 'visibility', 'featured',
+                               'forkedFrom', 'counts', 'createdAt', 'updatedAt', 'generatedAt'])
+        && m.keys().hasAll(['ownerId', 'title', 'scope', 'visibility', 'featured'])
+        && m.ownerId is string
+        && m.title is string && m.title.size() > 0 && m.title.size() <= 120
+        && (!('description' in m) || (m.description is string && m.description.size() <= 1000))
+        && (!('ownerName' in m) || (m.ownerName is string && m.ownerName.size() <= 80))
+        && m.visibility in ['private', 'public']
+        && m.featured is bool
+        && m.scope is map && m.scope.kind in ['language', 'movement', 'library']
+        && (!('counts' in m) || m.counts is map);
+    }
+
+    function mapMeta(mapId) {
+      return get(/databases/$(database)/documents/maps/$(mapId)).data;
+    }
+    // The meta as it will be once the current batch is written (a new map writes meta and graph together).
+    function mapMetaAfter(mapId) {
+      return getAfter(/databases/$(database)/documents/maps/$(mapId)).data;
+    }
+    function canReadMap(m) {
+      return m.visibility == 'public' || isOwner(m.ownerId) || isAdmin();
+    }
+
+    // A map: its meta here, its graph in content/graph, readers' suggestions under suggestions/.
+    match /maps/{mapId} {
+      allow read: if canReadMap(resource.data);
+      allow create: if request.auth != null
+        && request.resource.data.ownerId == request.auth.uid
+        && isValidMapMeta(request.resource.data)
+        && request.resource.data.featured == false;
+      // The owner edits anything but the owner and the featured flag; an admin may only feature or unpublish.
+      allow update: if (isOwner(resource.data.ownerId)
+          && isValidMapMeta(request.resource.data)
+          && request.resource.data.ownerId == resource.data.ownerId
+          && request.resource.data.featured == resource.data.featured)
+        || (isAdmin()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['featured', 'visibility', 'updatedAt'])
+          && request.resource.data.featured is bool
+          && request.resource.data.visibility in ['private', 'public']);
+      allow delete: if isOwner(resource.data.ownerId);
+
+      match /content/{part} {
+        allow read: if canReadMap(mapMeta(mapId));
+        allow create, update: if part == 'graph'
+          && isOwner(mapMetaAfter(mapId).ownerId)
+          && request.resource.data.keys().hasOnly(['nodes', 'links'])
+          && request.resource.data.nodes is list && request.resource.data.nodes.size() <= 600
+          && request.resource.data.links is list && request.resource.data.links.size() <= 2000;
+        allow delete: if isOwner(mapMeta(mapId).ownerId);
+      }
+
+      match /suggestions/{suggestionId} {
+        // Anyone signed in may suggest a change to a public map, as themselves.
+        allow create: if request.auth != null
+          && mapMeta(mapId).visibility == 'public'
+          && request.resource.data.keys().hasOnly(['byUid', 'byName', 'kind', 'payload', 'note', 'citation', 'status', 'createdAt'])
+          && request.resource.data.byUid == request.auth.uid
+          && request.resource.data.status == 'open'
+          && request.resource.data.kind in ['add-link', 'add-node', 'fix-node', 'hide']
+          && request.resource.data.payload is map
+          && request.resource.data.note is string && request.resource.data.note.size() <= 600
+          && (!('citation' in request.resource.data) || (request.resource.data.citation is string && request.resource.data.citation.size() <= 500))
+          && (!('byName' in request.resource.data) || (request.resource.data.byName is string && request.resource.data.byName.size() <= 80));
+        allow read: if request.auth != null
+          && (resource.data.byUid == request.auth.uid || isOwner(mapMeta(mapId).ownerId));
+        allow update: if isOwner(mapMeta(mapId).ownerId)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'decidedAt'])
+          && request.resource.data.status in ['accepted', 'declined'];
+        allow delete: if isOwner(mapMeta(mapId).ownerId);
+      }
+    }
+
+    // Reports of a public map that should not be there. Only admins read them.
+    match /reports/{reportId} {
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['mapId', 'byUid', 'reason', 'createdAt'])
+        && request.resource.data.byUid == request.auth.uid
+        && request.resource.data.mapId is string
+        && request.resource.data.reason is string && request.resource.data.reason.size() > 0 && request.resource.data.reason.size() <= 1000;
+      allow read, delete: if isAdmin();
+    }
+
+    match /admins/{uid} {
+      allow read: if isOwner(uid);
+    }
   }
 }

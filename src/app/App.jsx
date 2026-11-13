@@ -34,6 +34,7 @@ function AppGate() {
       <PublicShell
         view={view}
         location={location}
+        navigate={navigate}
         onSignIn={() => {
           setShowLanding(false);
           navigate("all");

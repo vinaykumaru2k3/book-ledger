@@ -153,6 +153,8 @@ export function validateGraph(graph) {
   return errors;
 }
 
+const STRUCTURAL = new Set(["wrote", "member_of"]);
+
 /** How many of each kind a map shows (hidden ones are not counted). */
 export function countsOf(graph) {
   const counts = { authors: 0, works: 0, movements: 0, links: 0 };
@@ -160,7 +162,8 @@ export function countsOf(graph) {
     if (!n.hidden) counts[`${n.kind}s`] += 1;
   });
   const shown = new Set(graph.nodes.filter((n) => !n.hidden).map((n) => n.id));
-  counts.links = graph.links.filter((l) => !l.hidden && shown.has(l.from) && shown.has(l.to)).length;
+  // "Links" are the connections between writers (influences, mentions), not authorship or membership.
+  counts.links = graph.links.filter((l) => !l.hidden && !STRUCTURAL.has(l.type) && shown.has(l.from) && shown.has(l.to)).length;
   return counts;
 }
 

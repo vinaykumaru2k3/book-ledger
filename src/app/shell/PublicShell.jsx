@@ -9,7 +9,7 @@ import { describeRoute } from "../views";
  * Frame for pages that anyone may open without signing in (e.g. the Kannada
  * Explorer): a slim top bar with the brand, "Sign in".
  */
-function PublicShell({ view, location, onSignIn }) {
+function PublicShell({ view, location, navigate, onSignIn }) {
   const { t } = useLanguage();
   const { page, kickerKey, titleKey } = describeRoute(view);
   if (!page) return null;
@@ -35,7 +35,7 @@ function PublicShell({ view, location, onSignIn }) {
         <p className="pk-kicker">{t(kickerKey)}</p>
         <h1 className="pk-title">{t(titleKey)}</h1>
         <Suspense fallback={<LoadingPanel label="Loading..." />}>
-          <page.Component params={location.params} path={buildPath(view, location.params)} />
+          <page.Component params={location.params} path={buildPath(view, location.params)} navigate={navigate} onSignIn={onSignIn} />
         </Suspense>
       </main>
     </div>

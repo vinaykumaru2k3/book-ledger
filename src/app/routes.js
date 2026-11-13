@@ -18,7 +18,7 @@ export const HOME_VIEW = "all";
 const LIBRARY_VIEWS = ["all", "favorites", ...Object.keys(STATUSES)];
 
 /** Views whose URL may have more than one segment, and the param names of the extra segments. */
-const NESTED = { kannada: ["section", "id"] };
+const NESTED = { kannada: ["section", "id"], maps: ["id", "section", "sub"] };
 
 function decode(segment) {
   try {

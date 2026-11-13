@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:rules": "npx firebase-tools@13 emulators:exec --only firestore --project demo-pustaka-rules \"npx vitest run --config vitest.rules.config.js\"",
     "emulators": "npx firebase-tools@13 emulators:start --only auth,firestore --project book-ledger-2a2e4",
     "seed": "node scripts/seed-emulator.mjs",
     "themes": "node scripts/build-themes.mjs",
@@ -22,6 +23,7 @@
     "react-dom": "^19.2.7"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@testing-library/react": "^16.3.3",
     "@vitejs/plugin-react": "^4.7.0",
     "jsdom": "^30.1.3",

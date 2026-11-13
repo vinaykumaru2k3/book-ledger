@@ -86,9 +86,10 @@ describe("normalizeMeta and validateGraph", () => {
 describe("countsOf", () => {
   it("counts what a reader sees", () => {
     const g = graph();
-    expect(countsOf(g)).toEqual({ authors: 4, works: 1, movements: 1, links: 6 });
+    // Links between writers only: authorship and movement membership are not counted.
+    expect(countsOf(g)).toEqual({ authors: 4, works: 1, movements: 1, links: 3 });
     g.nodes[0].hidden = true;
-    expect(countsOf(g)).toEqual({ authors: 3, works: 1, movements: 1, links: 1 });
+    expect(countsOf(g)).toEqual({ authors: 3, works: 1, movements: 1, links: 0 });
   });
 });
 

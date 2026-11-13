@@ -26,6 +26,8 @@ jobs:
 
       - run: npm ci
       - run: npm test
+      # Security rules are checked against the Firestore emulator before anything ships.
+      - run: npm run test:rules
       - run: npm run build
         env:
           # Optional. The repository secret VITE_GOOGLE_BOOKS_API_KEY gives
@@ -49,4 +51,15 @@ jobs:
           echo "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/firebase-sa.json"
           export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/firebase-sa.json"
           npx --yes firebase-tools@13 deploy --only firestore:rules --project book-ledger-2a2e4
+          rm -f "$RUNNER_TEMP/firebase-sa.json"
+
+      # The query indexes (the public map gallery). Needs the "Cloud Datastore Index Admin"
+      # role; kept apart so a missing role cannot stop the rules above from publishing.
+      - name: Deploy Firestore indexes
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          echo "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/firebase-sa.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/firebase-sa.json"
+          npx --yes firebase-tools@13 deploy --only firestore:indexes --project book-ledger-2a2e4 --non-interactive
           rm -f "$RUNNER_TEMP/firebase-sa.json"

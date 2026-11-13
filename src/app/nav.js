@@ -5,7 +5,7 @@
  * label for the narrow rail and tab bar; the palette uses the full `labelKey`.
  */
 import { shelfFromRoute } from "../domain/library";
-import { ForYouIcon, GalaxyIcon, InsightsIcon, LibraryIcon, ScriptIcon, ShelvesIcon, TopBooksIcon } from "../shared/pk/NavIcons";
+import { ForYouIcon, GalaxyIcon, InsightsIcon, LibraryIcon, MapIcon, ScriptIcon, ShelvesIcon, TopBooksIcon } from "../shared/pk/NavIcons";
 import { isValidView } from "./routes";
 
 const ALL_DESTINATIONS = [
@@ -15,10 +15,11 @@ const ALL_DESTINATIONS = [
   { id: "topbooks", labelKey: "nav.topBooks", icon: TopBooksIcon },
   { id: "analytics", labelKey: "nav.insights", icon: InsightsIcon },
   { id: "galaxy", labelKey: "nav.galaxy", shortKey: "nav.galaxyShort", icon: GalaxyIcon },
+  { id: "maps", labelKey: "nav.maps", shortKey: "nav.mapsShort", icon: MapIcon },
   { id: "kannada", labelKey: "nav.kannada", shortKey: "nav.kannadaShort", icon: ScriptIcon },
 ];
 
-/** Destinations that exist in this build (the Kannada Explorer is flag-gated). */
+/** Destinations that exist in this build (literary maps and the Kannada Explorer are flag-gated). */
 export const DESTINATIONS = ALL_DESTINATIONS.filter((d) => isValidView(d.id));
 
 /** Shown directly on the phone tab bar; everything else goes under "More". */
