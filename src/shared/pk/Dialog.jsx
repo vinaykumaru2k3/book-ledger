@@ -5,6 +5,25 @@ import { X } from "lucide-react";
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+// Dialogs can overlap (details, then the edit form on top). A lock per dialog that
+// remembered "the previous overflow" would restore "hidden" when the first one closed
+// before the second, leaving the page unscrollable. So count them: the page unlocks
+// only when the last dialog is gone, and gets back what it had before the first.
+let scrollLocks = 0;
+let overflowBeforeLock = "";
+
+function lockPageScroll() {
+  if (scrollLocks === 0) {
+    overflowBeforeLock = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+  }
+  scrollLocks += 1;
+  return () => {
+    scrollLocks = Math.max(0, scrollLocks - 1);
+    if (scrollLocks === 0) document.body.style.overflow = overflowBeforeLock;
+  };
+}
+
 /**
  * Modal dialog with the behaviour a keyboard or screen-reader user expects:
  * focus moves in and is trapped, Escape closes, the page behind cannot scroll,
@@ -27,8 +46,7 @@ function Dialog({ title, onClose, children, footer, size = "md", closeLabel = "C
   useEffect(() => {
     const opener = document.activeElement;
     const panel = panelRef.current;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const unlockPageScroll = lockPageScroll();
     (panel.querySelector("[data-autofocus]") || panel.querySelector(FOCUSABLE) || panel).focus();
 
     const onKeyDown = (event) => {
@@ -57,7 +75,7 @@ function Dialog({ title, onClose, children, footer, size = "md", closeLabel = "C
     document.addEventListener("keydown", onKeyDown);
     return () => {
       document.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = previousOverflow;
+      unlockPageScroll();
       if (opener instanceof HTMLElement) opener.focus();
     };
   }, []);

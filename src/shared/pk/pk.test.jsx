@@ -132,6 +132,23 @@ describe("Dialog", () => {
     fireEvent.mouseDown(screen.getByRole("dialog").parentElement);
     expect(onClose).toHaveBeenCalledTimes(1);
   });
+
+  it("keeps the page locked until the last of several open dialogs closes, whatever the order", () => {
+    // Details open, then the edit form on top; the one underneath closes first.
+    const both = (first, second) => (
+      <>
+        {first && <Dialog title="First" onClose={() => {}}>A</Dialog>}
+        {second && <Dialog title="Second" onClose={() => {}}>B</Dialog>}
+      </>
+    );
+    const { rerender } = render(both(true, false));
+    rerender(both(true, true));
+    expect(document.body.style.overflow).toBe("hidden");
+    rerender(both(false, true));
+    expect(document.body.style.overflow).toBe("hidden");
+    rerender(both(false, false));
+    expect(document.body.style.overflow).toBe("");
+  });
 });
 
 describe("ProgressRibbon", () => {
