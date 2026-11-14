@@ -3,7 +3,7 @@
  * springs between them and the movement regions behind them. Pure, so it can
  * be tested without a browser.
  */
-import { LINK_TYPES, degree } from "../../domain/literaryMap";
+import { LINK_TYPES, degree, influencePath } from "../../domain/literaryMap";
 
 /** The kinds of line a reader can switch on and off, and the link types in each. */
 export const LINE_KINDS = {
@@ -135,4 +135,18 @@ export function regionPoints(model, region, pad = 16) {
     for (let k = 0; k < 8; k += 1) points.push([n.x + Math.cos((k * Math.PI) / 4) * r, n.y + Math.sin((k * Math.PI) / 4) * r]);
   });
   return points;
+}
+
+/** Colours for movements, in order, shared by the graph's regions and the timeline's eras. */
+export const REGION_COLOURS = ["--pk-sapphire", "--pk-copper", "--pk-amethyst", "--pk-peacock", "--pk-emerald", "--pk-garnet", "--pk-gold"];
+
+/**
+ * The chain of influence from one node to another; when there is none,
+ * the chain through pages that mention each other, marked `weak`.
+ */
+export function tracePath(graph, fromId, toId) {
+  const ids = influencePath(graph, fromId, toId);
+  if (ids.length) return { ids, weak: false };
+  const weakIds = influencePath(graph, fromId, toId, { includeWeak: true });
+  return { ids: weakIds, weak: weakIds.length > 0 };
 }

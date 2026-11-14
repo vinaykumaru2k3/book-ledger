@@ -8,7 +8,10 @@ import { buildPath, parseLocation } from "../../app/routes";
 import MapListView from "./MapListView";
 import { linkPhrase, yearsText } from "./mapText";
 import MapInspector from "./MapInspector";
-import { drawnNeighbours, layoutModel, regionPoints } from "./mapLayout";
+import { drawnNeighbours, layoutModel, regionPoints, tracePath } from "./mapLayout";
+import { TIMELINE, connector, mainSpan, packRows, timelinePlot, yearTicks } from "./mapTimeline";
+import MapTimelineView from "./MapTimelineView";
+import { timelineOf } from "../../domain/literaryMap";
 
 vi.mock("../../services/wikidataBooks", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -201,5 +204,94 @@ describe("MapInspector", () => {
     expect(onAddBook).toHaveBeenCalledWith(expect.objectContaining({ id: "Q10" }));
     fireEvent.click(screen.getByRole("button", { name: "Close" }));
     expect(onClose).toHaveBeenCalled();
+  });
+});
+
+describe("tracePath", () => {
+  it("prefers recorded influence and falls back to mentions, marked weak", () => {
+    expect(tracePath(graph, "Q1", "Q2")).toEqual({ ids: ["Q1", "Q2"], weak: false });
+    const mentionsOnly = normalizeGraph({ nodes: graph.nodes, links: [{ from: "Q2", type: "mentioned", to: "Q1", source: "wikipedia" }] });
+    expect(tracePath(mentionsOnly, "Q1", "Q2")).toEqual({ ids: ["Q1", "Q2"], weak: true });
+    expect(tracePath(normalizeGraph({ nodes: graph.nodes, links: [] }), "Q1", "Q2")).toEqual({ ids: [], weak: false });
+  });
+});
+
+describe("timeline layout", () => {
+  it("labels round years far enough apart", () => {
+    expect(yearTicks({ from: 1904, to: 2007 }, 4)).toEqual({ step: 20, ticks: [1920, 1940, 1960, 1980, 2000] });
+    expect(yearTicks({ from: 1904, to: 1930 }, 40).step).toBe(2);
+    expect(yearTicks(null, 4).ticks).toEqual([]);
+  });
+
+  it("packs lives into the fewest rows, leaving room for names", () => {
+    const lives = [
+      { from: 1900, to: 1950 },
+      { from: 1920, to: 1990 },
+      { from: 1960, to: 2000 },
+    ];
+    expect(packRows(lives, 2).map((r) => r.length)).toEqual([2, 1]);
+    // A long name on the first life pushes the third into a new row.
+    expect(packRows(lives, 2, (l) => (l.from === 1900 ? 200 : 0)).map((r) => r.length)).toEqual([1, 1, 1]);
+  });
+
+  it("places bars by year under their movement's heading", () => {
+    const timeline = timelineOf(graph);
+    const plot = timelinePlot(timeline, { pxPerYear: 5 });
+    const kuvempu = plot.items.get("Q1");
+    expect(kuvempu.left).toBe(TIMELINE.pad);
+    expect(kuvempu.width).toBe((1994 - 1904) * 5);
+    expect(plot.items.get("Q2").left).toBe(plot.x(1938));
+    expect(plot.lanes).toHaveLength(1);
+    expect(kuvempu.top).toBeGreaterThan(plot.lanes[0].top);
+    expect(plot.height).toBeGreaterThan(kuvempu.top);
+    expect(connector(kuvempu, plot.items.get("Q2"), plot.x)).toMatch(/^M[\d.]+,[\d.]+ C/);
+  });
+
+  it("leaves a far-off early life out of the first view", () => {
+    const life = (from) => ({ from, to: from + 60 });
+    const lanes = [{ movement: null, members: [life(-800), ...Array.from({ length: 12 }, (_, i) => life(1700 + i * 20))] }];
+    expect(mainSpan({ range: { from: -800, to: 2000 }, lanes })).toEqual({ from: 1690, to: 2000 });
+    // Without a big gap the whole range is the main span.
+    const close = [{ movement: null, members: [life(1600), life(1700), life(1800)] }];
+    expect(mainSpan({ range: { from: 1600, to: 1860 }, lanes: close })).toEqual({ from: 1600, to: 1860 });
+    expect(mainSpan({ range: null, lanes: [] })).toBeNull();
+  });
+
+  it("has nothing to place without years", () => {
+    const undated = normalizeGraph({ nodes: [{ id: "Q9", kind: "author", name: { en: "Someone" } }] });
+    expect(timelinePlot(timelineOf(undated), { pxPerYear: 5 })).toMatchObject({ width: 0, height: 0 });
+  });
+});
+
+describe("MapTimelineView", () => {
+  const renderTimeline = (props = {}) =>
+    render(
+      <LanguageProvider>
+        <MapTimelineView graph={graph} scope={{ kind: "language", langCode: "kn" }} books={[]} canAdd onAddBook={() => {}} selectedId={null} onSelect={() => {}} onShowInList={() => {}} {...props} />
+      </LanguageProvider>
+    );
+
+  it("draws each dated life as a button, and selects one on click", () => {
+    const onSelect = vi.fn();
+    renderTimeline({ onSelect });
+    const life = screen.getByRole("button", { name: "ಕುವೆಂಪು, 1904–1994" });
+    expect(screen.getByRole("button", { name: /Kanooru Heggadathi, 1936|ಕಾನೂರು ಹೆಗ್ಗಡತಿ, 1936/ })).toBeTruthy();
+    fireEvent.click(life);
+    expect(onSelect).toHaveBeenCalledWith("Q1");
+  });
+
+  it("opens the inspector for the selected life, and hides works when asked", () => {
+    renderTimeline({ selectedId: "Q1" });
+    expect(screen.getByRole("heading", { name: /Trace a chain of influence/ })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "ಕುವೆಂಪು, 1904–1994" }).getAttribute("aria-pressed")).toBe("true");
+    fireEvent.click(screen.getByRole("button", { name: "Works" }));
+    expect(screen.queryByRole("button", { name: /ಕಾನೂರು ಹೆಗ್ಗಡತಿ, 1936/ })).toBeNull();
+  });
+
+  it("says so when no one has dates", () => {
+    const undated = normalizeGraph({ nodes: [{ id: "Q9", kind: "author", name: { en: "Someone" } }] });
+    renderTimeline({ graph: undated });
+    expect(screen.getByText(/nothing to place in time/)).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Someone" })).toBeTruthy();
   });
 });

@@ -13,6 +13,7 @@ import { visibleGraph } from "../../domain/literaryMap";
 import { deleteMap, updateMapMeta, useMapDocument } from "./useMapsController";
 import MapGraphView from "./MapGraphView";
 import MapListView from "./MapListView";
+import MapTimelineView from "./MapTimelineView";
 import { scopeLabel } from "./mapText";
 
 /** One literary map: its header (what, whose, how big) and its views. */
@@ -25,17 +26,24 @@ function MapView({ mapId, section, sub, user, navigate }) {
   const [busy, setBusy] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const shown = useMemo(() => (graph ? visibleGraph(graph) : null), [graph]);
-  const view = section === "list" ? "list" : "graph";
-  const [selectedId, setSelectedId] = useState(section === "node" ? sub : null);
+  const view = section === "list" || section === "timeline" ? section : "graph";
+  const [selectedId, setSelectedId] = useState(section === "node" || section === "timeline" ? sub || null : null);
   const [listFocus, setListFocus] = useState(null);
 
-  // Choosing a node on the graph names it in the address bar (so the link can be shared)
+  // Where a view shows a node: the graph at /node/:id, the timeline at /timeline/:id.
+  const pathFor = (next, id) => {
+    const node = id ? `/${encodeURIComponent(id)}` : "";
+    if (next === "list") return `/maps/${mapId}/list`;
+    if (next === "timeline") return `/maps/${mapId}/timeline${node}`;
+    return id ? `/maps/${mapId}/node${node}` : `/maps/${mapId}`;
+  };
+  // Choosing a node names it in the address bar (so the link can be shared)
   // without a new history entry for every click.
   const select = (id) => {
     setSelectedId(id);
-    window.history.replaceState(null, "", id ? `/maps/${mapId}/node/${encodeURIComponent(id)}` : `/maps/${mapId}`);
+    window.history.replaceState(null, "", pathFor(view, id));
   };
-  const showView = (next) => navigate(next === "list" ? `/maps/${mapId}/list` : selectedId ? `/maps/${mapId}/node/${encodeURIComponent(selectedId)}` : `/maps/${mapId}`);
+  const showView = (next) => navigate(pathFor(next, selectedId));
   const showInList = (node) => {
     setListFocus(node.id);
     navigate(`/maps/${mapId}/list`);
@@ -147,12 +155,25 @@ function MapView({ mapId, section, sub, user, navigate }) {
           onChange={showView}
           tabs={[
             { id: "graph", label: t("maps.view.graph") },
+            { id: "timeline", label: t("maps.view.timeline") },
             { id: "list", label: t("maps.view.list") },
           ]}
         />
       </div>
 
-      {view === "graph" ? (
+      {view === "timeline" && (
+        <MapTimelineView
+          graph={shown}
+          scope={meta.scope}
+          books={user ? books : []}
+          canAdd={Boolean(user)}
+          onAddBook={addBook}
+          selectedId={selectedId}
+          onSelect={select}
+          onShowInList={showInList}
+        />
+      )}
+      {view === "graph" && (
         <MapGraphView
           graph={shown}
           scope={meta.scope}
@@ -163,7 +184,8 @@ function MapView({ mapId, section, sub, user, navigate }) {
           onSelect={select}
           onShowInList={showInList}
         />
-      ) : (
+      )}
+      {view === "list" && (
         <MapListView
           graph={shown}
           scope={meta.scope}

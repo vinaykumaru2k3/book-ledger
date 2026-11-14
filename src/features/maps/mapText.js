@@ -8,10 +8,13 @@ export function scopeLabel(scope = {}, t) {
   return t("maps.scope.languageLabel", { name: scope.label || scope.langCode || scope.qid });
 }
 
+/** A year as text: "1936", or "800 BCE" before year one. */
+export const yearText = (n) => (n < 0 ? `${-n} BCE` : String(n));
+
 /** "1904–1994", "born 1974", "1936", or "" when nothing is known. */
 export function yearsText(years = {}, kind = "author") {
   const { from, to } = years;
-  const y = (n) => (n < 0 ? `${-n} BCE` : String(n));
+  const y = yearText;
   if (from !== undefined && to !== undefined && to !== from) return `${y(from)}–${y(to)}`;
   if (from !== undefined) return kind === "author" && to === undefined ? `b. ${y(from)}` : y(from);
   if (to !== undefined) return kind === "author" ? `d. ${y(to)}` : y(to);

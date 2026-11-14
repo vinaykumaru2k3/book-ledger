@@ -5,8 +5,8 @@ import SelectBox from "../../shared/pk/SelectBox";
 import { useLanguage } from "../../shared/i18n/LanguageContext";
 import { convexHull, fitCamera, screenToWorld } from "../../shared/graph/forceLayout";
 import { useForceLayout } from "../../shared/graph/useForceLayout";
-import { inLibrary, influencePath, searchNodes } from "../../domain/literaryMap";
-import { MAP_LAYOUT, drawnNeighbours, layoutModel, regionPoints } from "./mapLayout";
+import { inLibrary, searchNodes } from "../../domain/literaryMap";
+import { MAP_LAYOUT, REGION_COLOURS, drawnNeighbours, layoutModel, regionPoints, tracePath as findPath } from "./mapLayout";
 import MapInspector from "./MapInspector";
 import { NodeName } from "./MapListView";
 
@@ -15,7 +15,6 @@ const CLICK_SLOP_PX = 5;
 const TAP_REACH_PX = 14; // how far from a small node a tap still picks it
 const ZOOM = { min: 0.15, max: 4 };
 const ALWAYS_LABELLED = 14; // the most connected authors keep their names at any zoom
-const REGION_COLOURS = ["--pk-sapphire", "--pk-copper", "--pk-amethyst", "--pk-peacock", "--pk-emerald", "--pk-garnet", "--pk-gold"];
 const clampZoom = (z) => Math.max(ZOOM.min, Math.min(ZOOM.max, z));
 const shorten = (text, max = 28) => (text.length > max ? `${text.slice(0, max - 1)}…` : text);
 
@@ -109,13 +108,9 @@ function MapGraphView({ graph, scope, books, canAdd, onAddBook, selectedId, onSe
   }, [selectedId, path]);
   const tracePath = (toId) => {
     if (!toId || !selected) return setPath(null);
-    let ids = influencePath(graph, selected.id, toId);
-    let weak = false;
-    if (!ids.length) {
-      ids = influencePath(graph, selected.id, toId, { includeWeak: true });
-      weak = ids.length > 0;
-    }
-    setPath({ ids, weak });
+    const found = findPath(graph, selected.id, toId);
+    const { ids } = found;
+    setPath(found);
     const nodes = ids.map((id) => model.byId.get(id)).filter(Boolean);
     if (nodes.length) {
       cameraTouched.current = true;
