@@ -36,7 +36,7 @@ const smoothPath = (points) => (points.length ? `M${points.map(([x, y]) => `${x.
  * around their members. Influence is drawn as arrows, mentions as faint
  * dashed lines. Drag to pan, scroll or pinch to zoom, click to inspect.
  */
-function MapGraphView({ graph, scope, books, canAdd, onAddBook, selectedId, onSelect, onShowInList }) {
+function MapGraphView({ graph, scope, books, canAdd, onAddBook, selectedId, onSelect, onShowInList, onEdit }) {
   const { t } = useLanguage();
   const lang = scope?.langCode;
   const svgRef = useRef(null);
@@ -503,6 +503,7 @@ function MapGraphView({ graph, scope, books, canAdd, onAddBook, selectedId, onSe
             onJump={choose}
             onClose={() => onSelect(null)}
             onShowInList={onShowInList}
+            onEdit={onEdit}
             path={path}
             onPath={tracePath}
           />

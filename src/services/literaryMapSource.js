@@ -780,7 +780,8 @@ export async function growFrom(qid, { langCode, limit = 15, signal } = {}) {
       } UNION {
         wd:${qid} wdt:P135 ?m . ?x wdt:P135 ?m; wdt:P31 wd:Q5 . BIND("peer" AS ?rel)
       }
-      ?x wikibase:sitelinks ?sl .
+      # Without the hint the planner starts from every item's sitelinks and times out.
+      ?x wikibase:sitelinks ?sl . hint:Prior hint:runLast true .
     } GROUP BY ?x ?rel ORDER BY DESC(?links) LIMIT ${limit * 3}`,
     opts
   );

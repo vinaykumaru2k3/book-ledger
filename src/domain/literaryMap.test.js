@@ -1,18 +1,27 @@
 import { describe, expect, it } from "vitest";
 import {
   LIMITS,
+  addLink,
+  addToMap,
   applySuggestion,
   countsOf,
   degree,
+  hiddenItems,
   inLibrary,
   influencePath,
   linkId,
+  linkProblem,
   mergeGenerated,
   neighbours,
   normalizeGraph,
   normalizeMeta,
+  removeLink,
+  removeNode,
   searchNodes,
+  setHidden,
   timelineOf,
+  updateLink,
+  updateNode,
   validateGraph,
 } from "./literaryMap";
 
@@ -198,5 +207,84 @@ describe("inLibrary", () => {
     expect(inLibrary(g, [{ id: "b1", sourceKey: "wd:Q10", title: "Anything" }]).get("Q10")).toBe("b1");
     expect(inLibrary(g, [{ id: "b2", title: "Kanuru Heggaditi", author: "Kuvempu" }]).get("Q10")).toBe("b2");
     expect(inLibrary(g, [{ id: "b3", title: "Kanuru Heggaditi", author: "Someone Else" }]).size).toBe(0);
+  });
+});
+
+describe("owner edits", () => {
+  const MOVEMENT_NODE = { id: "Q30", qid: "Q30", kind: "movement", name: { en: "Navya" }, years: {}, source: "wikidata" };
+
+  it("adds what is new, skips what is there, and shows a hidden node again only when asked", () => {
+    const g = setHidden(graph(), { nodeId: "Q4" });
+    const grown = { nodes: [ADIGA, MOVEMENT_NODE], links: [link("Q2", "member_of", "Q30"), link("Q2", "member_of", "Q99")] };
+    const { graph: next, added } = addToMap(g, grown);
+    expect(added).toEqual({ nodes: 1, links: 1 });
+    expect(next.nodes.find((n) => n.id === "Q4").hidden).toBe(true);
+    expect(addToMap(g, grown, { unhide: true }).graph.nodes.find((n) => n.id === "Q4").hidden).toBeUndefined();
+    expect(g.nodes).toHaveLength(6); // the input is unchanged
+  });
+
+  it("asks every hand-drawn link for its two ends and a note", () => {
+    expect(linkProblem({ from: "Q1", to: "Q1", type: "influenced", note: "x" })).toBe("ends");
+    expect(linkProblem({ from: "Q1", to: "Q3", type: "nope", note: "x" })).toBe("type");
+    expect(linkProblem({ from: "Q1", to: "Q3", type: "influenced", note: "  " })).toBe("note");
+    expect(linkProblem({ from: "Q1", to: "Q3", type: "influenced", note: "Letters" })).toBe("");
+    expect(() => addLink(graph(), { from: "Q1", to: "Q3", type: "influenced" })).toThrow();
+  });
+
+  it("draws a link as the owner, or brings back a hidden one with the owner's note", () => {
+    const drawn = addLink(graph(), { from: "Q3", to: "Q4", type: "contemporary", note: "Both wrote of the coast", citation: "https://example.org/a" });
+    expect(drawn.links.at(-1)).toMatchObject({ from: "Q3", to: "Q4", source: "user", note: "Both wrote of the coast", citation: "https://example.org/a" });
+
+    const id = linkId("Q1", "influenced", "Q2");
+    const hidden = setHidden(graph(), { linkId: id });
+    const back = addLink(hidden, { from: "Q1", to: "Q2", type: "influenced", note: "His teacher" });
+    const restored = back.links.find((l) => l.id === id);
+    expect(restored).toMatchObject({ source: "wikidata", note: "His teacher" });
+    expect(restored.hidden).toBeUndefined();
+    expect(back.links).toHaveLength(graph().links.length);
+  });
+
+  it("keeps the owner's corrections through a refresh from Wikidata", () => {
+    const fixed = updateNode(graph(), "Q2", { name: { en: "K. P. Poornachandra Tejasvi" }, years: { from: 1938, to: 2007 }, note: "Son of Kuvempu" });
+    const node = fixed.nodes.find((n) => n.id === "Q2");
+    expect(node).toMatchObject({ edited: true, note: "Son of Kuvempu", name: { native: "ಪೂರ್ಣಚಂದ್ರ ತೇಜಸ್ವಿ", en: "K. P. Poornachandra Tejasvi" } });
+    const { graph: merged } = mergeGenerated(fixed, graph());
+    expect(merged.nodes.find((n) => n.id === "Q2").name.en).toBe("K. P. Poornachandra Tejasvi");
+    // A note alone is not a correction.
+    expect(updateNode(graph(), "Q1", { note: "Rashtrakavi" }).nodes[0].edited).toBeUndefined();
+  });
+
+  it("changes a link's note and citation", () => {
+    const id = linkId("Q1", "influenced", "Q2");
+    const next = updateLink(graph(), id, { note: "Father and son", citation: "https://example.org/b", type: "wrote" });
+    expect(next.links.find((l) => l.id === id)).toMatchObject({ type: "influenced", note: "Father and son", citation: "https://example.org/b" });
+  });
+
+  it("hides what was generated and deletes what the owner added", () => {
+    const withMine = addToMap(graph(), {
+      nodes: [{ id: "u1", kind: "work", name: { en: "Notes" }, authorIds: ["Q1", "u2"], source: "user" }, { id: "u2", kind: "author", name: { en: "A friend" }, source: "user" }],
+      links: [{ from: "u2", to: "u1", type: "wrote", source: "user" }],
+    }).graph;
+    const noFriend = removeNode(withMine, "u2");
+    expect(noFriend.nodes.some((n) => n.id === "u2")).toBe(false);
+    expect(noFriend.links.some((l) => l.from === "u2")).toBe(false);
+    expect(noFriend.nodes.find((n) => n.id === "u1").authorIds).toEqual(["Q1"]);
+
+    const noKuvempu = removeNode(graph(), "Q1");
+    expect(noKuvempu.nodes.find((n) => n.id === "Q1").hidden).toBe(true);
+    expect(noKuvempu.links).toHaveLength(graph().links.length);
+
+    const mention = linkId("Q3", "mentioned", "Q1");
+    expect(removeLink(graph(), mention).links.find((l) => l.id === mention).hidden).toBe(true);
+    const drawn = addLink(graph(), { from: "Q3", to: "Q4", type: "influenced", note: "x" });
+    expect(removeLink(drawn, linkId("Q3", "influenced", "Q4")).links).toHaveLength(graph().links.length);
+  });
+
+  it("lists what is hidden, and shows it again", () => {
+    const g = setHidden(setHidden(graph(), { nodeId: "Q4" }), { linkId: linkId("Q1", "influenced", "Q2") });
+    const hidden = hiddenItems(g);
+    expect(hidden.nodes.map((n) => n.id)).toEqual(["Q4"]);
+    expect(hidden.links.map((l) => l.id)).toEqual([linkId("Q1", "influenced", "Q2")]);
+    expect(hiddenItems(setHidden(g, { nodeId: "Q4" }, false)).nodes).toEqual([]);
   });
 });

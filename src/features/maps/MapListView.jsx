@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { BookCheck, ChevronDown, ExternalLink, Plus } from "lucide-react";
+import { BookCheck, ChevronDown, ExternalLink, Pencil, Plus } from "lucide-react";
 import Badge from "../../shared/pk/Badge";
 import Button from "../../shared/pk/Button";
 import SearchBox from "../../shared/pk/SearchBox";
@@ -82,7 +82,7 @@ export function NodeLinks({ graph, node, lang, onJump }) {
  * row opening to its links in plain sentences. Also the keyboard and
  * screen-reader way through a map.
  */
-function MapListView({ graph, scope, books, canAdd, onAddBook, focusId }) {
+function MapListView({ graph, scope, books, canAdd, onAddBook, focusId, onEdit }) {
   const { t } = useLanguage();
   const lang = scope?.langCode;
   const focusNode = focusId ? graph.nodes.find((n) => n.id === focusId) : null;
@@ -209,6 +209,11 @@ function MapListView({ graph, scope, books, canAdd, onAddBook, focusId }) {
                         </a>
                       )}
                       {node.source === "user" && <span className="pk-map-source">{t(SOURCE_KEYS.user)}</span>}
+                      {onEdit && (
+                        <Button size="sm" variant="ghost" icon={Pencil} onClick={() => onEdit(node)}>
+                          {t("maps.edit.edit")}
+                        </Button>
+                      )}
                     </div>
                   </div>
                 )}

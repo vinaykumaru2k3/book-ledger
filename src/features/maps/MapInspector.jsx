@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ArrowRight, BookCheck, ExternalLink, List, Plus, Route, X } from "lucide-react";
+import { ArrowRight, BookCheck, ExternalLink, List, Pencil, Plus, Route, X } from "lucide-react";
 import Badge from "../../shared/pk/Badge";
 import Button from "../../shared/pk/Button";
 import SearchBox from "../../shared/pk/SearchBox";
@@ -115,7 +115,7 @@ function PathFinder({ graph, node, lang, path, onPath, onJump }) {
  * a live Wikipedia introduction, its links in sentences, and (for works)
  * whether it is in the reader's library.
  */
-function MapInspector({ graph, node, lang, bookId, canAdd, onAddBook, onJump, onClose, onShowInList, path, onPath }) {
+function MapInspector({ graph, node, lang, bookId, canAdd, onAddBook, onJump, onClose, onShowInList, path, onPath, onEdit }) {
   const { t } = useLanguage();
   const years = yearsText(node.years, node.kind);
 
@@ -164,6 +164,11 @@ function MapInspector({ graph, node, lang, bookId, canAdd, onAddBook, onJump, on
       )}
 
       <div className="pk-map-row__actions">
+        {onEdit && (
+          <Button size="sm" icon={Pencil} onClick={() => onEdit(node)}>
+            {t("maps.edit.edit")}
+          </Button>
+        )}
         <Button size="sm" variant="ghost" icon={List} onClick={() => onShowInList(node)}>
           {t("maps.inspector.showInList")}
         </Button>

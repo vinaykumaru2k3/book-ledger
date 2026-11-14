@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, BookOpen, Check, Languages, Loader2, Sparkles } from "lucide-react";
+import { ArrowLeft, BookOpen, Check, Languages, Sparkles } from "lucide-react";
 import { useBooks } from "../../app/AppContext";
 import Button from "../../shared/pk/Button";
 import EmptyState from "../../shared/pk/EmptyState";
@@ -11,9 +11,9 @@ import { countsOf, degree, normalizeMeta } from "../../domain/literaryMap";
 import { LANGUAGES, SIZES, generateMap } from "../../services/literaryMapSource";
 import { searchItems } from "../../services/wikidataBooks";
 import { createMap } from "./useMapsController";
+import { Progress } from "./MapProgress";
 
 const KANNADA_SCRIPT = /[ಀ-೿]/;
-const STAGES = ["authors", "library", "relations", "details", "mentions"];
 const SORTED_LANGUAGES = [...LANGUAGES].sort((a, b) => a.label.localeCompare(b.label));
 
 /** A big radio button: a choice with a line of explanation. */
@@ -101,32 +101,6 @@ function LanguageSelect({ label, value, onChange, hint }) {
   );
 }
 
-/** Live progress while a map is generated: each stage, and what has been found so far. */
-function Progress({ progress, kind }) {
-  const { t } = useLanguage();
-  const stages = STAGES.filter((s) => s !== "library" || kind === "library");
-  const current = stages.indexOf(progress?.stage);
-  const c = progress || {};
-  return (
-    <div className="pk-map-progress" role="status" aria-live="polite">
-      <ol className="pk-map-progress__stages">
-        {stages.map((stage, i) => {
-          const state = progress?.stage === "done" || i < current ? "done" : i === current ? "active" : "todo";
-          return (
-            <li key={stage} className={`pk-map-progress__stage pk-map-progress__stage--${state}`}>
-              {state === "done" ? <Check size={16} aria-hidden="true" /> : state === "active" ? <Loader2 size={16} className="pk-spin" aria-hidden="true" /> : <span className="pk-map-progress__dot" aria-hidden="true" />}
-              <span>
-                {t(`maps.stage.${stage}`)}
-                {stage === "library" && c.of ? ` (${c.books}/${c.of})` : ""}
-              </span>
-            </li>
-          );
-        })}
-      </ol>
-      <p className="pk-map-progress__counts">{t("maps.countsWithLinks", { authors: c.authors || 0, works: c.works || 0, movements: c.movements || 0, links: c.links || 0 })}</p>
-    </div>
-  );
-}
 
 /**
  * Make a map in four steps: what it covers, how big, generate (from Wikidata

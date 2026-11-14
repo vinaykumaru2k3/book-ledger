@@ -11,7 +11,8 @@ import MapInspector from "./MapInspector";
 import { drawnNeighbours, layoutModel, regionPoints, tracePath } from "./mapLayout";
 import { TIMELINE, connector, mainSpan, packRows, timelinePlot, yearTicks } from "./mapTimeline";
 import MapTimelineView from "./MapTimelineView";
-import { timelineOf } from "../../domain/literaryMap";
+import { setHidden, timelineOf } from "../../domain/literaryMap";
+import { HiddenDialog, LinkDialog, NodeEditDialog } from "./MapEditor";
 
 vi.mock("../../services/wikidataBooks", async (importOriginal) => ({
   ...(await importOriginal()),
@@ -293,5 +294,73 @@ describe("MapTimelineView", () => {
     renderTimeline({ graph: undated });
     expect(screen.getByText(/nothing to place in time/)).toBeTruthy();
     expect(screen.getByRole("button", { name: "Someone" })).toBeTruthy();
+  });
+});
+
+describe("owner editing", () => {
+  const fakeEditor = () => ({ busy: false, apply: vi.fn(async () => true), undo: vi.fn(), canUndo: false, notify: vi.fn() });
+  const inLanguage = (ui) => render(<LanguageProvider>{ui}</LanguageProvider>);
+
+  it("draws a link only once it says why", async () => {
+    const editor = fakeEditor();
+    const onClose = vi.fn();
+    inLanguage(<LinkDialog graph={graph} lang="kn" fromId="Q2" editor={editor} onClose={onClose} />);
+    fireEvent.change(screen.getByRole("searchbox", { name: "To" }), { target: { value: "kuvempu" } });
+    fireEvent.click(screen.getByRole("button", { name: /Kuvempu/ }));
+    fireEvent.change(screen.getByLabelText("Link"), { target: { value: "responded_to" } });
+    fireEvent.click(screen.getByRole("button", { name: "Draw link" }));
+    expect(screen.getByText("Say why, so readers can weigh the link.")).toBeTruthy();
+    expect(editor.apply).not.toHaveBeenCalled();
+
+    fireEvent.change(screen.getByLabelText("Why (needed)"), { target: { value: "His essay on Kuvempu." } });
+    fireEvent.click(screen.getByRole("button", { name: "Draw link" }));
+    await vi.waitFor(() => expect(onClose).toHaveBeenCalled());
+    const [next, message] = editor.apply.mock.calls[0];
+    expect(message).toBe("Link drawn.");
+    expect(next.links).toContainEqual(expect.objectContaining({ from: "Q2", to: "Q1", type: "responded_to", note: "His essay on Kuvempu.", source: "user" }));
+  });
+
+  it("saves a corrected name, marked so a refresh keeps it", async () => {
+    const editor = fakeEditor();
+    inLanguage(<NodeEditDialog graph={graph} nodeId="Q1" scope={{ kind: "language", langCode: "kn" }} lang="kn" editor={editor} onClose={() => {}} onLink={() => {}} />);
+    fireEvent.change(screen.getByLabelText("Name in English"), { target: { value: "K. V. Puttappa" } });
+    fireEvent.click(screen.getByRole("button", { name: "Save" }));
+    await vi.waitFor(() => expect(editor.apply).toHaveBeenCalled());
+    const q1 = editor.apply.mock.calls[0][0].nodes.find((n) => n.id === "Q1");
+    expect(q1.name.en).toBe("K. V. Puttappa");
+    expect(q1.edited).toBe(true);
+  });
+
+  it("asks before taking a node off the map, and hides what Wikidata gave", async () => {
+    const editor = fakeEditor();
+    inLanguage(<NodeEditDialog graph={graph} nodeId="Q2" scope={{ kind: "language", langCode: "kn" }} lang="kn" editor={editor} onClose={() => {}} onLink={() => {}} />);
+    fireEvent.click(screen.getByRole("button", { name: "Take off the map" }));
+    const confirm = screen.getByRole("group", { name: "Take off the map" });
+    fireEvent.click(within(confirm).getByRole("button", { name: "Take off the map" }));
+    await vi.waitFor(() => expect(editor.apply).toHaveBeenCalled());
+    expect(editor.apply.mock.calls[0][0].nodes.find((n) => n.id === "Q2").hidden).toBe(true);
+  });
+
+  it("shows a hidden author again", async () => {
+    const editor = fakeEditor();
+    const hidden = setHidden(graph, { nodeId: "Q2" }, true);
+    inLanguage(<HiddenDialog graph={hidden} lang="kn" editor={editor} onClose={() => {}} />);
+    fireEvent.click(screen.getByRole("button", { name: "Show again" }));
+    await vi.waitFor(() => expect(editor.apply).toHaveBeenCalled());
+    expect(editor.apply.mock.calls[0][0].nodes.find((n) => n.id === "Q2").hidden).toBeFalsy();
+  });
+
+  it("offers Edit in the inspector and the list only to an editing owner", () => {
+    const onEdit = vi.fn();
+    const node = graph.nodes.find((n) => n.id === "Q1");
+    const view = inLanguage(<MapInspector graph={graph} node={node} lang="kn" onJump={() => {}} onClose={() => {}} onShowInList={() => {}} />);
+    expect(screen.queryByRole("button", { name: "Edit" })).toBeNull();
+    view.rerender(
+      <LanguageProvider>
+        <MapInspector graph={graph} node={node} lang="kn" onJump={() => {}} onClose={() => {}} onShowInList={() => {}} onEdit={onEdit} />
+      </LanguageProvider>
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    expect(onEdit).toHaveBeenCalledWith(node);
   });
 });

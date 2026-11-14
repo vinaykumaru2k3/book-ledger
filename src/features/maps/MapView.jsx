@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { ArrowLeft, Globe2, Lock, Trash2 } from "lucide-react";
+import { ArrowLeft, Check, Globe2, Lock, Pencil, Trash2 } from "lucide-react";
 import { useBooks, useModal, useUi } from "../../app/AppContext";
 import Badge from "../../shared/pk/Badge";
 import Button from "../../shared/pk/Button";
@@ -14,6 +14,8 @@ import { deleteMap, updateMapMeta, useMapDocument } from "./useMapsController";
 import MapGraphView from "./MapGraphView";
 import MapListView from "./MapListView";
 import MapTimelineView from "./MapTimelineView";
+import { AddNodeDialog, EditBar, HiddenDialog, LinkDialog, NodeEditDialog, RefreshDialog } from "./MapEditor";
+import { useMapEditor } from "./useMapEditor";
 import { scopeLabel } from "./mapText";
 
 /** One literary map: its header (what, whose, how big) and its views. */
@@ -29,6 +31,9 @@ function MapView({ mapId, section, sub, user, navigate }) {
   const view = section === "list" || section === "timeline" ? section : "graph";
   const [selectedId, setSelectedId] = useState(section === "node" || section === "timeline" ? sub || null : null);
   const [listFocus, setListFocus] = useState(null);
+  const [editing, setEditing] = useState(false);
+  const [dialog, setDialog] = useState(null); // { kind: "add" | "link" | "node" | "hidden" | "refresh", id? }
+  const editor = useMapEditor(mapId, graph, notify, t);
 
   // Where a view shows a node: the graph at /node/:id, the timeline at /timeline/:id.
   const pathFor = (next, id) => {
@@ -76,6 +81,9 @@ function MapView({ mapId, section, sub, user, navigate }) {
   }
 
   const mine = user?.uid === meta.ownerId;
+  const canEdit = mine && editing;
+  const onEdit = canEdit ? (node) => setDialog({ kind: "node", id: node.id }) : undefined;
+  const closeDialog = () => setDialog(null);
   const isPublic = meta.visibility === "public";
   const { authors, works, movements, links } = meta.counts;
 
@@ -137,6 +145,9 @@ function MapView({ mapId, section, sub, user, navigate }) {
           </Badge>
           {mine && (
             <>
+              <Button size="sm" variant={editing ? "primary" : "secondary"} icon={editing ? Check : Pencil} onClick={() => setEditing((e) => !e)} aria-pressed={editing}>
+                {t(editing ? "maps.edit.stop" : "maps.edit.start")}
+              </Button>
               <Button size="sm" onClick={toggleVisibility} loading={busy}>
                 {t(isPublic ? "maps.makePrivate" : "maps.makePublic")}
               </Button>
@@ -161,6 +172,17 @@ function MapView({ mapId, section, sub, user, navigate }) {
         />
       </div>
 
+      {canEdit && (
+        <EditBar
+          graph={graph}
+          editor={editor}
+          onAdd={() => setDialog({ kind: "add" })}
+          onLink={(id) => setDialog({ kind: "link", id })}
+          onHidden={() => setDialog({ kind: "hidden" })}
+          onRefresh={() => setDialog({ kind: "refresh" })}
+        />
+      )}
+
       {view === "timeline" && (
         <MapTimelineView
           graph={shown}
@@ -171,6 +193,7 @@ function MapView({ mapId, section, sub, user, navigate }) {
           selectedId={selectedId}
           onSelect={select}
           onShowInList={showInList}
+          onEdit={onEdit}
         />
       )}
       {view === "graph" && (
@@ -183,6 +206,7 @@ function MapView({ mapId, section, sub, user, navigate }) {
           selectedId={selectedId}
           onSelect={select}
           onShowInList={showInList}
+          onEdit={onEdit}
         />
       )}
       {view === "list" && (
@@ -193,8 +217,27 @@ function MapView({ mapId, section, sub, user, navigate }) {
           canAdd={Boolean(user)}
           onAddBook={addBook}
           focusId={listFocus || selectedId || undefined}
+          onEdit={onEdit}
         />
       )}
+
+      {canEdit && dialog?.kind === "add" && (
+        <AddNodeDialog graph={graph} scope={meta.scope} lang={meta.scope.langCode} editor={editor} onClose={closeDialog} onAdded={(id) => view !== "list" && select(id)} />
+      )}
+      {canEdit && dialog?.kind === "link" && <LinkDialog graph={graph} lang={meta.scope.langCode} fromId={dialog.id} editor={editor} onClose={closeDialog} />}
+      {canEdit && dialog?.kind === "node" && graph.nodes.some((n) => n.id === dialog.id) && (
+        <NodeEditDialog
+          graph={graph}
+          nodeId={dialog.id}
+          scope={meta.scope}
+          lang={meta.scope.langCode}
+          editor={editor}
+          onClose={closeDialog}
+          onLink={(id) => setDialog({ kind: "link", id })}
+        />
+      )}
+      {canEdit && dialog?.kind === "hidden" && <HiddenDialog graph={graph} lang={meta.scope.langCode} editor={editor} onClose={closeDialog} />}
+      {canEdit && dialog?.kind === "refresh" && <RefreshDialog graph={graph} scope={meta.scope} books={books} editor={editor} onClose={closeDialog} />}
 
       {confirmDelete && (
         <Dialog

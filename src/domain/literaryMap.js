@@ -79,6 +79,10 @@ export function normalizeNode(raw = {}) {
   if (kind === "work" && raw.authorIds?.length) node.authorIds = uniq(raw.authorIds.map(String)).slice(0, 10);
   if (raw.note) node.note = clip(raw.note, LIMITS.note);
   if (raw.hidden) node.hidden = true;
+  // The owner corrected its names or years: a refresh from Wikidata keeps them.
+  if (raw.edited) node.edited = true;
+  // The owner brought it in (from a search or "grow from here"): a refresh keeps it.
+  if (raw.added) node.added = true;
   return node;
 }
 
@@ -97,6 +101,7 @@ export function normalizeLink(raw = {}) {
   if (raw.note) link.note = clip(raw.note, LIMITS.note);
   if (/^https?:\/\//.test(raw.citation || "")) link.citation = clip(raw.citation, 500);
   if (raw.hidden) link.hidden = true;
+  if (raw.added) link.added = true;
   return link;
 }
 
@@ -176,8 +181,8 @@ export function visibleGraph(graph) {
 
 /**
  * Refreshing a map from Wikidata without undoing its owner's work:
- * - what the owner hid stays hidden, and their notes stay;
- * - nodes and links the owner (or a suggestion) added are kept;
+ * - what the owner hid stays hidden, and their notes and corrections stay;
+ * - nodes and links the owner (or a suggestion) added or brought in are kept;
  * - generated items no longer on Wikidata are dropped unless the owner annotated them;
  * - new generated items come in.
  * Returns the merged graph and what changed, for a preview before applying.
@@ -196,9 +201,10 @@ export function mergeGenerated(existing, fresh) {
     const merged = { ...n };
     if (before.hidden) merged.hidden = true;
     if (before.note) merged.note = before.note;
+    if (before.edited) Object.assign(merged, { name: before.name, years: before.years, edited: true });
     return merged;
   });
-  const keptNodes = old.nodes.filter((n) => !freshNodeIds.has(n.id) && (n.source === "user" || n.note || n.hidden));
+  const keptNodes = old.nodes.filter((n) => !freshNodeIds.has(n.id) && (n.source === "user" || n.note || n.hidden || n.edited || n.added));
   const allNodes = [...nodes, ...keptNodes];
 
   const links = next.links.map((l) => {
@@ -211,7 +217,7 @@ export function mergeGenerated(existing, fresh) {
     return merged;
   });
   const keptLinks = old.links.filter(
-    (l) => !freshLinkIds.has(l.id) && (l.source === "user" || l.source === "suggestion" || l.note || l.hidden)
+    (l) => !freshLinkIds.has(l.id) && (l.source === "user" || l.source === "suggestion" || l.note || l.hidden || l.added)
   );
   const graph = normalizeGraph({ nodes: allNodes, links: [...links, ...keptLinks] });
 
@@ -479,4 +485,148 @@ function sameSurname(a, b) {
   const longest = (s) => String(s).split(/[\s,.]+/).sort((x, y) => y.length - x.length)[0] || "";
   const x = soundKey(longest(a));
   return x.length >= 3 && x === soundKey(longest(b));
+}
+
+/* ------------------------------ Owner edits ------------------------------ */
+// Each returns a new graph and leaves the one given unchanged. What came from
+// Wikidata or Wikipedia is hidden rather than deleted, so a refresh does not
+// bring it back; what the owner added is deleted outright.
+
+const generated = (item) => item.source === "wikidata" || item.source === "wikipedia";
+
+/**
+ * Adds nodes and links (from a search, "grow from here" or a form), skipping
+ * what the map has already, and marks them as the owner's so a refresh keeps them. A node already there but hidden is shown again
+ * only when `unhide` is set (the owner asked for that node by name). Links need
+ * both ends on the map. Returns the graph and how many nodes and links came in.
+ */
+export function addToMap(graph, { nodes = [], links = [] }, { unhide = false } = {}) {
+  const have = new Map(graph.nodes.map((n) => [n.id, n]));
+  const addedNodes = [];
+  let shown = 0;
+  let next = graph.nodes;
+  nodes.map((n) => normalizeNode({ ...n, added: true })).forEach((node) => {
+    const old = have.get(node.id);
+    if (!old) {
+      addedNodes.push(node);
+      have.set(node.id, node);
+    } else if (old.hidden && unhide) {
+      next = next.map((n) => (n.id === node.id ? withoutKey(n, "hidden") : n));
+      shown += 1;
+    }
+  });
+  const haveLinks = new Set(graph.links.map((l) => l.id));
+  const addedLinks = [];
+  links.map((l) => normalizeLink({ ...l, added: true })).forEach((link) => {
+    if (haveLinks.has(link.id) || link.from === link.to || !have.has(link.from) || !have.has(link.to)) return;
+    haveLinks.add(link.id);
+    addedLinks.push(link);
+  });
+  return {
+    graph: { nodes: [...next, ...addedNodes], links: [...graph.links, ...addedLinks] },
+    added: { nodes: addedNodes.length + shown, links: addedLinks.length },
+  };
+}
+
+/**
+ * Why a link the owner draws cannot be saved, as a code, or "" when it can:
+ * "ends" (both ends must be chosen and differ), "type", or "note" (every
+ * hand-drawn link says why, so readers can weigh it).
+ */
+export function linkProblem(raw = {}) {
+  if (!raw.from || !raw.to || raw.from === raw.to) return "ends";
+  if (!LINK_TYPES[raw.type]) return "type";
+  if (!String(raw.note || "").trim()) return "note";
+  return "";
+}
+
+/**
+ * Draws a link as the owner. Drawing one the map has already (say, a hidden
+ * generated one) shows it again with the owner's note and citation; the source
+ * stays what it was.
+ */
+export function addLink(graph, raw) {
+  const problem = linkProblem(raw);
+  if (problem) throw new Error(`Link cannot be saved: ${problem}`);
+  const link = normalizeLink({ ...raw, source: "user" });
+  const old = graph.links.find((l) => l.id === link.id);
+  if (!old) return { ...graph, links: [...graph.links, link] };
+  const updated = normalizeLink({ ...old, note: link.note, citation: link.citation ?? old.citation, hidden: false });
+  return { ...graph, links: graph.links.map((l) => (l.id === link.id ? updated : l)) };
+}
+
+/**
+ * Corrects a node: `name` ({ native, en }), `years` ({ from, to }, a blank
+ * clears one) and `note`. Corrected names and years survive a refresh.
+ */
+export function updateNode(graph, id, patch = {}) {
+  return {
+    ...graph,
+    nodes: graph.nodes.map((n) => {
+      if (n.id !== id) return n;
+      const next = { ...n };
+      if (patch.name) next.name = { ...n.name, ...patch.name };
+      if (patch.years) next.years = { ...patch.years };
+      if (patch.name || patch.years) next.edited = true;
+      if ("note" in patch) next.note = patch.note;
+      return normalizeNode(next);
+    }),
+  };
+}
+
+/** Changes a link's note or citation. */
+export function updateLink(graph, id, patch = {}) {
+  return {
+    ...graph,
+    links: graph.links.map((l) => (l.id === id ? normalizeLink({ ...l, ...pick(patch, ["note", "citation"]) }) : l)),
+  };
+}
+
+/** Hides (or shows again) a node or a link: `{ nodeId }` or `{ linkId }`. */
+export function setHidden(graph, { nodeId, linkId }, hidden = true) {
+  const flip = (item) => (hidden ? { ...item, hidden: true } : withoutKey(item, "hidden"));
+  return {
+    nodes: graph.nodes.map((n) => (n.id === nodeId ? flip(n) : n)),
+    links: graph.links.map((l) => (l.id === linkId ? flip(l) : l)),
+  };
+}
+
+/**
+ * Takes a node off the map: deleted with its links when the owner added it,
+ * hidden when it was generated (its links stay, unseen, for if it comes back).
+ */
+export function removeNode(graph, id) {
+  const node = graph.nodes.find((n) => n.id === id);
+  if (!node) return graph;
+  if (generated(node)) return setHidden(graph, { nodeId: id });
+  return {
+    nodes: graph.nodes.filter((n) => n.id !== id).map((n) => (n.authorIds?.includes(id) ? normalizeNode({ ...n, authorIds: n.authorIds.filter((a) => a !== id) }) : n)),
+    links: graph.links.filter((l) => l.from !== id && l.to !== id),
+  };
+}
+
+/** Takes a link off the map: deleted when the owner or a suggestion added it, hidden when generated. */
+export function removeLink(graph, id) {
+  const link = graph.links.find((l) => l.id === id);
+  if (!link) return graph;
+  if (generated(link)) return setHidden(graph, { linkId: id });
+  return { ...graph, links: graph.links.filter((l) => l.id !== id) };
+}
+
+/** What the owner has hidden: nodes, and links between nodes still shown. */
+export function hiddenItems(graph) {
+  const shown = new Set(graph.nodes.filter((n) => !n.hidden).map((n) => n.id));
+  return {
+    nodes: graph.nodes.filter((n) => n.hidden),
+    links: graph.links.filter((l) => l.hidden && shown.has(l.from) && shown.has(l.to)),
+  };
+}
+
+function withoutKey(item, key) {
+  const { [key]: _drop, ...rest } = item;
+  return rest;
+}
+
+function pick(object, keys) {
+  return Object.fromEntries(keys.filter((k) => k in object).map((k) => [k, object[k]]));
 }

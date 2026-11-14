@@ -35,7 +35,7 @@ const reducedMotion = () => Boolean(window.matchMedia?.("(prefers-reduced-motion
  * influences as curves. On a phone the same lives run down the page as a list
  * with a small bar each.
  */
-function MapTimelineView({ graph, scope, books, canAdd, onAddBook, selectedId, onSelect, onShowInList }) {
+function MapTimelineView({ graph, scope, books, canAdd, onAddBook, selectedId, onSelect, onShowInList, onEdit }) {
   const { t } = useLanguage();
   const lang = scope?.langCode;
   const narrow = useMatches(NARROW);
@@ -249,6 +249,7 @@ function MapTimelineView({ graph, scope, books, canAdd, onAddBook, selectedId, o
       onJump={choose}
       onClose={() => onSelect(null)}
       onShowInList={onShowInList}
+      onEdit={onEdit}
       path={path}
       onPath={onPath}
     />
